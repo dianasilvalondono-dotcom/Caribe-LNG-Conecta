@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
-         getCronograma, getHuellaSocial, updateCronogramaEstado } from './lib/supabase'
+         getCronograma, getHuellaSocial, updateCronogramaEstado,
+         getReportesSemanales, addReporteSemanal, getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -424,6 +425,329 @@ function AgreementCard({ ag, canEdit, onEdit }) {
   )
 }
 
+
+// InputSemanal component
+function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved }) {
+  const [tab, setTab] = useState('reporte')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const myTerr = territorio || 'Barbosa'
+
+  // Reporte semanal form
+  const [semana, setSemana] = useState('')
+  const [fechaCorte, setFechaCorte] = useState(new Date().toISOString().split('T')[0])
+  const [acuerdosFirmados, setAcuerdosFirmados] = useState(0)
+  const [compromisosNuevos, setCompromisosNuevos] = useState(0)
+  const [compromisosCumplidos, setCompromisosCumplidos] = useState(0)
+  const [diagnosticos, setDiagnosticos] = useState(0)
+  const [actasVecindad, setActasVecindad] = useState(0)
+  const [induccionesPgs, setInduccionesPgs] = useState(0)
+  const [eventosAid, setEventosAid] = useState(0)
+  const [eventosAii, setEventosAii] = useState(0)
+  const [eventosInst, setEventosInst] = useState(0)
+  const [asistentes, setAsistentes] = useState(0)
+  const [pqrsRecibidas, setPqrsRecibidas] = useState(0)
+  const [pqrsCerradas, setPqrsCerradas] = useState(0)
+  const [pqrsPendientes, setPqrsPendientes] = useState(0)
+  const [incidentes, setIncidentes] = useState(0)
+  const [actoresGest, setActoresGest] = useState(0)
+  const [alertasDac, setAlertasDac] = useState(0)
+  const [logros, setLogros] = useState('')
+  const [dificultades, setDificultades] = useState('')
+  const [escalamientos, setEscalamientos] = useState('')
+  const [prioridades, setPrioridades] = useState('')
+
+  // Seguimiento form
+  const [sgAcuerdo, setSgAcuerdo] = useState('')
+  const [sgCompromiso, setSgCompromiso] = useState('')
+  const [sgFecha, setSgFecha] = useState('')
+  const [sgResponsableCl, setSgResponsableCl] = useState('')
+  const [sgResponsableCom, setSgResponsableCom] = useState('')
+  const [sgEstado, setSgEstado] = useState('Pendiente')
+  const [sgObservacion, setSgObservacion] = useState('')
+
+  async function handleSaveReporte() {
+    if (!semana || !fechaCorte) return
+    setSaving(true)
+    try {
+      await addReporteSemanal({
+        semana: parseInt(semana), fecha_corte: fechaCorte, territorio: myTerr, user_id: session.user.id,
+        acuerdos_firmados: acuerdosFirmados, compromisos_nuevos: compromisosNuevos, compromisos_cumplidos: compromisosCumplidos,
+        diagnosticos, actas_vecindad: actasVecindad, inducciones_pgs: induccionesPgs,
+        eventos_aid: eventosAid, eventos_aii: eventosAii, eventos_institucional: eventosInst, asistentes_total: asistentes,
+        pqrs_recibidas: pqrsRecibidas, pqrs_cerradas: pqrsCerradas, pqrs_pendientes: pqrsPendientes, incidentes,
+        actores_gestionados: actoresGest, alertas_escaladas_dac: alertasDac,
+        logros, dificultades, escalamientos, prioridades_proxima: prioridades
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+      onSaved()
+    } finally { setSaving(false) }
+  }
+
+  async function handleSaveSeguimiento() {
+    if (!sgAcuerdo || !sgCompromiso) return
+    setSaving(true)
+    try {
+      await addSeguimientoAcuerdo({
+        territorio: myTerr, acuerdo: sgAcuerdo, compromiso: sgCompromiso,
+        fecha_pactada: sgFecha || null, responsable_cl: sgResponsableCl, responsable_comunidad: sgResponsableCom,
+        estado: sgEstado, observacion: sgObservacion, user_id: session.user.id,
+        semana_reporte: semana ? parseInt(semana) : null
+      })
+      setSgAcuerdo(''); setSgCompromiso(''); setSgFecha(''); setSgResponsableCl(''); setSgResponsableCom(''); setSgObservacion('')
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+      onSaved()
+    } finally { setSaving(false) }
+  }
+
+  const myReportes = reportes.filter(r => r.territorio === myTerr)
+  const mySeguimiento = seguimiento.filter(s => s.territorio === myTerr)
+
+  const NumField = ({ label, value, onChange }) => (
+    <div style={{ flex: 1, minWidth: 120 }}>
+      <label style={{ fontSize: 10, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{label}</label>
+      <input type="number" min="0" value={value} onChange={e => onChange(parseInt(e.target.value) || 0)}
+        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 14,
+          fontWeight: 700, color: C.text, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', textAlign: 'center' }} />
+    </div>
+  )
+
+  const TextArea = ({ label, value, onChange, placeholder }) => (
+    <div style={{ marginBottom: 10 }}>
+      <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
+      <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 12,
+          resize: 'none', height: 60, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
+    </div>
+  )
+
+  return (
+    <div style={{ maxWidth: 640, margin: '0 auto' }}>
+      <div style={{ marginBottom: 18 }}>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} &rarr; {myTerr} &rarr; Cada viernes</p>
+      </div>
+
+      {saved && (
+        <div style={{ background: '#dcfce7', borderRadius: 10, padding: '10px 16px', marginBottom: 14, fontSize: 13, color: '#166534', fontWeight: 600 }}>
+          Guardado correctamente
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
+        {[
+          { id: 'reporte', label: 'Reporte Semanal' },
+          { id: 'seguimiento', label: 'Seguimiento Acuerdos' },
+          { id: 'historico', label: 'Historico' },
+        ].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
+              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* REPORTE SEMANAL */}
+      {tab === 'reporte' && (
+        <div>
+          {/* Header */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 0 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 10, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3 }}>SEMANA #</label>
+                <input type="number" value={semana} onChange={e => setSemana(e.target.value)} placeholder="1-52"
+                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 14,
+                    fontWeight: 700, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+              </div>
+              <div style={{ flex: 2 }}>
+                <label style={{ fontSize: 10, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3 }}>FECHA CORTE</label>
+                <input type="date" value={fechaCorte} onChange={e => setFechaCorte(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 13,
+                    outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* P1: Acuerdos */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P1 &mdash; Acuerdos Sociales</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <NumField label="Firmados" value={acuerdosFirmados} onChange={setAcuerdosFirmados} />
+              <NumField label="Compromisos nuevos" value={compromisosNuevos} onChange={setCompromisosNuevos} />
+              <NumField label="Cumplidos" value={compromisosCumplidos} onChange={setCompromisosCumplidos} />
+            </div>
+          </div>
+
+          {/* P2: Huella Social */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Huella Social</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <NumField label="Diagnosticos" value={diagnosticos} onChange={setDiagnosticos} />
+              <NumField label="Actas vecindad" value={actasVecindad} onChange={setActasVecindad} />
+              <NumField label="Inducciones PGS" value={induccionesPgs} onChange={setInduccionesPgs} />
+            </div>
+          </div>
+
+          {/* P3: Eventos */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P3 &mdash; Eventos y Socializaciones</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <NumField label="Eventos AID" value={eventosAid} onChange={setEventosAid} />
+              <NumField label="Eventos AII" value={eventosAii} onChange={setEventosAii} />
+              <NumField label="Institucional" value={eventosInst} onChange={setEventosInst} />
+              <NumField label="Asistentes total" value={asistentes} onChange={setAsistentes} />
+            </div>
+          </div>
+
+          {/* PQRS */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>PQRS / Incidentes</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <NumField label="PQRS recibidas" value={pqrsRecibidas} onChange={setPqrsRecibidas} />
+              <NumField label="Cerradas" value={pqrsCerradas} onChange={setPqrsCerradas} />
+              <NumField label="Pendientes" value={pqrsPendientes} onChange={setPqrsPendientes} />
+              <NumField label="Incidentes" value={incidentes} onChange={setIncidentes} />
+            </div>
+          </div>
+
+          {/* Actores */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Actores y Alertas</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <NumField label="Actores gestionados" value={actoresGest} onChange={setActoresGest} />
+              <NumField label="Alertas escaladas DAC" value={alertasDac} onChange={setAlertasDac} />
+            </div>
+          </div>
+
+          {/* Narrativo */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Resumen Narrativo</div>
+            <TextArea label="Logros de la semana" value={logros} onChange={setLogros} placeholder="Que se logro esta semana..." />
+            <TextArea label="Dificultades / barreras" value={dificultades} onChange={setDificultades} placeholder="Que dificultades hubo..." />
+            <TextArea label="Escalamientos a DAC" value={escalamientos} onChange={setEscalamientos} placeholder="Que se escalo a Diana..." />
+            <TextArea label="Prioridades proxima semana" value={prioridades} onChange={setPrioridades} placeholder="Que hay que hacer la proxima semana..." />
+          </div>
+
+          <button onClick={handleSaveReporte} disabled={saving || !semana}
+            style={{ width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
+              border: 'none', borderRadius: 10, padding: '13px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', marginBottom: 20 }}>
+            {saving ? 'Guardando...' : 'Guardar Reporte Semanal'}
+          </button>
+        </div>
+      )}
+
+      {/* SEGUIMIENTO ACUERDOS */}
+      {tab === 'seguimiento' && (
+        <div>
+          {/* Add new */}
+          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Nuevo Compromiso</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div>
+                <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Acuerdo</label>
+                <select value={sgAcuerdo} onChange={e => setSgAcuerdo(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 12, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
+                  <option value="">Seleccionar acuerdo...</option>
+                  {myTerr === 'Barbosa' ? ['B1: Corresponsabilidad Comunitaria', 'B2: Infraestructura y Entorno', 'B3: Gestion Social y Control de Conflictos'].map(a => <option key={a} value={a}>{a}</option>)
+                    : ['T1: Sector Pesquero, Maritimo y Turistico', 'T2: Desarrollo de Capacidades y Convivencia', 'T3: Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </div>
+              <Field label="Compromiso especifico" value={sgCompromiso} onChange={setSgCompromiso} placeholder="Que se comprometio..." />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ flex: 1 }}><Field label="Fecha pactada" value={sgFecha} onChange={setSgFecha} type="date" /></div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Estado</label>
+                  <select value={sgEstado} onChange={e => setSgEstado(e.target.value)}
+                    style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 12, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
+                    {['Pendiente', 'En proceso', 'Cumplido', 'Incumplido', 'Escalado'].map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ flex: 1 }}><Field label="Responsable CL" value={sgResponsableCl} onChange={setSgResponsableCl} placeholder="Caribe LNG" /></div>
+                <div style={{ flex: 1 }}><Field label="Responsable Comunidad" value={sgResponsableCom} onChange={setSgResponsableCom} placeholder="Comunidad" /></div>
+              </div>
+              <Field label="Observacion" value={sgObservacion} onChange={setSgObservacion} placeholder="Notas adicionales..." />
+              <button onClick={handleSaveSeguimiento} disabled={saving || !sgAcuerdo || !sgCompromiso}
+                style={{ width: '100%', background: saving ? '#94a3b8' : C.accent, color: 'white',
+                  border: 'none', borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
+                {saving ? 'Guardando...' : 'Agregar Compromiso'}
+              </button>
+            </div>
+          </div>
+
+          {/* List existing */}
+          <div style={{ fontSize: 11, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+            Compromisos registrados ({mySeguimiento.length})
+          </div>
+          {mySeguimiento.map(s => {
+            const stColor = s.estado === 'Cumplido' ? C.green : s.estado === 'En proceso' ? C.orange : s.estado === 'Incumplido' || s.estado === 'Escalado' ? C.red : C.subtle
+            return (
+              <div key={s.id} style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderLeft: `4px solid ${stColor}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: C.accent }}>{s.acuerdo}</div>
+                  <Tag color={stColor}>{s.estado}</Tag>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: C.text, marginBottom: 2 }}>{s.compromiso}</div>
+                {s.fecha_pactada && <div style={{ fontSize: 10, color: C.subtle }}>Fecha: {new Date(s.fecha_pactada).toLocaleDateString('es-CO')}</div>}
+                {s.observacion && <div style={{ fontSize: 10, color: C.muted, marginTop: 3 }}>{s.observacion}</div>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* HISTORICO */}
+      {tab === 'historico' && (
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+            Reportes enviados ({myReportes.length})
+          </div>
+          {myReportes.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 40, color: C.subtle, fontSize: 13 }}>No hay reportes aun. Llena tu primer reporte semanal.</div>
+          )}
+          {myReportes.map(r => {
+            const totalEventos = (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0)
+            const semaforo = r.incidentes > 0 ? C.red : r.pqrs_pendientes > 3 ? C.orange : C.green
+            return (
+              <div key={r.id} style={{ background: C.card, borderRadius: 12, padding: '14px 16px', marginBottom: 10,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${semaforo}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>Semana {r.semana}</span>
+                    <span style={{ fontSize: 11, color: C.subtle, marginLeft: 8 }}>{new Date(r.fecha_corte).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  </div>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: semaforo }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 8 }}>
+                  {[
+                    { label: 'Acuerdos', value: r.acuerdos_firmados, color: C.accent },
+                    { label: 'Eventos', value: totalEventos, color: C.tolu },
+                    { label: 'PQRS pend.', value: r.pqrs_pendientes, color: r.pqrs_pendientes > 0 ? C.orange : C.green },
+                    { label: 'Actores', value: r.actores_gestionados, color: C.barbosa },
+                  ].map(s => (
+                    <div key={s.label} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 18, fontWeight: 900, color: s.color }}>{s.value}</div>
+                      <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, textTransform: 'uppercase' }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+                {r.logros && <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Logros: </span>{r.logros}</div>}
+                {r.dificultades && <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginTop: 2 }}><span style={{ fontWeight: 700, color: C.text }}>Dificultades: </span>{r.dificultades}</div>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ━━ Main App ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function App() {
   const [session, setSession] = useState(null)
@@ -443,6 +767,8 @@ export default function App() {
   const [cronograma, setCronograma] = useState([])
   const [huellaSocial, setHuellaSocial] = useState([])
   const [cronoFilter, setCronoFilter] = useState('Todos')
+  const [reportes, setReportes] = useState([])
+  const [seguimiento, setSeguimiento] = useState([])
 
   // ━━ Auth ━━
   useEffect(() => {
@@ -466,11 +792,13 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, cr, hs] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial()])
+      const [a, ag, cr, hs, rp, sg] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos()])
       setActors(a || [])
       setAgreements(ag || [])
       setCronograma(cr || [])
       setHuellaSocial(hs || [])
+      setReportes(rp || [])
+      setSeguimiento(sg || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -482,6 +810,8 @@ export default function App() {
     const ch = supabase.channel('crm-updates')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'actors' }, () => loadData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'agreements' }, () => loadData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reportes_semanales' }, () => loadData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'seguimiento_acuerdos' }, () => loadData())
       .subscribe()
     return () => supabase.removeChannel(ch)
   }, [session, loadData])
@@ -523,6 +853,7 @@ export default function App() {
     { id: 'actores', label: 'Actores', icon: '' },
     { id: 'acuerdos', label: 'Acuerdos', icon: '' },
     { id: 'cronograma', label: 'Cronograma', icon: '' },
+    { id: 'input', label: 'Input Semanal', icon: '' },
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '' }] : []),
   ]
 
@@ -830,6 +1161,13 @@ export default function App() {
           </div>
         )}
 
+
+        {/* INPUT SEMANAL */}
+        {view === 'input' && (
+          <InputSemanal session={session} profile={profile} territorio={myTerritorio}
+            reportes={reportes} seguimiento={seguimiento} onSaved={loadData} />
+        )}
+
         {/* ━━ GESTORA VIEW ━━ */}
         {view === 'gestora' && isGestora && (
           <div style={{ maxWidth: 480, margin: '0 auto' }}>
@@ -893,4 +1231,3 @@ export default function App() {
     </div>
   )
 }
-
