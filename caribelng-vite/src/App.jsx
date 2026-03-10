@@ -250,10 +250,10 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Estado de la relacion</div>
             <div style={{ fontSize: 16, color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</div>
             <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
-              {actor.semaforo === 'rojo' && 'No hemos logrado acercamiento o hay oposicion activa'}
-              {actor.semaforo === 'naranja' && 'Hay tension o el actor esta evitando el dialogo'}
-              {actor.semaforo === 'amarillo' && 'Necesita seguimiento, falta comunicacion reciente'}
-              {actor.semaforo === 'verde' && 'Relacion positiva con comunicacion regular'}
+              {actor.semaforo === 'rojo' && 'No se ha logrado acercamiento o hay oposicion activa'}
+              {actor.semaforo === 'naranja' && 'Relacion inactiva o sin contacto reciente'}
+              {actor.semaforo === 'amarillo' && 'En proceso de acercamiento, falta consolidar la relacion'}
+              {actor.semaforo === 'verde' && 'Relacion activa con comunicacion regular'}
             </div>
           </div>
           <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
@@ -283,7 +283,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           <div style={{ flex: 1 }}><div style={{ fontSize: 16, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>CUADRANTE</div><div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>{actor.cuadrante}</div></div>
         </div>
 
-        {actor.owner && <InfoRow label="Owner" val={actor.owner} />}
+        {actor.owner && <InfoRow label="Owner Caribe LNG" val={actor.owner} />}
         {actor.frecuencia && <InfoRow label="Frecuencia" val={actor.frecuencia} />}
         {actor.contacto && <InfoRow label="Contacto" val={actor.contacto} />}
 
