@@ -127,3 +127,17 @@ export async function upsertProfile(userId, { full_name, avatar_url, email, role
     .upsert({ id: userId, full_name, avatar_url, email, role, updated_at: new Date().toISOString() })
   if (error) throw error
 }
+export async function getCronograma() {
+  const { data } = await supabase.from('cronograma').select('*').order('territorio').order('numero')
+  return data
+}
+
+export async function getHuellaSocial() {
+  const { data } = await supabase.from('huella_social').select('*').order('territorio').order('id')
+  return data
+}
+
+export async function updateCronogramaEstado(id, estado) {
+  const { data } = await supabase.from('cronograma').update({ estado }).eq('id', id)
+  return data
+}
