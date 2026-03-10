@@ -22,10 +22,10 @@ const C = {
 }
 
 const SEMAFORO = {
-  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: '🟢' },
-  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: '🟡' },
-  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: '🟠' },
-  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: '🔴' },
+  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: 🟢 },
+  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: 🟡 },
+  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: 🟠 },
+  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: 🔴 },
 }
 
 const TIPO_COLOR = {
@@ -513,10 +513,10 @@ export default function App() {
   if (!session) return <LoginScreen />
 
   const NAV = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'actores', label: 'Actores', icon: '' },
-    { id: 'acuerdos', label: 'Acuerdos', icon: '' },
-    ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '' }] : []),
+    { id: 'dashboard', label: 'Dashboard', icon: 📊 },
+    { id: 'actores', label: 'Actores', icon:  },
+    { id: 'acuerdos', label: 'Acuerdos', icon:  },
+    ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: }] : []),
   ]
 
   return (
