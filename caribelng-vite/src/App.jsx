@@ -1054,13 +1054,15 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
               border: 'none', borderRadius: 10, padding: '13px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', marginBottom: 20 }}>
             {saving ? 'Guardando...' : 'Guardar Reporte Semanal'}
           </button>
-        </div> 
-             <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgC30umcdhdBRY5F1Sjx_MMrAa8c1li2QamoYiBNuVLR3LE?e=ZvD6QH" target="_blank" rel="noopener"
+          <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgC30umcdhdBRY5F1Sjx_MMrAa8c1li2QamoYiBNuVLR3LE?e=ZvD6QH" target="_blank" rel="noopener"
             style={{ display: 'block', width: '100%', background: '#f1f5f9', border: '1px solid #e2e8f0',
               borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              textAlign: 'center', textDecoration: 'none', color: C.accent, marginBottom: 20, boxSizing: 'border-box' }}>
+              textAlign: 'center', textDecoration: 'none', color: C.accent, boxSizing: 'border-box' }}>
             Abrir OneDrive — Subir evidencias ({myTerr})
-          </a>      )}
+          </a>
+        </div>
+      )}
+
       {/* SEGUIMIENTO ACUERDOS */}
       {tab === 'seguimiento' && (
         <div>
@@ -1331,50 +1333,31 @@ export default function App() {
             <div style={{ marginBottom: 20 }}>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Dashboard Ejecutivo</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
+              <button onClick={() => window.print()} style={{ marginTop: 6, background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
             </div>
-            {/* Alertas inteligentes */}
             {(() => {
               const alertas = []
               const hoy = new Date()
-              
-              // PQRS pendientes del ultimo reporte
               const ultimosReportes = {}
-              reportes.forEach(r => {
-                if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r
-              })
+              reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
               Object.values(ultimosReportes).forEach(r => {
                 if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} PQRS pendientes`, color: C.orange, bg: '#fff7ed' })
-                if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s) reportado(s)`, color: C.red, bg: '#fef2f2' })
+                if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, bg: '#fef2f2' })
                 if (r.alertas_escaladas_dac > 0) alertas.push({ icon: '📢', text: `${r.territorio}: ${r.alertas_escaladas_dac} alerta(s) escalada(s) a DAC`, color: C.red, bg: '#fef2f2' })
               })
-
-              // Compromisos vencidos
               seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
-                const fecha = new Date(s.fecha_pactada)
-                if (fecha < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 60)}... (${s.territorio})`, color: C.red, bg: '#fef2f2' })
+                if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 50)}... (${s.territorio})`, color: C.red, bg: '#fef2f2' })
               })
-
-              // Eventos proximos del cronograma (esta semana)
-              const enUnaSemana = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000)
               cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
                 alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 60)}...`, color: C.accent, bg: '#eff6ff' })
               })
-
-              // Riesgos en accion inmediata
               const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
-              if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata requieren gestion`, color: C.red, bg: '#fef2f2' })
-
-              // Sin reportes esta semana
-              const semanActual = Math.ceil((hoy - new Date(hoy.getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000))
-              const reportesSemana = reportes.filter(r => r.semana === semanActual)
-              if (reportesSemana.length === 0 && hoy.getDay() >= 4) alertas.push({ icon: '📝', text: 'Faltan reportes semanales de las gestoras', color: C.orange, bg: '#fff7ed' })
-
+              if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata`, color: C.red, bg: '#fef2f2' })
               if (!alertas.length) return null
               return (
                 <div style={{ marginBottom: 16 }}>
                   {alertas.slice(0, 6).map((a, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: a.bg,
-                      borderRadius: 8, padding: '8px 12px', marginBottom: 4, borderLeft: `3px solid ${a.color}` }}>
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: a.bg, borderRadius: 8, padding: '8px 12px', marginBottom: 4, borderLeft: `3px solid ${a.color}` }}>
                       <span style={{ fontSize: 14 }}>{a.icon}</span>
                       <span style={{ fontSize: 12, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span>
                     </div>
