@@ -477,7 +477,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
         {[
-          { label: 'Criticos', count: rojos.length, color: C.red, bg: '#fee2e2' },
+          { label: 'Accion inmediata', count: rojos.length, color: C.red, bg: '#fee2e2' },
           { label: 'Vigilar', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
           { label: 'Bajo control', count: verdes.length, color: C.green, bg: '#dcfce7' },
           { label: 'En revision', count: azules.length, color: C.accent, bg: '#dbeafe' },
@@ -1354,7 +1354,7 @@ export default function App() {
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
                 <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
-                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Requiere atención', stats.rojo]].map(([k, lbl, v]) => (
+                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'En gestion activa', stats.rojo]].map(([k, lbl, v]) => (
                   <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
                     <SemDot s={k} size={9} />
                     <span style={{ fontSize: 12, color: C.muted, width: 140 }}>{lbl}</span>
@@ -1383,7 +1383,7 @@ export default function App() {
             </div>
             {/* Critical actors */}
             <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-              <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>⚠️ Actores Accion inmediata — Acción requerida</h3>
+              <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
                 {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').slice(0, 8).map(a => (
                   <div key={a.id} onClick={() => { setSelectedActor(a); setView('actores') }}
