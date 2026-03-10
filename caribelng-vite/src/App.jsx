@@ -22,10 +22,10 @@ const C = {
 }
 
 const SEMAFORO = {
-  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: '🟢' },
-  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: '🟡' },
-  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: '🟠' },
-  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: '🔴' },
+  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: '🟢' },
+  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: '🟡' },
+  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: '🟠' },
+  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: '🔴' },
 }
 
 const TIPO_COLOR = {
@@ -324,7 +324,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           <button onClick={handleSave} disabled={saving || !resumen.trim()}
             style={{ marginTop: 8, width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
               border: 'none', borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
-            {saving ? '💾 Guardando...' : '💾 Guardar novedad'}
+            {saving ? '💾 Guardando...' : '💾 Guardar novedad'}
           </button>
         </div>
 
@@ -566,10 +566,10 @@ export default function App() {
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 20 }}>
-              <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
-              <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
+              <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
+              <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
               <StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" />
-              <StatCard label="Críticos 🔴" value={stats.rojo} color={C.red} icon="🚨" />
+              <StatCard label="Críticos 🔴" value={stats.rojo} color={C.red} icon="🚨" />
               <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
@@ -647,7 +647,7 @@ export default function App() {
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
                 style={{ flex: 1, minWidth: 180, border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 11px',
                   fontSize: 13, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
               {[
@@ -704,7 +704,7 @@ export default function App() {
         {view === 'gestora' && isGestora && (
           <div style={{ maxWidth: 480, margin: '0 auto' }}>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
+              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
             </div>
             {/* Priority actors */}
@@ -725,7 +725,7 @@ export default function App() {
             </div>
             {/* Birthday widget */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
+              <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
               {(() => {
                 const today = new Date()
                 const upcoming = actors.filter(a => a.cumpleanos).map(a => {
@@ -743,7 +743,7 @@ export default function App() {
                       <div style={{ fontSize: 11, color: C.subtle }}>{a.dateStr}</div>
                     </div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: a.diff <= 7 ? C.red : C.orange }}>
-                      {a.diff === 0 ? '¡Hoy! 🎉' : `En ${a.diff} días`}
+                      {a.diff === 0 ? '¡Hoy! 🎉' : `En ${a.diff} días`}
                     </div>
                   </div>
                 ))
