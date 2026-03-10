@@ -29,8 +29,8 @@ const SEMAFORO = {
 }
 
 const TIPO_COLOR = {
-  Comunitario: C.tolu, Pol√≠tico: '#ec4899', Institucional: C.barbosa,
-  Empresarial: '#f59e0b', Medi√°tico: C.muted, Social: '#10b981', Educativo: '#06b6d4',
+  Comunitario: C.tolu, Político: '#ec4899', Institucional: C.barbosa,
+  Empresarial: '#f59e0b', Mediático: C.muted, Social: '#10b981', Educativo: '#06b6d4',
 }
 function getTipoColor(tipo = '') {
   for (const k of Object.keys(TIPO_COLOR)) if (tipo.includes(k)) return TIPO_COLOR[k]
