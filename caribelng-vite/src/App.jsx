@@ -247,7 +247,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
         {/* Key info grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
           {[
-            { label: 'Semáforo', val: <span style={{ color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</span> },
+            { label: 'Estado de la relación', val: <span style={{ color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</span> },
             { label: 'Posición', val: actor.posicion },
             { label: 'Riesgo', val: <span style={{ color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</span> },
           ].map(({ label, val }) => (
@@ -490,7 +490,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
       </div>
 
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-        {[{ id: 'mapa', label: 'Mapa de Riesgos' }, { id: 'legislativo', label: 'Riesgos Legislativos' }, { id: 'cronograma', label: 'Cronograma Politico' }].map(t => (
+        {[{ id: 'mapa', label: 'Mapa de Riesgos' }, { id: 'legislativo', label: 'Riesgos Legislativos' }, { id: 'cronograma', label: 'Calendario electoral' }].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
               border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
@@ -525,9 +525,9 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
                   <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
                     <div style={{ paddingTop: 12 }}>
                       {r.descripcion && <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
-                      {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Quien detona: </span>{r.quien_detona}</div>}
-                      {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien mitiga: </span>{r.quien_mitiga}</div>}
-                      {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo: </span>{r.que_hacemos}</div>}
+                      {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Quien puede activar este riesgo: </span>{r.quien_detona}</div>}
+                      {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien nos ayuda a controlarlo: </span>{r.quien_mitiga}</div>}
+                      {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo hoy: </span>{r.que_hacemos}</div>}
                       {bt.length > 0 && (
                         <div style={{ marginTop: 10 }}>
                           <div style={{ fontSize: 16, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Causa y efecto</div>
@@ -637,52 +637,52 @@ function KPIsView({ reportes, seguimiento }) {
   }
 
   const KPIS_BARBOSA = [
-    { cat: 'SOCIALIZACIONES Y EVENTOS', items: [
-      { name: 'Socializaciones AID', field: 'eventos_aid', meta: 12, base: '1/mes' },
-      { name: 'Socializaciones AII', field: 'eventos_aii', meta: 4, base: '1/trim' },
+    { cat: 'EVENTOS Y REUNIONES', items: [
+      { name: 'Eventos area de influencia directa', field: 'eventos_aid', meta: 12, base: '1/mes' },
+      { name: 'Eventos area de influencia indirecta', field: 'eventos_aii', meta: 4, base: '1/trim' },
       { name: 'Reuniones institucionales', field: 'eventos_institucional', meta: 4, base: '1/trim' },
     ]},
-    { cat: 'DIAGNOSTICO TERRITORIAL', items: [
-      { name: 'Diagnosticos sociofamiliares', field: 'diagnosticos', meta: 53, base: '53 viv/sem' },
+    { cat: 'DIAGNOSTICO EN TERRITORIO', items: [
+      { name: 'Visitas a familias', field: 'diagnosticos', meta: 53, base: '53 viv/sem' },
       { name: 'Actas de vecindad', field: 'actas_vecindad', meta: 0, base: 'Segun obra' },
-      { name: 'Inducciones PGS', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
+      { name: 'Capacitaciones a contratistas', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
     ]},
-    { cat: 'PQRS', items: [
-      { name: 'PQRS recibidas', field: 'pqrs_recibidas', meta: 0, base: '0/mes', invert: true },
-      { name: 'PQRS pendientes', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
+    { cat: 'QUEJAS Y RECLAMOS', items: [
+      { name: 'Quejas recibidas', field: 'pqrs_recibidas', meta: 0, base: '0/mes', invert: true },
+      { name: 'Quejas sin resolver', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
       { name: 'Incidentes', field: 'incidentes', meta: 0, base: '0/mes', invert: true },
     ]},
-    { cat: 'ACUERDOS SOCIALES', items: [
+    { cat: 'ACUERDOS CON LA COMUNIDAD', items: [
       { name: 'Acuerdos firmados', field: 'acuerdos_firmados', meta: 3, base: 'Antes COD' },
       { name: 'Compromisos cumplidos', field: 'compromisos_cumplidos', meta: 0, base: '>=90%' },
     ]},
-    { cat: 'ACTORES', items: [
-      { name: 'Actores gestionados', field: 'actores_gestionados', meta: 0, base: 'Semanal' },
+    { cat: 'CONTACTOS Y RELACIONES', items: [
+      { name: 'Personas contactadas', field: 'actores_gestionados', meta: 0, base: 'Semanal' },
       { name: 'Alertas escaladas DAC', field: 'alertas_escaladas_dac', meta: 0, base: '0/mes', invert: true },
     ]},
   ]
 
   const KPIS_TOLU = [
-    { cat: 'SOCIALIZACIONES Y EVENTOS', items: [
-      { name: 'Socializaciones AID', field: 'eventos_aid', meta: 12, base: '1/mes' },
-      { name: 'Socializaciones AII', field: 'eventos_aii', meta: 4, base: '1/trim' },
+    { cat: 'EVENTOS Y REUNIONES', items: [
+      { name: 'Eventos area de influencia directa', field: 'eventos_aid', meta: 12, base: '1/mes' },
+      { name: 'Eventos area de influencia indirecta', field: 'eventos_aii', meta: 4, base: '1/trim' },
       { name: 'Reuniones institucionales', field: 'eventos_institucional', meta: 4, base: '1/trim' },
     ]},
-    { cat: 'DIAGNOSTICO TERRITORIAL', items: [
-      { name: 'Asociaciones mapeadas', field: 'diagnosticos', meta: 0, base: 'Acumulativo' },
-      { name: 'Inducciones PGS', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
+    { cat: 'DIAGNOSTICO EN TERRITORIO', items: [
+      { name: 'Organizaciones identificadas', field: 'diagnosticos', meta: 0, base: 'Acumulativo' },
+      { name: 'Capacitaciones a contratistas', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
     ]},
-    { cat: 'PQRS', items: [
-      { name: 'PQRS recibidas', field: 'pqrs_recibidas', meta: 0, base: '0/mes', invert: true },
-      { name: 'PQRS pendientes', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
+    { cat: 'QUEJAS Y RECLAMOS', items: [
+      { name: 'Quejas recibidas', field: 'pqrs_recibidas', meta: 0, base: '0/mes', invert: true },
+      { name: 'Quejas sin resolver', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
       { name: 'Incidentes', field: 'incidentes', meta: 0, base: '0/mes', invert: true },
     ]},
-    { cat: 'ACUERDOS SOCIALES', items: [
+    { cat: 'ACUERDOS CON LA COMUNIDAD', items: [
       { name: 'Acuerdos firmados', field: 'acuerdos_firmados', meta: 3, base: 'Antes COD' },
       { name: 'Compromisos cumplidos', field: 'compromisos_cumplidos', meta: 0, base: '>=90%' },
     ]},
-    { cat: 'ACTORES', items: [
-      { name: 'Actores gestionados', field: 'actores_gestionados', meta: 0, base: 'Semanal' },
+    { cat: 'CONTACTOS Y RELACIONES', items: [
+      { name: 'Personas contactadas', field: 'actores_gestionados', meta: 0, base: 'Semanal' },
       { name: 'Alertas escaladas DAC', field: 'alertas_escaladas_dac', meta: 0, base: '0/mes', invert: true },
     ]},
   ]
@@ -1003,9 +1003,9 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Diagnóstico Territorial</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="Diagnosticos" value={diagnosticos} onChange={setDiagnosticos} />
-              <NumField label="Actas vecindad" value={actasVecindad} onChange={setActasVecindad} />
-              <NumField label="Inducciones PGS" value={induccionesPgs} onChange={setInduccionesPgs} />
+              <NumField label="Visitas y diagnosticos" value={diagnosticos} onChange={setDiagnosticos} />
+              <NumField label="Actas y acuerdos vecinales" value={actasVecindad} onChange={setActasVecindad} />
+              <NumField label="Capacitaciones a contratistas" value={induccionesPgs} onChange={setInduccionesPgs} />
             </div>
           </div>
 
@@ -1013,18 +1013,18 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P3 &mdash; Eventos y Socializaciones</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="Eventos AID" value={eventosAid} onChange={setEventosAid} />
-              <NumField label="Eventos AII" value={eventosAii} onChange={setEventosAii} />
+              <NumField label="Eventos area de influencia directa" value={eventosAid} onChange={setEventosAid} />
+              <NumField label="Eventos area de influencia indirecta" value={eventosAii} onChange={setEventosAii} />
               <NumField label="Institucional" value={eventosInst} onChange={setEventosInst} />
               <NumField label="Asistentes total" value={asistentes} onChange={setAsistentes} />
             </div>
           </div>
 
-          {/* PQRS */}
+          {/* quejas */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>PQRS / Incidentes</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Quejas, peticiones y reclamos</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="PQRS recibidas" value={pqrsRecibidas} onChange={setPqrsRecibidas} />
+              <NumField label="Quejas recibidas" value={pqrsRecibidas} onChange={setPqrsRecibidas} />
               <NumField label="Cerradas" value={pqrsCerradas} onChange={setPqrsCerradas} />
               <NumField label="Pendientes" value={pqrsPendientes} onChange={setPqrsPendientes} />
               <NumField label="Incidentes" value={incidentes} onChange={setIncidentes} />
@@ -1033,20 +1033,20 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* Actores */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Actores y Alertas</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Contactos y alertas</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="Actores gestionados" value={actoresGest} onChange={setActoresGest} />
-              <NumField label="Alertas escaladas DAC" value={alertasDac} onChange={setAlertasDac} />
+              <NumField label="Personas contactadas" value={actoresGest} onChange={setActoresGest} />
+              <NumField label="Alertas enviadas a direccion" value={alertasDac} onChange={setAlertasDac} />
             </div>
           </div>
 
           {/* Narrativo */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Resumen Narrativo</div>
-            <TextArea label="Logros de la semana" value={logros} onChange={setLogros} placeholder="Que se logro esta semana..." />
-            <TextArea label="Dificultades / barreras" value={dificultades} onChange={setDificultades} placeholder="Que dificultades hubo..." />
-            <TextArea label="Escalamientos a DAC" value={escalamientos} onChange={setEscalamientos} placeholder="Que se escalo a Diana..." />
-            <TextArea label="Prioridades proxima semana" value={prioridades} onChange={setPrioridades} placeholder="Que hay que hacer la proxima semana..." />
+            <TextArea label="Que se logro esta semana" value={logros} onChange={setLogros} placeholder="Que se logro esta semana..." />
+            <TextArea label="Dificultades o problemas" value={dificultades} onChange={setDificultades} placeholder="Que dificultades hubo..." />
+            <TextArea label="Temas que necesitan atencion de direccion" value={escalamientos} onChange={setEscalamientos} placeholder="Que se escalo a Diana..." />
+            <TextArea label="Que hay que hacer la proxima semana" value={prioridades} onChange={setPrioridades} placeholder="Que hay que hacer la proxima semana..." />
           </div>
 
           <button onClick={handleSaveReporte} disabled={saving || !semana}
@@ -1151,7 +1151,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
                   {[
                     { label: 'Acuerdos', value: r.acuerdos_firmados, color: C.accent },
                     { label: 'Eventos', value: totalEventos, color: C.tolu },
-                    { label: 'PQRS pend.', value: r.pqrs_pendientes, color: r.pqrs_pendientes > 0 ? C.orange : C.green },
+                    { label: 'Quejas pend.', value: r.pqrs_pendientes, color: r.pqrs_pendientes > 0 ? C.orange : C.green },
                     { label: 'Actores', value: r.actores_gestionados, color: C.barbosa },
                   ].map(s => (
                     <div key={s.label} style={{ textAlign: 'center' }}>
@@ -1343,7 +1343,7 @@ export default function App() {
               const ultimosReportes = {}
               reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
               Object.values(ultimosReportes).forEach(r => {
-                if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} PQRS pendientes`, color: C.orange, bg: '#fff7ed' })
+                if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} Quejas sin resolver`, color: C.orange, bg: '#fff7ed' })
                 if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, bg: '#fef2f2' })
               })
               seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
@@ -1444,7 +1444,7 @@ export default function App() {
                   fontSize: 15, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
               {[
                 { val: filterT, set: setFilterT, label: 'Territorio', opts: ['Todos', 'Tolú', 'Barbosa', 'Nacional'] },
-                { val: filterS, set: setFilterS, label: 'Semáforo', opts: ['Todos', 'verde', 'amarillo', 'naranja', 'rojo'] },
+                { val: filterS, set: setFilterS, label: 'Estado de la relación', opts: ['Todos', 'verde', 'amarillo', 'naranja', 'rojo'] },
                 { val: filterR, set: setFilterR, label: 'Riesgo', opts: ['Todos', 'Bajo', 'Medio', 'Alto', 'Muy Alto'] },
               ].map(f => (
                 <select key={f.label} value={f.val} onChange={e => f.set(e.target.value)}
@@ -1561,7 +1561,7 @@ export default function App() {
                                 #{ev.numero}
                               </span>
                               <span style={{ fontSize: 15, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
-                              <select value={ev.estado} onChange={e => updateCronogramaEstado(ev.id, e.target.value).then(loadData)} style={{ fontSize: 15, fontWeight: 700, color: stColor, background: stBg, border: `1px solid ${stColor}`, borderRadius: 20, padding: '2px 12px', cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>{['Pendiente', 'En proceso', 'Cumplido'].map(e => <option key={e} value={e}>{e}</option>)}</select>
+                              <Tag color={stColor} bg={stBg}>{ev.estado}</Tag>
                             </div>
                             {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
                           </div>
