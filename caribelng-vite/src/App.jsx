@@ -246,16 +246,34 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
 
         {/* Key info grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
-          {[
-            { label: 'Estado de la relación', val: <span style={{ color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</span> },
-            { label: 'Posición', val: actor.posicion },
-            { label: 'Riesgo', val: <span style={{ color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</span> },
-          ].map(({ label, val }) => (
-            <div key={label} style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-              <div style={{ fontSize: 16 }}>{val}</div>
+          <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
+            <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Estado de la relacion</div>
+            <div style={{ fontSize: 16, color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</div>
+            <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
+              {actor.semaforo === 'rojo' && 'No hemos logrado acercamiento o hay oposicion activa'}
+              {actor.semaforo === 'naranja' && 'Hay tension o el actor esta evitando el dialogo'}
+              {actor.semaforo === 'amarillo' && 'Necesita seguimiento, falta comunicacion reciente'}
+              {actor.semaforo === 'verde' && 'Relacion positiva con comunicacion regular'}
             </div>
-          ))}
+          </div>
+          <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
+            <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Posicion</div>
+            <div style={{ fontSize: 16 }}>{actor.posicion}</div>
+            <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
+              {(actor.posicion || '').includes('Aliado') && 'Apoya el proyecto activamente'}
+              {(actor.posicion || '').includes('Neutro') && 'No tiene posicion definida frente al proyecto'}
+              {(actor.posicion || '').includes('Opositor') && 'Se opone al proyecto de forma activa'}
+            </div>
+          </div>
+          <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
+            <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Nivel de riesgo</div>
+            <div style={{ fontSize: 16, color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</div>
+            <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
+              {(actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') && 'Este actor puede activar un riesgo importante para el proyecto'}
+              {actor.riesgo === 'Medio' && 'Tiene influencia moderada sobre algun riesgo del proyecto'}
+              {actor.riesgo === 'Bajo' && 'Bajo impacto en los riesgos del proyecto'}
+            </div>
+          </div>
         </div>
 
         {/* Power/interest */}
