@@ -169,3 +169,22 @@ export async function updateSeguimientoAcuerdo(id, updates) {
   const { data } = await supabase.from('seguimiento_acuerdos').update(updates).eq('id', id)
   return data
 }
+export async function getRiesgos() {
+  const { data } = await supabase.from('riesgos').select('*').order('id')
+  return data
+}
+
+export async function getBowTie(riesgoId) {
+  const { data } = await supabase.from('bow_tie').select('*').eq('riesgo_id', riesgoId)
+  return data
+}
+
+export async function getRiesgosLegislativos() {
+  const { data } = await supabase.from('riesgos_legislativos').select('*').order('id')
+  return data
+}
+
+export async function getCronogramaLegislativo() {
+  const { data } = await supabase.from('cronograma_legislativo').select('*').order('id')
+  return data
+}
