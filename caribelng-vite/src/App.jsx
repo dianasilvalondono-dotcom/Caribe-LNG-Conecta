@@ -1561,7 +1561,7 @@ export default function App() {
                                 #{ev.numero}
                               </span>
                               <span style={{ fontSize: 15, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
-                              <Tag color={stColor} bg={stBg}>{ev.estado}</Tag>
+                              <select value={ev.estado} onChange={e => updateCronogramaEstado(ev.id, e.target.value).then(loadData)} style={{ fontSize: 15, fontWeight: 700, color: stColor, background: stBg, border: `1px solid ${stColor}`, borderRadius: 20, padding: '2px 12px', cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>{['Pendiente', 'En proceso', 'Cumplido'].map(e => <option key={e} value={e}>{e}</option>)}</select>
                             </div>
                             {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
                           </div>
