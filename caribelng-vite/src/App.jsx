@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
          getCronograma, getHuellaSocial, updateCronogramaEstado,
-         getReportesSemanales, addReporteSemanal, getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo } from './lib/supabase'
+         getReportesSemanales, addReporteSemanal, getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo,
+         getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -425,6 +426,186 @@ function AgreementCard({ ag, canEdit, onEdit }) {
   )
 }
 
+
+
+
+// RiesgosView component
+function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
+  const [tab, setTab] = useState('mapa')
+  const [expandedRisk, setExpandedRisk] = useState(null)
+  const [bowTieData, setBowTieData] = useState({})
+
+  async function toggleRisk(rid) {
+    if (expandedRisk === rid) { setExpandedRisk(null); return }
+    setExpandedRisk(rid)
+    if (!bowTieData[rid]) {
+      const data = await getBowTie(rid)
+      setBowTieData(prev => ({ ...prev, [rid]: data || [] }))
+    }
+  }
+
+  function getSemaforoColor(sem) {
+    if (!sem) return C.subtle
+    if (sem.includes('Alto') || sem.includes('Rojo')) return C.red
+    if (sem.includes('Medio') || sem.includes('Vigilar')) return C.yellow
+    if (sem.includes('Bajo') || sem.includes('control')) return C.green
+    if (sem.includes('Revision') || sem.includes('Azul')) return C.accent
+    return C.subtle
+  }
+
+  function getNivelColor(nivel) {
+    if (!nivel) return C.subtle
+    const n = nivel.toUpperCase()
+    if (n.includes('MUY ALTO')) return '#7f1d1d'
+    if (n.includes('ALTO')) return C.red
+    if (n.includes('MEDIO')) return C.orange
+    if (n.includes('BAJO')) return C.green
+    return C.subtle
+  }
+
+  const rojos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
+  const amarillos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Medio') || r.semaforo.includes('Vigilar')))
+  const verdes = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Bajo') || r.semaforo.includes('control')))
+  const azules = riesgos.filter(r => r.semaforo && r.semaforo.includes('Revision'))
+
+  return (
+    <div>
+      <div style={{ marginBottom: 18 }}>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
+        {[
+          { label: 'Criticos', count: rojos.length, color: C.red, bg: '#fee2e2' },
+          { label: 'Vigilar', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
+          { label: 'Bajo control', count: verdes.length, color: C.green, bg: '#dcfce7' },
+          { label: 'En revision', count: azules.length, color: C.accent, bg: '#dbeafe' },
+        ].map(s => (
+          <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '14px 16px', borderLeft: `4px solid ${s.color}`, textAlign: 'center' }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.count}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
+        {[{ id: 'mapa', label: 'Mapa de Riesgos' }, { id: 'legislativo', label: 'Riesgos Legislativos' }, { id: 'cronograma', label: 'Cronograma Politico' }].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
+              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'mapa' && (
+        <div>
+          {riesgos.map(r => {
+            const semColor = getSemaforoColor(r.semaforo)
+            const isExp = expandedRisk === r.id
+            const bt = bowTieData[r.id] || []
+            return (
+              <div key={r.id} style={{ background: C.card, borderRadius: 12, marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${semColor}`, overflow: 'hidden' }}>
+                <div onClick={() => toggleRisk(r.id)} style={{ padding: '14px 16px', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: 'white', background: semColor, padding: '2px 8px', borderRadius: 10 }}>{r.id}</span>
+                      <span style={{ fontSize: 10, color: C.muted }}>{r.zona}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <Tag color={C.muted}>P: {r.probabilidad}</Tag>
+                      <Tag color={semColor}>I: {r.impacto}</Tag>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
+                  {!isExp && r.que_hacemos && <div style={{ fontSize: 11, color: C.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
+                </div>
+                {isExp && (
+                  <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
+                    <div style={{ paddingTop: 12 }}>
+                      {r.descripcion && <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
+                      {r.quien_detona && <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Quien detona: </span>{r.quien_detona}</div>}
+                      {r.quien_mitiga && <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien mitiga: </span>{r.quien_mitiga}</div>}
+                      {r.que_hacemos && <div style={{ fontSize: 11, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo: </span>{r.que_hacemos}</div>}
+                      {bt.length > 0 && (
+                        <div style={{ marginTop: 10 }}>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Analisis Bow-Tie</div>
+                          {bt.map((b, idx) => (
+                            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, marginBottom: 8, fontSize: 10, lineHeight: 1.4 }}>
+                              <div>
+                                {b.causa && <div style={{ background: '#fee2e2', padding: '6px 8px', borderRadius: 6, color: '#991b1b', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Causa: </span>{b.causa}</div>}
+                                {b.control_preventivo && <div style={{ background: '#dbeafe', padding: '6px 8px', borderRadius: 6, color: '#1e40af' }}><span style={{ fontWeight: 700 }}>Ctrl prev: </span>{b.control_preventivo}</div>}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', color: C.subtle, fontSize: 16, padding: '0 4px' }}>&rarr;</div>
+                              <div>
+                                {b.control_detectivo && <div style={{ background: '#fef9c3', padding: '6px 8px', borderRadius: 6, color: '#854d0e', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Ctrl det: </span>{b.control_detectivo}</div>}
+                                {b.consecuencia && <div style={{ background: '#fce7f3', padding: '6px 8px', borderRadius: 6, color: '#9d174d' }}><span style={{ fontWeight: 700 }}>Consecuencia: </span>{b.consecuencia}</div>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {tab === 'legislativo' && (
+        <div>
+          {riesgosLeg.map(r => {
+            const nivelColor = getNivelColor(r.nivel_riesgo)
+            return (
+              <div key={r.id} style={{ background: C.card, borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.3, flex: 1 }}>{r.tema}</div>
+                  <Tag color={nivelColor}>{r.nivel_riesgo}</Tag>
+                </div>
+                <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginBottom: 6 }}>{r.descripcion}</div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+                  <Tag color={C.muted}>Prob: {r.probabilidad}</Tag>
+                  <Tag color={C.accent}>{r.comision}</Tag>
+                </div>
+                {r.impacto && <div style={{ fontSize: 11, color: '#9a3412', background: '#fff7ed', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5, marginBottom: 6 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{r.impacto}</div>}
+                {r.acciones_preventivas && <div style={{ fontSize: 11, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Acciones: </span>{r.acciones_preventivas}</div>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {tab === 'cronograma' && (
+        <div>
+          <div style={{ position: 'relative', paddingLeft: 20 }}>
+            <div style={{ position: 'absolute', left: 8, top: 0, bottom: 0, width: 2, background: '#e2e8f0' }} />
+            {cronoLeg.map(ev => {
+              const nivelColor = getNivelColor(ev.nivel_riesgo)
+              return (
+                <div key={ev.id} style={{ position: 'relative', marginBottom: 16, paddingLeft: 20 }}>
+                  <div style={{ position: 'absolute', left: -16, top: 6, width: 12, height: 12, borderRadius: '50%', background: nivelColor, border: '2px solid white', boxShadow: '0 0 0 2px ' + nivelColor }} />
+                  <div style={{ background: C.card, borderRadius: 12, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                      <div><span style={{ fontSize: 10, fontWeight: 700, color: nivelColor, textTransform: 'uppercase' }}>{ev.fecha}</span> <Tag color={C.muted} bg="#f1f5f9">{ev.tipo}</Tag></div>
+                      <Tag color={nivelColor}>{ev.nivel_riesgo}</Tag>
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.3, marginBottom: 4 }}>{ev.evento}</div>
+                    <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginBottom: 4 }}>{ev.impacto}</div>
+                    {ev.accion && <div style={{ fontSize: 10, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.4 }}><span style={{ fontWeight: 700 }}>Accion: </span>{ev.accion}</div>}
+                    {ev.responsable && <div style={{ fontSize: 10, color: C.subtle, marginTop: 4 }}>Responsable: {ev.responsable}</div>}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 
 // KPIs Gestoras component
@@ -1003,6 +1184,9 @@ export default function App() {
   const [cronograma, setCronograma] = useState([])
   const [huellaSocial, setHuellaSocial] = useState([])
   const [cronoFilter, setCronoFilter] = useState('Todos')
+  const [riesgos, setRiesgos] = useState([])
+  const [riesgosLeg, setRiesgosLeg] = useState([])
+  const [cronoLeg, setCronoLeg] = useState([])
   const [reportes, setReportes] = useState([])
   const [seguimiento, setSeguimiento] = useState([])
 
@@ -1028,13 +1212,16 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, cr, hs, rp, sg] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos()])
+      const [a, ag, cr, hs, rp, sg, ri, rl, cleg] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo()])
       setActors(a || [])
       setAgreements(ag || [])
       setCronograma(cr || [])
       setHuellaSocial(hs || [])
       setReportes(rp || [])
       setSeguimiento(sg || [])
+      setRiesgos(ri || [])
+      setRiesgosLeg(rl || [])
+      setCronoLeg(cleg || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -1091,6 +1278,7 @@ export default function App() {
     { id: 'cronograma', label: 'Cronograma', icon: '' },
     { id: 'input', label: 'Input Semanal', icon: '' },
     { id: 'kpis', label: 'KPIs', icon: '' },
+    { id: 'riesgos', label: 'Riesgos', icon: '' },
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '' }] : []),
   ]
 
@@ -1409,6 +1597,12 @@ export default function App() {
         {/* KPIs GESTORAS */}
         {view === 'kpis' && (
           <KPIsView reportes={reportes} seguimiento={seguimiento} />
+        )}
+
+
+        {/* RIESGOS */}
+        {view === 'riesgos' && (
+          <RiesgosView riesgos={riesgos} riesgosLeg={riesgosLeg} cronoLeg={cronoLeg} />
         )}
 
         {/* ━━ GESTORA VIEW ━━ */}
