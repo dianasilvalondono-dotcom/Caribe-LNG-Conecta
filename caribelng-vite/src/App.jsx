@@ -245,7 +245,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
         </div>
 
         {/* Key info grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
           {[
             { label: 'Semáforo', val: <span style={{ color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</span> },
             { label: 'Posición', val: actor.posicion },
@@ -475,7 +475,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 18 }}>
         {[
           { label: 'Accion inmediata', count: rojos.length, color: C.red, bg: '#fee2e2' },
           { label: 'Vigilar', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
@@ -802,7 +802,7 @@ function KPIsView({ reportes, seguimiento }) {
       </div>
 
       {/* Summary cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 18 }}>
         <StatCard label="Reportes" value={totalReportes} color={C.navy} />
         <StatCard label="Eventos" value={totalEventos} color={C.tolu} />
         <StatCard label="Compromisos" value={`${compromisosCumplidos}/${totalCompromisos}`} color={C.green} />
@@ -932,7 +932,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   )
 
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto' }}>
+    <div>
       <div style={{ marginBottom: 18 }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} &rarr; Cada viernes</p>
@@ -1357,14 +1357,14 @@ export default function App() {
               if (!alertas.length) return null
               return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}` }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 13, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span></div>))}</div>)
             })()}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
               <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
               <StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" />
               <StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" />
               <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {[
                 { label: 'Tolú', value: stats.tolu, color: C.tolu, desc: 'Terminal marítima →  Sucre' },
                 { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
@@ -1501,7 +1501,7 @@ export default function App() {
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
             </div>
             {/* Progress summary */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {(() => {
                 const cumplido = cronograma.filter(c => c.estado === 'Cumplido').length
                 const enProceso = cronograma.filter(c => c.estado === 'En proceso').length
@@ -1636,7 +1636,7 @@ export default function App() {
 
         {/* ━━ GESTORA VIEW ━━ */}
         {view === 'gestora' && isGestora && (
-          <div style={{ maxWidth: 480, margin: '0 auto' }}>
+          <div>
             <div style={{ marginBottom: 18 }}>
               <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
