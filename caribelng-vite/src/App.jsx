@@ -426,12 +426,239 @@ function AgreementCard({ ag, canEdit, onEdit }) {
 }
 
 
+
+// KPIs Gestoras component
+function KPIsView({ reportes, seguimiento }) {
+  const [terrFilter, setTerrFilter] = useState('Todos')
+
+  const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+
+  function getMonthData(territorio, mes) {
+    return reportes.filter(r => {
+      if (territorio !== 'Todos' && r.territorio !== territorio) return false
+      const m = new Date(r.fecha_corte).getMonth()
+      return m === mes
+    })
+  }
+
+  function sumField(territorio, mes, field) {
+    return getMonthData(territorio, mes).reduce((sum, r) => sum + (r[field] || 0), 0)
+  }
+
+  function sumTotal(territorio, field) {
+    return reportes.filter(r => territorio === 'Todos' || r.territorio === territorio)
+      .reduce((sum, r) => sum + (r[field] || 0), 0)
+  }
+
+  function sumQ(territorio, field, q) {
+    const meses = q === 1 ? [0,1,2] : q === 2 ? [3,4,5] : q === 3 ? [6,7,8] : [9,10,11]
+    return meses.reduce((sum, m) => sum + sumField(territorio, m, field), 0)
+  }
+
+  const KPIS_BARBOSA = [
+    { cat: 'SOCIALIZACIONES Y EVENTOS', items: [
+      { name: 'Socializaciones AID', field: 'eventos_aid', meta: 12, base: '1/mes' },
+      { name: 'Socializaciones AII', field: 'eventos_aii', meta: 4, base: '1/trim' },
+      { name: 'Reuniones institucionales', field: 'eventos_institucional', meta: 4, base: '1/trim' },
+    ]},
+    { cat: 'DIAGNOSTICO TERRITORIAL', items: [
+      { name: 'Diagnosticos sociofamiliares', field: 'diagnosticos', meta: 53, base: '53 viv/sem' },
+      { name: 'Actas de vecindad', field: 'actas_vecindad', meta: 0, base: 'Segun obra' },
+      { name: 'Inducciones PGS', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
+    ]},
+    { cat: 'PQRS', items: [
+      { name: 'PQRS recibidas', field: 'pqrs_recibidas', meta: 0, base: '0/mes', invert: true },
+      { name: 'PQRS pendientes', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
+      { name: 'Incidentes', field: 'incidentes', meta: 0, base: '0/mes', invert: true },
+    ]},
+    { cat: 'ACUERDOS SOCIALES', items: [
+      { name: 'Acuerdos firmados', field: 'acuerdos_firmados', meta: 3, base: 'Antes COD' },
+      { name: 'Compromisos cumplidos', field: 'compromisos_cumplidos', meta: 0, base: '>=90%' },
+    ]},
+    { cat: 'ACTORES', items: [
+      { name: 'Actores gestionados', field: 'actores_gestionados', meta: 0, base: 'Semanal' },
+      { name: 'Alertas escaladas DAC', field: 'alertas_escaladas_dac', meta: 0, base: '0/mes', invert: true },
+    ]},
+  ]
+
+  const KPIS_TOLU = [
+    { cat: 'SOCIALIZACIONES Y EVENTOS', items: [
+      { name: 'Socializaciones AID', field: 'eventos_aid', meta: 12, base: '1/mes' },
+      { name: 'Socializaciones AII', field: 'eventos_aii', meta: 4, base: '1/trim' },
+      { name: 'Reuniones institucionales', field: 'eventos_institucional', meta: 4, base: '1/trim' },
+    ]},
+    { cat: 'DIAGNOSTICO TERRITORIAL', items: [
+      { name: 'Asociaciones mapeadas', field: 'diagnosticos', meta: 0, base: 'Acumulativo' },
+      { name: 'Inducciones PGS', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
+    ]},
+    { cat: 'PQRS', items: [
+      { name: 'PQRS recibidas', field: 'pqrs_recibidas', meta: 0, base: '0/mes', invert: true },
+      { name: 'PQRS pendientes', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
+      { name: 'Incidentes', field: 'incidentes', meta: 0, base: '0/mes', invert: true },
+    ]},
+    { cat: 'ACUERDOS SOCIALES', items: [
+      { name: 'Acuerdos firmados', field: 'acuerdos_firmados', meta: 3, base: 'Antes COD' },
+      { name: 'Compromisos cumplidos', field: 'compromisos_cumplidos', meta: 0, base: '>=90%' },
+    ]},
+    { cat: 'ACTORES', items: [
+      { name: 'Actores gestionados', field: 'actores_gestionados', meta: 0, base: 'Semanal' },
+      { name: 'Alertas escaladas DAC', field: 'alertas_escaladas_dac', meta: 0, base: '0/mes', invert: true },
+    ]},
+  ]
+
+  function renderTerritory(territorio, kpis) {
+    const color = territorio === 'Tolu' ? C.tolu : C.barbosa
+    const totalReportes = reportes.filter(r => r.territorio === territorio).length
+
+    return (
+      <div key={territorio} style={{ marginBottom: 28 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div style={{ width: 4, height: 24, background: color, borderRadius: 2 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{territorio}</div>
+            <div style={{ fontSize: 11, color: C.subtle }}>
+              {territorio === 'Tolu' ? 'Terminal maritima' : 'Planta de regasificacion'} &rarr; {totalReportes} reportes
+            </div>
+          </div>
+        </div>
+
+        {kpis.map(cat => (
+          <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>{cat.cat}</div>
+            
+            {/* Header row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center' }}>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700 }}>KPI</div>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q1</div>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q2</div>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q3</div>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q4</div>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Total</div>
+              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Meta</div>
+            </div>
+
+            {cat.items.map(kpi => {
+              const total = sumTotal(territorio, kpi.field)
+              const pct = kpi.meta > 0 ? Math.round((total / kpi.meta) * 100) : 0
+              const statusColor = kpi.invert
+                ? (total === 0 ? C.green : total <= 3 ? C.orange : C.red)
+                : (kpi.meta > 0 ? (pct >= 80 ? C.green : pct >= 50 ? C.orange : C.red) : C.subtle)
+
+              return (
+                <div key={kpi.name} style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, alignItems: 'center',
+                  padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: C.text }}>{kpi.name}</div>
+                    <div style={{ fontSize: 9, color: C.subtle }}>{kpi.base}</div>
+                  </div>
+                  {[1, 2, 3, 4].map(q => (
+                    <div key={q} style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: C.text }}>
+                      {sumQ(territorio, kpi.field, q) || '-'}
+                    </div>
+                  ))}
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: statusColor }}>{total}</div>
+                  </div>
+                  <div style={{ textAlign: 'center', fontSize: 11, fontWeight: 600, color: C.muted }}>
+                    {kpi.meta || '-'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ))}
+
+        {/* Seguimiento acuerdos summary */}
+        {(() => {
+          const sg = seguimiento.filter(s => s.territorio === territorio)
+          if (!sg.length) return null
+          const cumplidos = sg.filter(s => s.estado === 'Cumplido').length
+          const total = sg.length
+          const pct = total ? Math.round((cumplidos / total) * 100) : 0
+          return (
+            <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>COMPROMISOS DE ACUERDOS</div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 8 }}>
+                <div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: pct >= 90 ? C.green : pct >= 60 ? C.orange : C.red }}>{pct}%</div>
+                  <div style={{ fontSize: 10, color: C.muted }}>cumplimiento</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <Bar value={pct} color={pct >= 90 ? C.green : pct >= 60 ? C.orange : C.red} height={8} />
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700 }}>{cumplidos}/{total}</div>
+                  <div style={{ fontSize: 10, color: C.subtle }}>compromisos</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {['Cumplido', 'En proceso', 'Pendiente', 'Incumplido', 'Escalado'].map(est => {
+                  const count = sg.filter(s => s.estado === est).length
+                  if (!count) return null
+                  const c = est === 'Cumplido' ? C.green : est === 'En proceso' ? C.orange : est === 'Pendiente' ? C.subtle : C.red
+                  return <Tag key={est} color={c}>{est}: {count}</Tag>
+                })}
+              </div>
+            </div>
+          )
+        })()}
+      </div>
+    )
+  }
+
+  // Overall summary stats
+  const totalReportes = reportes.length
+  const totalCompromisos = seguimiento.length
+  const compromisosCumplidos = seguimiento.filter(s => s.estado === 'Cumplido').length
+  const totalEventos = reportes.reduce((s, r) => s + (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0), 0)
+  const totalIncidentes = reportes.reduce((s, r) => s + (r.incidentes || 0), 0)
+
+  return (
+    <div>
+      <div style={{ marginBottom: 18 }}>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs Gestion Social</h1>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
+      </div>
+
+      {/* Summary cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 18 }}>
+        <StatCard label="Reportes" value={totalReportes} color={C.navy} />
+        <StatCard label="Eventos" value={totalEventos} color={C.tolu} />
+        <StatCard label="Compromisos" value={`${compromisosCumplidos}/${totalCompromisos}`} color={C.green} />
+        <StatCard label="Incidentes" value={totalIncidentes} color={totalIncidentes === 0 ? C.green : C.red} />
+      </div>
+
+      {/* Filter */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        {['Todos', 'Barbosa', 'Tolu'].map(t => (
+          <button key={t} onClick={() => setTerrFilter(t)}
+            style={{ background: terrFilter === t ? C.navy : '#f1f5f9', color: terrFilter === t ? 'white' : C.text,
+              border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+            {t === 'Tolu' ? 'Tolú' : t}
+          </button>
+        ))}
+      </div>
+
+      {/* KPI tables by territory */}
+      {(terrFilter === 'Todos' || terrFilter === 'Barbosa') && renderTerritory('Barbosa', KPIS_BARBOSA)}
+      {(terrFilter === 'Todos' || terrFilter === 'Tolu') && renderTerritory('Tolú', KPIS_TOLU)}
+
+      {totalReportes === 0 && (
+        <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>
+          <div style={{ fontSize: 14, marginBottom: 6 }}>No hay reportes semanales aun</div>
+          <div style={{ fontSize: 12 }}>Los KPIs se calculan automaticamente cuando las gestoras llenen sus reportes en Input Semanal.</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // InputSemanal component
 function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved }) {
   const [tab, setTab] = useState('reporte')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
- const [myTerr, setMyTerr] = useState(territorio || 'Barbosa')
+  const [myTerr, setMyTerr] = useState(territorio || 'Barbosa')
 
   // Reporte semanal form
   const [semana, setSemana] = useState('')
@@ -591,9 +818,9 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          P2 &mdash; Diagnóstico Territorial
+          {/* P2: Huella Social */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Huella Social</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Diagnóstico Territorial</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="Diagnosticos" value={diagnosticos} onChange={setDiagnosticos} />
               <NumField label="Actas vecindad" value={actasVecindad} onChange={setActasVecindad} />
@@ -863,6 +1090,7 @@ export default function App() {
     { id: 'acuerdos', label: 'Acuerdos', icon: '' },
     { id: 'cronograma', label: 'Cronograma', icon: '' },
     { id: 'input', label: 'Input Semanal', icon: '' },
+    { id: 'kpis', label: 'KPIs', icon: '' },
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '' }] : []),
   ]
 
@@ -1175,6 +1403,12 @@ export default function App() {
         {view === 'input' && (
           <InputSemanal session={session} profile={profile} territorio={myTerritorio}
             reportes={reportes} seguimiento={seguimiento} onSaved={loadData} />
+        )}
+
+
+        {/* KPIs GESTORAS */}
+        {view === 'kpis' && (
+          <KPIsView reportes={reportes} seguimiento={seguimiento} />
         )}
 
         {/* ━━ GESTORA VIEW ━━ */}
