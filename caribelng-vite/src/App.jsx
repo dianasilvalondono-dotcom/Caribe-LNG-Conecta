@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance } from './lib/supabase'
 
-// ‚îÄ‚îÄ Design tokens ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
   navy:    '#0f2744',
   blue:    '#1e3a5f',
@@ -22,10 +22,10 @@ const C = {
 }
 
 const SEMAFORO = {
-  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: 'üü¢' },
-  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: 'üü°' },
-  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: 'üü†' },
-  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: 'üî¥' },
+  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: '🟢' },
+  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: '🟡' },
+  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: '🟠' },
+  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: '🔴' },
 }
 
 const TIPO_COLOR = {
@@ -40,7 +40,7 @@ function initials(name = '') {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }
 
-// ‚îÄ‚îÄ Tiny UI helpers ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Tiny UI helpers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function Avatar({ name, size = 40, color }) {
   const c = color || getTipoColor(name)
   return (
@@ -104,7 +104,7 @@ function SemDot({ s, size = 9 }) {
     background: sc.color, flexShrink: 0 }} />
 }
 
-// ‚îÄ‚îÄ Login screen ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Login screen ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function LoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -128,7 +128,7 @@ function LoginScreen() {
         textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
         <div style={{ width: 56, height: 56, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`,
           borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 26, margin: '0 auto 16px' }}>‚ö°</div>
+          fontSize: 26, margin: '0 auto 16px' }}>⚡</div>
         <h1 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>
           Caribe LNG
         </h1>
@@ -162,7 +162,7 @@ function LoginScreen() {
   )
 }
 
-// ‚îÄ‚îÄ Actor card ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Actor card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ActorCard({ actor, onClick }) {
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
   return (
@@ -188,7 +188,7 @@ function ActorCard({ actor, onClick }) {
   )
 }
 
-// ‚îÄ‚îÄ Actor Modal ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Actor Modal ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ActorModal({ actor, session, onClose, onUpdated }) {
   const [interactions, setInteractions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -238,13 +238,13 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
               <div style={{ fontSize: 11, color: C.subtle, marginTop: 1 }}>{actor.territorio} →  {actor.area}</div>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: C.subtle, padding: 0 }}>‚úï</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: C.subtle, padding: 0 }}>✕</button>
         </div>
 
         {/* Key info grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
           {[
-            { label: 'Sem√°foro', val: <span style={{ color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</span> },
+            { label: 'Semáforo', val: <span style={{ color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</span> },
             { label: 'Posición', val: actor.posicion },
             { label: 'Riesgo', val: <span style={{ color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</span> },
           ].map(({ label, val }) => (
@@ -258,7 +258,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
         {/* Power/interest */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 14, background: '#f8fafc', borderRadius: 8, padding: '10px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>PODER</div><Pill value={actor.poder} color={C.accent} /></div>
-          <div><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>INTER√âS</div><Pill value={actor.interes} color={C.barbosa} /></div>
+          <div><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>INTERÉS</div><Pill value={actor.interes} color={C.barbosa} /></div>
           <div style={{ flex: 1 }}><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>CUADRANTE</div><div style={{ fontSize: 11, fontWeight: 700, color: C.accent }}>{actor.cuadrante}</div></div>
         </div>
 
@@ -318,13 +318,13 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             ))}
           </div>
           <textarea value={resumen} onChange={e => setResumen(e.target.value)}
-            placeholder="¬øQué pasó? ¬øQué dijo? ¬øHay algo urgente que escalar?"
+            placeholder="¿Qué pasó? ¿Qué dijo? ¿Hay algo urgente que escalar?"
             style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '9px 11px', fontSize: 13,
               resize: 'none', height: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
           <button onClick={handleSave} disabled={saving || !resumen.trim()}
             style={{ marginTop: 8, width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
               border: 'none', borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
-            {saving ? 'üíæ Guardando...' : 'üíæ Guardar novedad'}
+            {saving ? '💾 Guardando...' : '💾 Guardar novedad'}
           </button>
         </div>
 
@@ -339,7 +339,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2 }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{i.tipo}</span>
                     <span style={{ fontSize: 10, color: C.subtle }}>{new Date(i.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}</span>
-                    {i.profiles?.full_name && <span style={{ fontSize: 10, color: C.subtle }}>‚Äî {i.profiles.full_name}</span>}
+                    {i.profiles?.full_name && <span style={{ fontSize: 10, color: C.subtle }}>— {i.profiles.full_name}</span>}
                   </div>
                   <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5 }}>{i.resumen}</div>
                 </div>
@@ -381,7 +381,7 @@ function Field({ label, value, onChange, type = 'text', placeholder }) {
   )
 }
 
-// ‚îÄ‚îÄ Agreement card ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Agreement card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AgreementCard({ ag, canEdit, onEdit }) {
   const isT = ag.territorio === 'Tolú'
   const stC = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }
@@ -423,7 +423,7 @@ function AgreementCard({ ag, canEdit, onEdit }) {
   )
 }
 
-// ‚îÄ‚îÄ Main App ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ━━ Main App ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -440,7 +440,7 @@ export default function App() {
   const [filterS, setFilterS] = useState('Todos')
   const [filterR, setFilterR] = useState('Todos')
 
-  // ‚îÄ‚îÄ Auth ‚îÄ‚îÄ
+  // ━━ Auth ━━
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
@@ -457,7 +457,7 @@ export default function App() {
     getProfile(u.id).then(setProfile)
   }, [session])
 
-  // ‚îÄ‚îÄ Data ‚îÄ‚îÄ
+  // ━━ Data ━━
   const loadData = useCallback(async () => {
     if (!session) return
     setDataLoading(true)
@@ -470,7 +470,7 @@ export default function App() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // ‚îÄ‚îÄ Realtime ‚îÄ‚îÄ
+  // ━━ Realtime ━━
   useEffect(() => {
     if (!session) return
     const ch = supabase.channel('crm-updates')
@@ -525,7 +525,7 @@ export default function App() {
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 54 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>‚ö°</div>
+            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>⚡</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
               <div style={{ fontSize: 9, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Centro de Relacionamiento 2026</div>
@@ -558,7 +558,7 @@ export default function App() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px' }}>
 
-        {/* ‚îÄ‚îÄ DASHBOARD ‚îÄ‚îÄ */}
+        {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
           <div>
             <div style={{ marginBottom: 20 }}>
@@ -566,15 +566,15 @@ export default function App() {
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 20 }}>
-              <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="üë•" />
-              <StatCard label="Relación estable üü¢" value={stats.verde} color={C.green} icon="‚úÖ" />
-              <StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="‚ö†Ô∏è" />
-              <StatCard label="Cr√≠ticos üî¥" value={stats.rojo} color={C.red} icon="üö®" />
-              <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="‚ö†Ô∏è" />
+              <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
+              <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
+              <StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" />
+              <StatCard label="Críticos 🔴" value={stats.rojo} color={C.red} icon="🚨" />
+              <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
               {[
-                { label: 'Tolú', value: stats.tolu, color: C.tolu, desc: 'Terminal mar√≠tima →  Sucre' },
+                { label: 'Tolú', value: stats.tolu, color: C.tolu, desc: 'Terminal marítima →  Sucre' },
                 { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
                 { label: 'Nacional', value: stats.nacional, color: C.muted, desc: 'Legislativo →  Regulatorio' },
               ].map(t => (
@@ -589,9 +589,9 @@ export default function App() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               {/* Semaforo chart */}
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>Sem√°foro de relacionamiento</h3>
+                <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
-                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Cr√≠tico', stats.rojo]].map(([k, lbl, v]) => (
+                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Crítico', stats.rojo]].map(([k, lbl, v]) => (
                   <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
                     <SemDot s={k} size={9} />
                     <span style={{ fontSize: 12, color: C.muted, width: 140 }}>{lbl}</span>
@@ -620,7 +620,7 @@ export default function App() {
             </div>
             {/* Critical actors */}
             <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-              <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>‚ö†Ô∏è Actores cr√≠ticos ‚Äî Acción requerida</h3>
+              <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>⚠️ Actores críticos — Acción requerida</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
                 {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').slice(0, 8).map(a => (
                   <div key={a.id} onClick={() => { setSelectedActor(a); setView('actores') }}
@@ -638,7 +638,7 @@ export default function App() {
           </div>
         )}
 
-        {/* ‚îÄ‚îÄ ACTORES ‚îÄ‚îÄ */}
+        {/* ━━ ACTORES ━━ */}
         {view === 'actores' && (
           <div>
             <div style={{ marginBottom: 16 }}>
@@ -647,12 +647,12 @@ export default function App() {
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="üîç  Buscar por nombre, tipo..."
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
                 style={{ flex: 1, minWidth: 180, border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 11px',
                   fontSize: 13, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
               {[
                 { val: filterT, set: setFilterT, label: 'Territorio', opts: ['Todos', 'Tolú', 'Barbosa', 'Nacional'] },
-                { val: filterS, set: setFilterS, label: 'Sem√°foro', opts: ['Todos', 'verde', 'amarillo', 'naranja', 'rojo'] },
+                { val: filterS, set: setFilterS, label: 'Semáforo', opts: ['Todos', 'verde', 'amarillo', 'naranja', 'rojo'] },
                 { val: filterR, set: setFilterR, label: 'Riesgo', opts: ['Todos', 'Bajo', 'Medio', 'Alto', 'Muy Alto'] },
               ].map(f => (
                 <select key={f.label} value={f.val} onChange={e => f.set(e.target.value)}
@@ -672,7 +672,7 @@ export default function App() {
           </div>
         )}
 
-        {/* ‚îÄ‚îÄ ACUERDOS ‚îÄ‚îÄ */}
+        {/* ━━ ACUERDOS ━━ */}
         {view === 'acuerdos' && (
           <div>
             <div style={{ marginBottom: 18 }}>
@@ -686,7 +686,7 @@ export default function App() {
                     <div style={{ width: 4, height: 20, background: t === 'Tolú' ? C.tolu : C.barbosa, borderRadius: 2 }} />
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 800 }}>{t}</div>
-                      <div style={{ fontSize: 11, color: C.subtle }}>{t === 'Tolú' ? 'Terminal mar√≠tima' : 'Planta de regasificación'}</div>
+                      <div style={{ fontSize: 11, color: C.subtle }}>{t === 'Tolú' ? 'Terminal marítima' : 'Planta de regasificación'}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -700,16 +700,16 @@ export default function App() {
           </div>
         )}
 
-        {/* ‚îÄ‚îÄ GESTORA VIEW ‚îÄ‚îÄ */}
+        {/* ━━ GESTORA VIEW ━━ */}
         {view === 'gestora' && isGestora && (
           <div style={{ maxWidth: 480, margin: '0 auto' }}>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>üì± Mi Territorio</h1>
+              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
             </div>
             {/* Priority actors */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 700 }}>‚ö†Ô∏è Actores que necesitan atención hoy</h3>
+              <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
               {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => (
                 <div key={a.id} onClick={() => setSelectedActor(a)}
                   style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '9px 0',
@@ -719,13 +719,13 @@ export default function App() {
                     <div style={{ fontSize: 13, fontWeight: 600 }}>{a.nombre}</div>
                     <div style={{ fontSize: 11, color: C.subtle }}>{a.tipo}</div>
                   </div>
-                  <span style={{ fontSize: 13, color: C.subtle }}>‚Ä∫</span>
+                  <span style={{ fontSize: 13, color: C.subtle }}>›</span>
                 </div>
               ))}
             </div>
             {/* Birthday widget */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700 }}>üéÇ Próximos cumpleaños</h3>
+              <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
               {(() => {
                 const today = new Date()
                 const upcoming = actors.filter(a => a.cumpleanos).map(a => {
@@ -735,7 +735,7 @@ export default function App() {
                   const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
                   return { ...a, diff, dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) }
                 }).filter(a => a.diff <= 30).sort((a, b) => a.diff - b.diff)
-                if (!upcoming.length) return <div style={{ fontSize: 12, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 d√≠as ‚Äî agrega fechas al abrir un actor comunitario.</div>
+                if (!upcoming.length) return <div style={{ fontSize: 12, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 días — agrega fechas al abrir un actor comunitario.</div>
                 return upcoming.map(a => (
                   <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
                     <div>
@@ -743,7 +743,7 @@ export default function App() {
                       <div style={{ fontSize: 11, color: C.subtle }}>{a.dateStr}</div>
                     </div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: a.diff <= 7 ? C.red : C.orange }}>
-                      {a.diff === 0 ? '¬°Hoy! üéâ' : `En ${a.diff} d√≠as`}
+                      {a.diff === 0 ? '¡Hoy! 🎉' : `En ${a.diff} días`}
                     </div>
                   </div>
                 ))
