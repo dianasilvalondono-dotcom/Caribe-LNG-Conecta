@@ -57,7 +57,7 @@ function Avatar({ name, size = 40, color }) {
 
 function Tag({ children, color = C.accent, bg }) {
   return (
-    <span style={{ fontSize: 10, background: bg || color + '22', color,
+    <span style={{ fontSize: 16, background: bg || color + '22', color,
       padding: '2px 8px', borderRadius: 20, fontWeight: 700, whiteSpace: 'nowrap' }}>
       {children}
     </span>
@@ -91,9 +91,9 @@ function StatCard({ label, value, sub, color = C.navy, icon }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontSize: 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
-          <div style={{ fontSize: 13, color: C.muted, marginTop: 3, fontWeight: 700,
+          <div style={{ fontSize: 15, color: C.muted, marginTop: 3, fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-          {sub && <div style={{ fontSize: 11, color: C.subtle, marginTop: 2 }}>{sub}</div>}
+          {sub && <div style={{ fontSize: 15, color: C.subtle, marginTop: 2 }}>{sub}</div>}
         </div>
         {icon && <div style={{ fontSize: 26, opacity: 0.12 }}>{icon}</div>}
       </div>
@@ -135,29 +135,29 @@ function LoginScreen() {
         <h1 style={{ margin: '0 0 6px', fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>
           Caribe LNG
         </h1>
-        <p style={{ margin: '0 0 8px', color: C.muted, fontSize: 13 }}>
+        <p style={{ margin: '0 0 8px', color: C.muted, fontSize: 15 }}>
           Centro de Relacionamiento 2026
         </p>
-        <p style={{ margin: '0 0 28px', color: C.subtle, fontSize: 12 }}>
+        <p style={{ margin: '0 0 28px', color: C.subtle, fontSize: 16 }}>
           Tolú →  Barbosa →  Nacional
         </p>
         <input type="email" placeholder="Correo electrónico" value={email}
           onChange={e => setEmail(e.target.value)}
           style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0',
-            fontSize: 14, marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
+            fontSize: 16, marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
         <input type="password" placeholder="Contraseña" value={password}
           onChange={e => setPassword(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleLogin()}
           style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0',
-            fontSize: 14, marginBottom: 16, boxSizing: 'border-box', outline: 'none' }} />
-        {error && <p style={{ color: C.red, fontSize: 13, margin: '0 0 12px' }}>{error}</p>}
+            fontSize: 16, marginBottom: 16, boxSizing: 'border-box', outline: 'none' }} />
+        {error && <p style={{ color: C.red, fontSize: 15, margin: '0 0 12px' }}>{error}</p>}
         <button onClick={handleLogin} disabled={loading}
           style={{ width: '100%', background: loading ? '#f1f5f9' : C.navy, border: 'none',
-            borderRadius: 10, padding: '12px 16px', fontSize: 14, fontWeight: 600,
+            borderRadius: 10, padding: '12px 16px', fontSize: 16, fontWeight: 600,
             cursor: loading ? 'wait' : 'pointer', color: 'white', transition: 'all 0.15s' }}>
           {loading ? 'Conectando...' : 'Entrar'}
         </button>
-        <p style={{ margin: '16px 0 0', fontSize: 11, color: C.subtle }}>
+        <p style={{ margin: '16px 0 0', fontSize: 15, color: C.subtle }}>
           Solo para equipo Caribe LNG →  Acceso controlado por rol
         </p>
       </div>
@@ -178,9 +178,9 @@ function ActorCard({ actor, onClick }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
           <SemDot s={actor.semaforo} size={7} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.nombre}</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.nombre}</span>
         </div>
-        <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.tipo}</div>
+        <div style={{ fontSize: 15, color: C.muted, marginBottom: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.tipo}</div>
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
           <Tag color={sc.color}>{actor.posicion}</Tag>
           <Tag color={C.muted}>P:{actor.poder} I:{actor.interes}</Tag>
@@ -237,8 +237,8 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             <Avatar name={actor.nombre} size={48} color={getTipoColor(actor.tipo)} />
             <div>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>{actor.nombre}</h2>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{actor.tipo} →  {actor.nivel}</div>
-              <div style={{ fontSize: 11, color: C.subtle, marginTop: 1 }}>{actor.territorio} →  {actor.area}</div>
+              <div style={{ fontSize: 16, color: C.muted, marginTop: 2 }}>{actor.tipo} →  {actor.nivel}</div>
+              <div style={{ fontSize: 15, color: C.subtle, marginTop: 1 }}>{actor.territorio} →  {actor.area}</div>
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: C.subtle, padding: 0 }}>✕</button>
@@ -252,17 +252,17 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             { label: 'Riesgo', val: <span style={{ color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</span> },
           ].map(({ label, val }) => (
             <div key={label} style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-              <div style={{ fontSize: 12 }}>{val}</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
+              <div style={{ fontSize: 16 }}>{val}</div>
             </div>
           ))}
         </div>
 
         {/* Power/interest */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 14, background: '#f8fafc', borderRadius: 8, padding: '10px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>PODER</div><Pill value={actor.poder} color={C.accent} /></div>
-          <div><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>INTERÉS</div><Pill value={actor.interes} color={C.barbosa} /></div>
-          <div style={{ flex: 1 }}><div style={{ fontSize: 10, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>CUADRANTE</div><div style={{ fontSize: 11, fontWeight: 700, color: C.accent }}>{actor.cuadrante}</div></div>
+          <div><div style={{ fontSize: 16, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>PODER</div><Pill value={actor.poder} color={C.accent} /></div>
+          <div><div style={{ fontSize: 16, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>INTERÉS</div><Pill value={actor.interes} color={C.barbosa} /></div>
+          <div style={{ flex: 1 }}><div style={{ fontSize: 16, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>CUADRANTE</div><div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>{actor.cuadrante}</div></div>
         </div>
 
         {actor.owner && <InfoRow label="Owner" val={actor.owner} />}
@@ -279,17 +279,17 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
         {/* Community fields */}
         {isCommunity && (
           <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, marginTop: 14 }}>
-            <div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Datos comunitarios</div>
+            <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Datos comunitarios</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
               <Field label="Cumpleaños" value={cumple} onChange={setCumple} type="date" />
               <Field label="Hijos" value={hijos} onChange={setHijos} placeholder="Nombres / edades" />
             </div>
             <Field label="Próximo paso" value={proximoPaso} onChange={setProximoPaso} placeholder="Ej: Llamar para reunión la próxima semana" />
             <div style={{ marginTop: 8 }}>
-              <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 4 }}>Notas personales</label>
+              <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 4 }}>Notas personales</label>
               <textarea value={notasPer} onChange={e => setNotasPer(e.target.value)}
                 placeholder="Lo que hay que recordar: gustos, familia, tensiones..."
-                style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '8px 10px', fontSize: 12,
+                style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '8px 10px', fontSize: 16,
                   resize: 'none', height: 60, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
             </div>
           </div>
@@ -297,13 +297,13 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
 
         {/* Log interaction */}
         <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, marginTop: 14 }}>
-          <div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registrar novedad</div>
+          <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registrar novedad</div>
           {/* Tipo */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
             {['Visita', 'Llamada', 'Reunión', 'Evento', 'WhatsApp'].map(t => (
               <button key={t} onClick={() => setTipo(t)}
                 style={{ background: tipo === t ? C.navy : '#f1f5f9', color: tipo === t ? 'white' : C.text,
-                  border: 'none', borderRadius: 20, padding: '5px 12px', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>
+                  border: 'none', borderRadius: 20, padding: '5px 12px', fontSize: 15, cursor: 'pointer', fontWeight: 600 }}>
                 {t}
               </button>
             ))}
@@ -314,7 +314,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
               <button key={k} onClick={() => setNewSemaforo(k)}
                 style={{ flex: 1, background: newSemaforo === k ? v.bg : '#f8fafc',
                   border: `2px solid ${newSemaforo === k ? v.color : 'transparent'}`,
-                  borderRadius: 8, padding: '6px 4px', cursor: 'pointer', fontSize: 11,
+                  borderRadius: 8, padding: '6px 4px', cursor: 'pointer', fontSize: 15,
                   fontWeight: 700, color: v.color }}>
                 {v.dot}
               </button>
@@ -322,11 +322,11 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           </div>
           <textarea value={resumen} onChange={e => setResumen(e.target.value)}
             placeholder="¿Qué pasó? ¿Qué dijo? ¿Hay algo urgente que escalar?"
-            style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '9px 11px', fontSize: 13,
+            style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '9px 11px', fontSize: 15,
               resize: 'none', height: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
           <button onClick={handleSave} disabled={saving || !resumen.trim()}
             style={{ marginTop: 8, width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
-              border: 'none', borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
+              border: 'none', borderRadius: 10, padding: '11px', fontSize: 15, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
             {saving ? '💾 Guardando...' : '💾 Guardar novedad'}
           </button>
         </div>
@@ -334,17 +334,17 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
         {/* History */}
         {interactions.length > 0 && (
           <div style={{ marginTop: 14, borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
-            <div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Historial</div>
+            <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Historial</div>
             {interactions.slice(0, 5).map(i => (
               <div key={i.id} style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'flex-start' }}>
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: i.semaforo_nuevo ? SEMAFORO[i.semaforo_nuevo]?.color : C.subtle, marginTop: 5, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{i.tipo}</span>
-                    <span style={{ fontSize: 10, color: C.subtle }}>{new Date(i.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}</span>
-                    {i.profiles?.full_name && <span style={{ fontSize: 10, color: C.subtle }}>— {i.profiles.full_name}</span>}
+                    <span style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{i.tipo}</span>
+                    <span style={{ fontSize: 16, color: C.subtle }}>{new Date(i.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}</span>
+                    {i.profiles?.full_name && <span style={{ fontSize: 16, color: C.subtle }}>— {i.profiles.full_name}</span>}
                   </div>
-                  <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5 }}>{i.resumen}</div>
+                  <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5 }}>{i.resumen}</div>
                 </div>
               </div>
             ))}
@@ -358,8 +358,8 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
 function InfoRow({ label, val }) {
   return (
     <div style={{ display: 'flex', gap: 8, marginBottom: 5, alignItems: 'flex-start' }}>
-      <span style={{ fontSize: 10, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', minWidth: 76, paddingTop: 1 }}>{label}</span>
-      <span style={{ fontSize: 12, color: C.text }}>{val}</span>
+      <span style={{ fontSize: 16, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', minWidth: 76, paddingTop: 1 }}>{label}</span>
+      <span style={{ fontSize: 16, color: C.text }}>{val}</span>
     </div>
   )
 }
@@ -367,8 +367,8 @@ function InfoRow({ label, val }) {
 function Block({ label, bg, color, children }) {
   return (
     <div style={{ marginBottom: 8 }}>
-      <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-      <div style={{ fontSize: 12, color, background: bg, padding: '9px 11px', borderRadius: 8, lineHeight: 1.6 }}>{children}</div>
+      <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
+      <div style={{ fontSize: 16, color, background: bg, padding: '9px 11px', borderRadius: 8, lineHeight: 1.6 }}>{children}</div>
     </div>
   )
 }
@@ -376,9 +376,9 @@ function Block({ label, bg, color, children }) {
 function Field({ label, value, onChange, type = 'text', placeholder }) {
   return (
     <div>
-      <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
+      <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
       <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 12,
+        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 16,
           outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: C.text }} />
     </div>
   )
@@ -399,29 +399,29 @@ function AgreementCard({ ag, canEdit, onEdit }) {
             <Tag color={isT ? '#0369a1' : '#5b21b6'} bg={isT ? '#e0f2fe' : '#ede9fe'}>{ag.id} →  {ag.territorio}</Tag>
             <Tag color={barColor}>{ag.estado}</Tag>
           </div>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>{ag.nombre}</h3>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>{ag.nombre}</h3>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 10 }}>
           <div style={{ fontSize: 24, fontWeight: 900, color: barColor, lineHeight: 1 }}>{ag.avance}%</div>
           {canEdit && (
             <button onClick={() => onEdit(ag)} style={{ marginTop: 4, background: '#f1f5f9', border: 'none',
-              borderRadius: 6, padding: '3px 8px', fontSize: 10, cursor: 'pointer', color: C.muted }}>
+              borderRadius: 6, padding: '3px 8px', fontSize: 16, cursor: 'pointer', color: C.muted }}>
               Editar
             </button>
           )}
         </div>
       </div>
       <Bar value={ag.avance} color={barColor} height={5} />
-      <div style={{ marginTop: 10, fontSize: 12, color: C.muted, lineHeight: 1.5 }}>
+      <div style={{ marginTop: 10, fontSize: 16, color: C.muted, lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700, color: C.text }}>Intervenciones: </span>{ag.intervenciones}
       </div>
-      <div style={{ marginTop: 6, fontSize: 12, color: C.muted }}>
+      <div style={{ marginTop: 6, fontSize: 16, color: C.muted }}>
         <span style={{ fontWeight: 700, color: C.text }}>Actores: </span>{ag.actores}
       </div>
-      <div style={{ marginTop: 8, background: '#f0fdf4', borderRadius: 8, padding: '8px 11px', fontSize: 12, color: '#166534', lineHeight: 1.5 }}>
+      <div style={{ marginTop: 8, background: '#f0fdf4', borderRadius: 8, padding: '8px 11px', fontSize: 16, color: '#166534', lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
-      {ag.notas && <div style={{ marginTop: 6, fontSize: 11, color: C.orange, fontWeight: 600 }}>{ag.notas}</div>}
+      {ag.notas && <div style={{ marginTop: 6, fontSize: 15, color: C.orange, fontWeight: 600 }}>{ag.notas}</div>}
     </div>
   )
 }
@@ -472,7 +472,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
     <div>
       <div style={{ marginBottom: 18 }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
-        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 18 }}>
@@ -484,7 +484,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
         ].map(s => (
           <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '14px 16px', borderLeft: `4px solid ${s.color}`, textAlign: 'center' }}>
             <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.count}</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -493,7 +493,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
         {[{ id: 'mapa', label: 'Mapa de Riesgos' }, { id: 'legislativo', label: 'Riesgos Legislativos' }, { id: 'cronograma', label: 'Cronograma Politico' }].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
-              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
             {t.label}
           </button>
         ))}
@@ -510,29 +510,29 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
                 <div onClick={() => toggleRisk(r.id)} style={{ padding: '14px 16px', cursor: 'pointer' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 11, fontWeight: 800, color: 'white', background: semColor, padding: '2px 8px', borderRadius: 10 }}>{r.id}</span>
-                      <span style={{ fontSize: 10, color: C.muted }}>{r.zona}</span>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: 'white', background: semColor, padding: '2px 8px', borderRadius: 10 }}>{r.id}</span>
+                      <span style={{ fontSize: 16, color: C.muted }}>{r.zona}</span>
                     </div>
                     <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                       <Tag color={C.muted}>P: {r.probabilidad}</Tag>
                       <Tag color={semColor}>I: {r.impacto}</Tag>
                     </div>
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
-                  {!isExp && r.que_hacemos && <div style={{ fontSize: 11, color: C.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
+                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
+                  {!isExp && r.que_hacemos && <div style={{ fontSize: 15, color: C.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
                 </div>
                 {isExp && (
                   <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
                     <div style={{ paddingTop: 12 }}>
-                      {r.descripcion && <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
-                      {r.quien_detona && <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Quien detona: </span>{r.quien_detona}</div>}
-                      {r.quien_mitiga && <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien mitiga: </span>{r.quien_mitiga}</div>}
-                      {r.que_hacemos && <div style={{ fontSize: 11, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo: </span>{r.que_hacemos}</div>}
+                      {r.descripcion && <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
+                      {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Quien detona: </span>{r.quien_detona}</div>}
+                      {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien mitiga: </span>{r.quien_mitiga}</div>}
+                      {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo: </span>{r.que_hacemos}</div>}
                       {bt.length > 0 && (
                         <div style={{ marginTop: 10 }}>
-                          <div style={{ fontSize: 10, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Analisis Bow-Tie</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Analisis Bow-Tie</div>
                           {bt.map((b, idx) => (
-                            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, marginBottom: 8, fontSize: 10, lineHeight: 1.4 }}>
+                            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, marginBottom: 8, fontSize: 16, lineHeight: 1.4 }}>
                               <div>
                                 {b.causa && <div style={{ background: '#fee2e2', padding: '6px 8px', borderRadius: 6, color: '#991b1b', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Causa: </span>{b.causa}</div>}
                                 {b.control_preventivo && <div style={{ background: '#dbeafe', padding: '6px 8px', borderRadius: 6, color: '#1e40af' }}><span style={{ fontWeight: 700 }}>Ctrl prev: </span>{b.control_preventivo}</div>}
@@ -562,16 +562,16 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
             return (
               <div key={r.id} style={{ background: C.card, borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.3, flex: 1 }}>{r.tema}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.3, flex: 1 }}>{r.tema}</div>
                   <Tag color={nivelColor}>{r.nivel_riesgo}</Tag>
                 </div>
-                <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginBottom: 6 }}>{r.descripcion}</div>
+                <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5, marginBottom: 6 }}>{r.descripcion}</div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
                   <Tag color={C.muted}>Prob: {r.probabilidad}</Tag>
                   <Tag color={C.accent}>{r.comision}</Tag>
                 </div>
-                {r.impacto && <div style={{ fontSize: 11, color: '#9a3412', background: '#fff7ed', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5, marginBottom: 6 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{r.impacto}</div>}
-                {r.acciones_preventivas && <div style={{ fontSize: 11, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Acciones: </span>{r.acciones_preventivas}</div>}
+                {r.impacto && <div style={{ fontSize: 15, color: '#9a3412', background: '#fff7ed', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5, marginBottom: 6 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{r.impacto}</div>}
+                {r.acciones_preventivas && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Acciones: </span>{r.acciones_preventivas}</div>}
               </div>
             )
           })}
@@ -589,13 +589,13 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
                   <div style={{ position: 'absolute', left: -16, top: 6, width: 12, height: 12, borderRadius: '50%', background: nivelColor, border: '2px solid white', boxShadow: '0 0 0 2px ' + nivelColor }} />
                   <div style={{ background: C.card, borderRadius: 12, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                      <div><span style={{ fontSize: 10, fontWeight: 700, color: nivelColor, textTransform: 'uppercase' }}>{ev.fecha}</span> <Tag color={C.muted} bg="#f1f5f9">{ev.tipo}</Tag></div>
+                      <div><span style={{ fontSize: 16, fontWeight: 700, color: nivelColor, textTransform: 'uppercase' }}>{ev.fecha}</span> <Tag color={C.muted} bg="#f1f5f9">{ev.tipo}</Tag></div>
                       <Tag color={nivelColor}>{ev.nivel_riesgo}</Tag>
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.3, marginBottom: 4 }}>{ev.evento}</div>
-                    <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginBottom: 4 }}>{ev.impacto}</div>
-                    {ev.accion && <div style={{ fontSize: 10, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.4 }}><span style={{ fontWeight: 700 }}>Accion: </span>{ev.accion}</div>}
-                    {ev.responsable && <div style={{ fontSize: 10, color: C.subtle, marginTop: 4 }}>Responsable: {ev.responsable}</div>}
+                    <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.3, marginBottom: 4 }}>{ev.evento}</div>
+                    <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5, marginBottom: 4 }}>{ev.impacto}</div>
+                    {ev.accion && <div style={{ fontSize: 16, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.4 }}><span style={{ fontWeight: 700 }}>Accion: </span>{ev.accion}</div>}
+                    {ev.responsable && <div style={{ fontSize: 16, color: C.subtle, marginTop: 4 }}>Responsable: {ev.responsable}</div>}
                   </div>
                 </div>
               )
@@ -697,7 +697,7 @@ function KPIsView({ reportes, seguimiento }) {
           <div style={{ width: 4, height: 24, background: color, borderRadius: 2 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{territorio}</div>
-            <div style={{ fontSize: 11, color: C.subtle }}>
+            <div style={{ fontSize: 15, color: C.subtle }}>
               {territorio === 'Tolu' ? 'Terminal maritima' : 'Planta de regasificacion'} &rarr; {totalReportes} reportes
             </div>
           </div>
@@ -705,17 +705,17 @@ function KPIsView({ reportes, seguimiento }) {
 
         {kpis.map(cat => (
           <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-            <div style={{ fontSize: 10, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>{cat.cat}</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>{cat.cat}</div>
             
             {/* Header row */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center' }}>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700 }}>KPI</div>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q1</div>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q2</div>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q3</div>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q4</div>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Total</div>
-              <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Meta</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700 }}>KPI</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q1</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q2</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q3</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q4</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Total</div>
+              <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Meta</div>
             </div>
 
             {cat.items.map(kpi => {
@@ -729,18 +729,18 @@ function KPIsView({ reportes, seguimiento }) {
                 <div key={kpi.name} style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, alignItems: 'center',
                   padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: C.text }}>{kpi.name}</div>
-                    <div style={{ fontSize: 9, color: C.subtle }}>{kpi.base}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{kpi.name}</div>
+                    <div style={{ fontSize: 15, color: C.subtle }}>{kpi.base}</div>
                   </div>
                   {[1, 2, 3, 4].map(q => (
-                    <div key={q} style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: C.text }}>
+                    <div key={q} style={{ textAlign: 'center', fontSize: 15, fontWeight: 700, color: C.text }}>
                       {sumQ(territorio, kpi.field, q) || '-'}
                     </div>
                   ))}
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: statusColor }}>{total}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: statusColor }}>{total}</div>
                   </div>
-                  <div style={{ textAlign: 'center', fontSize: 11, fontWeight: 600, color: C.muted }}>
+                  <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 600, color: C.muted }}>
                     {kpi.meta || '-'}
                   </div>
                 </div>
@@ -758,18 +758,18 @@ function KPIsView({ reportes, seguimiento }) {
           const pct = total ? Math.round((cumplidos / total) * 100) : 0
           return (
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>COMPROMISOS DE ACUERDOS</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>COMPROMISOS DE ACUERDOS</div>
               <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 8 }}>
                 <div>
                   <div style={{ fontSize: 28, fontWeight: 900, color: pct >= 90 ? C.green : pct >= 60 ? C.orange : C.red }}>{pct}%</div>
-                  <div style={{ fontSize: 10, color: C.muted }}>cumplimiento</div>
+                  <div style={{ fontSize: 16, color: C.muted }}>cumplimiento</div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <Bar value={pct} color={pct >= 90 ? C.green : pct >= 60 ? C.orange : C.red} height={8} />
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700 }}>{cumplidos}/{total}</div>
-                  <div style={{ fontSize: 10, color: C.subtle }}>compromisos</div>
+                  <div style={{ fontSize: 16, fontWeight: 700 }}>{cumplidos}/{total}</div>
+                  <div style={{ fontSize: 16, color: C.subtle }}>compromisos</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -798,7 +798,7 @@ function KPIsView({ reportes, seguimiento }) {
     <div>
       <div style={{ marginBottom: 18 }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs Gestion Social</h1>
-        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
       </div>
 
       {/* Summary cards */}
@@ -814,7 +814,7 @@ function KPIsView({ reportes, seguimiento }) {
         {['Todos', 'Barbosa', 'Tolu'].map(t => (
           <button key={t} onClick={() => setTerrFilter(t)}
             style={{ background: terrFilter === t ? C.navy : '#f1f5f9', color: terrFilter === t ? 'white' : C.text,
-              border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+              border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600 }}>
             {t === 'Tolu' ? 'Tolú' : t}
           </button>
         ))}
@@ -826,8 +826,8 @@ function KPIsView({ reportes, seguimiento }) {
 
       {totalReportes === 0 && (
         <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>
-          <div style={{ fontSize: 14, marginBottom: 6 }}>No hay reportes semanales aun</div>
-          <div style={{ fontSize: 12 }}>Los KPIs se calculan automaticamente cuando las gestoras llenen sus reportes en Input Semanal.</div>
+          <div style={{ fontSize: 16, marginBottom: 6 }}>No hay reportes semanales aun</div>
+          <div style={{ fontSize: 16 }}>Los KPIs se calculan automaticamente cuando las gestoras llenen sus reportes en Input Semanal.</div>
         </div>
       )}
     </div>
@@ -915,18 +915,18 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
   const NumField = ({ label, value, onChange }) => (
     <div style={{ flex: 1, minWidth: 120 }}>
-      <label style={{ fontSize: 10, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{label}</label>
+      <label style={{ fontSize: 16, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{label}</label>
       <input type="number" min="0" value={value} onChange={e => onChange(parseInt(e.target.value) || 0)}
-        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 14,
+        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
           fontWeight: 700, color: C.text, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', textAlign: 'center' }} />
     </div>
   )
 
   const TextArea = ({ label, value, onChange, placeholder }) => (
     <div style={{ marginBottom: 10 }}>
-      <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
+      <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
       <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 12,
+        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
           resize: 'none', height: 60, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
     </div>
   )
@@ -935,12 +935,12 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
     <div>
       <div style={{ marginBottom: 18 }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
-        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} &rarr; Cada viernes</p>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} &rarr; Cada viernes</p>
             <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
               {['Barbosa', 'Tolú'].map(t => (
                 <button key={t} onClick={() => setMyTerr(t)}
                   style={{ flex: 1, background: myTerr === t ? C.navy : '#f1f5f9', color: myTerr === t ? 'white' : C.text,
-                    border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>
                   {t}
                 </button>
               ))}
@@ -948,7 +948,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
       </div>
 
       {saved && (
-        <div style={{ background: '#dcfce7', borderRadius: 10, padding: '10px 16px', marginBottom: 14, fontSize: 13, color: '#166534', fontWeight: 600 }}>
+        <div style={{ background: '#dcfce7', borderRadius: 10, padding: '10px 16px', marginBottom: 14, fontSize: 15, color: '#166534', fontWeight: 600 }}>
           Guardado correctamente
         </div>
       )}
@@ -962,7 +962,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
-              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
             {t.label}
           </button>
         ))}
@@ -975,15 +975,15 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: 0 }}>
               <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 10, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3 }}>SEMANA #</label>
+                <label style={{ fontSize: 16, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3 }}>SEMANA #</label>
                 <input type="number" value={semana} onChange={e => setSemana(e.target.value)} placeholder="1-52"
-                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 14,
+                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
                     fontWeight: 700, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
               </div>
               <div style={{ flex: 2 }}>
-                <label style={{ fontSize: 10, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3 }}>FECHA CORTE</label>
+                <label style={{ fontSize: 16, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3 }}>FECHA CORTE</label>
                 <input type="date" value={fechaCorte} onChange={e => setFechaCorte(e.target.value)}
-                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 13,
+                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15,
                     outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
               </div>
             </div>
@@ -991,7 +991,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* P1: Acuerdos */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P1 &mdash; Acuerdos Sociales</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P1 &mdash; Acuerdos Sociales</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="Firmados" value={acuerdosFirmados} onChange={setAcuerdosFirmados} />
               <NumField label="Compromisos nuevos" value={compromisosNuevos} onChange={setCompromisosNuevos} />
@@ -1001,7 +1001,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* P2: Huella Social */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Diagnóstico Territorial</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Diagnóstico Territorial</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="Diagnosticos" value={diagnosticos} onChange={setDiagnosticos} />
               <NumField label="Actas vecindad" value={actasVecindad} onChange={setActasVecindad} />
@@ -1011,7 +1011,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* P3: Eventos */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P3 &mdash; Eventos y Socializaciones</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P3 &mdash; Eventos y Socializaciones</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="Eventos AID" value={eventosAid} onChange={setEventosAid} />
               <NumField label="Eventos AII" value={eventosAii} onChange={setEventosAii} />
@@ -1022,7 +1022,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* PQRS */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>PQRS / Incidentes</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>PQRS / Incidentes</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="PQRS recibidas" value={pqrsRecibidas} onChange={setPqrsRecibidas} />
               <NumField label="Cerradas" value={pqrsCerradas} onChange={setPqrsCerradas} />
@@ -1033,7 +1033,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* Actores */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Actores y Alertas</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Actores y Alertas</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="Actores gestionados" value={actoresGest} onChange={setActoresGest} />
               <NumField label="Alertas escaladas DAC" value={alertasDac} onChange={setAlertasDac} />
@@ -1042,7 +1042,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           {/* Narrativo */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Resumen Narrativo</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Resumen Narrativo</div>
             <TextArea label="Logros de la semana" value={logros} onChange={setLogros} placeholder="Que se logro esta semana..." />
             <TextArea label="Dificultades / barreras" value={dificultades} onChange={setDificultades} placeholder="Que dificultades hubo..." />
             <TextArea label="Escalamientos a DAC" value={escalamientos} onChange={setEscalamientos} placeholder="Que se escalo a Diana..." />
@@ -1051,12 +1051,12 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
 
           <button onClick={handleSaveReporte} disabled={saving || !semana}
             style={{ width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
-              border: 'none', borderRadius: 10, padding: '13px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', marginBottom: 20 }}>
+              border: 'none', borderRadius: 10, padding: '13px', fontSize: 16, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', marginBottom: 20 }}>
             {saving ? 'Guardando...' : 'Guardar Reporte Semanal'}
           </button>
           <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgC30umcdhdBRY5F1Sjx_MMrAa8c1li2QamoYiBNuVLR3LE?e=ZvD6QH" target="_blank" rel="noopener"
             style={{ display: 'block', width: '100%', background: '#f1f5f9', border: '1px solid #e2e8f0',
-              borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              borderRadius: 10, padding: '11px', fontSize: 15, fontWeight: 600, cursor: 'pointer',
               textAlign: 'center', textDecoration: 'none', color: C.accent, boxSizing: 'border-box' }}>
             Abrir OneDrive — Subir evidencias ({myTerr})
           </a>
@@ -1068,12 +1068,12 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
         <div>
           {/* Add new */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Nuevo Compromiso</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Nuevo Compromiso</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div>
-                <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Acuerdo</label>
+                <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Acuerdo</label>
                 <select value={sgAcuerdo} onChange={e => setSgAcuerdo(e.target.value)}
-                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 12, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
+                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
                   <option value="">Seleccionar acuerdo...</option>
                   {myTerr === 'Barbosa' ? ['B1: Corresponsabilidad Comunitaria', 'B2: Infraestructura y Entorno', 'B3: Gestion Social y Control de Conflictos'].map(a => <option key={a} value={a}>{a}</option>)
                     : ['T1: Sector Pesquero, Maritimo y Turistico', 'T2: Desarrollo de Capacidades y Convivencia', 'T3: Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)}
@@ -1083,9 +1083,9 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
               <div style={{ display: 'flex', gap: 8 }}>
                 <div style={{ flex: 1 }}><Field label="Fecha pactada" value={sgFecha} onChange={setSgFecha} type="date" /></div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Estado</label>
+                  <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Estado</label>
                   <select value={sgEstado} onChange={e => setSgEstado(e.target.value)}
-                    style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 12, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
+                    style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 16, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
                     {['Pendiente', 'En proceso', 'Cumplido', 'Incumplido', 'Escalado'].map(e => <option key={e} value={e}>{e}</option>)}
                   </select>
                 </div>
@@ -1097,14 +1097,14 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
               <Field label="Observacion" value={sgObservacion} onChange={setSgObservacion} placeholder="Notas adicionales..." />
               <button onClick={handleSaveSeguimiento} disabled={saving || !sgAcuerdo || !sgCompromiso}
                 style={{ width: '100%', background: saving ? '#94a3b8' : C.accent, color: 'white',
-                  border: 'none', borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
+                  border: 'none', borderRadius: 10, padding: '11px', fontSize: 15, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
                 {saving ? 'Guardando...' : 'Agregar Compromiso'}
               </button>
             </div>
           </div>
 
           {/* List existing */}
-          <div style={{ fontSize: 11, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
             Compromisos registrados ({mySeguimiento.length})
           </div>
           {mySeguimiento.map(s => {
@@ -1113,12 +1113,12 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
               <div key={s.id} style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderLeft: `4px solid ${stColor}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: C.accent }}>{s.acuerdo}</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: C.accent }}>{s.acuerdo}</div>
                   <Tag color={stColor}>{s.estado}</Tag>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: C.text, marginBottom: 2 }}>{s.compromiso}</div>
-                {s.fecha_pactada && <div style={{ fontSize: 10, color: C.subtle }}>Fecha: {new Date(s.fecha_pactada).toLocaleDateString('es-CO')}</div>}
-                {s.observacion && <div style={{ fontSize: 10, color: C.muted, marginTop: 3 }}>{s.observacion}</div>}
+                <div style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 2 }}>{s.compromiso}</div>
+                {s.fecha_pactada && <div style={{ fontSize: 16, color: C.subtle }}>Fecha: {new Date(s.fecha_pactada).toLocaleDateString('es-CO')}</div>}
+                {s.observacion && <div style={{ fontSize: 16, color: C.muted, marginTop: 3 }}>{s.observacion}</div>}
               </div>
             )
           })}
@@ -1128,11 +1128,11 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
       {/* HISTORICO */}
       {tab === 'historico' && (
         <div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
             Reportes enviados ({myReportes.length})
           </div>
           {myReportes.length === 0 && (
-            <div style={{ textAlign: 'center', padding: 40, color: C.subtle, fontSize: 13 }}>No hay reportes aun. Llena tu primer reporte semanal.</div>
+            <div style={{ textAlign: 'center', padding: 40, color: C.subtle, fontSize: 15 }}>No hay reportes aun. Llena tu primer reporte semanal.</div>
           )}
           {myReportes.map(r => {
             const totalEventos = (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0)
@@ -1142,8 +1142,8 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
                 boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${semaforo}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>Semana {r.semana}</span>
-                    <span style={{ fontSize: 11, color: C.subtle, marginLeft: 8 }}>{new Date(r.fecha_corte).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: C.text }}>Semana {r.semana}</span>
+                    <span style={{ fontSize: 15, color: C.subtle, marginLeft: 8 }}>{new Date(r.fecha_corte).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   </div>
                   <div style={{ width: 10, height: 10, borderRadius: '50%', background: semaforo }} />
                 </div>
@@ -1156,12 +1156,12 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
                   ].map(s => (
                     <div key={s.label} style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: 18, fontWeight: 900, color: s.color }}>{s.value}</div>
-                      <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, textTransform: 'uppercase' }}>{s.label}</div>
+                      <div style={{ fontSize: 15, color: C.muted, fontWeight: 700, textTransform: 'uppercase' }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
-                {r.logros && <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Logros: </span>{r.logros}</div>}
-                {r.dificultades && <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginTop: 2 }}><span style={{ fontWeight: 700, color: C.text }}>Dificultades: </span>{r.dificultades}</div>}
+                {r.logros && <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Logros: </span>{r.logros}</div>}
+                {r.dificultades && <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5, marginTop: 2 }}><span style={{ fontWeight: 700, color: C.text }}>Dificultades: </span>{r.dificultades}</div>}
               </div>
             )
           })}
@@ -1272,7 +1272,7 @@ export default function App() {
 
   if (authLoading) return (
     <div style={{ minHeight: '100vh', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>Cargando...</div>
+      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>Cargando...</div>
     </div>
   )
   if (!session) return <LoginScreen />
@@ -1294,10 +1294,10 @@ export default function App() {
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><svg viewBox="0 0 863.64 794.92" width="20" height="20"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
+            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}><svg viewBox="0 0 863.64 794.92" width="20" height="20"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
-              <div style={{ fontSize: 9, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Centro de Relacionamiento 2026</div>
+              <div style={{ fontSize: 15, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Centro de Relacionamiento 2026</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 2 }}>
@@ -1306,7 +1306,7 @@ export default function App() {
                 style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
                   color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                   border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
-                  fontSize: 11, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span>{n.icon}</span><span>{n.label}</span>
               </button>
             ))}
@@ -1314,11 +1314,11 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {profile?.avatar_url
               ? <img src={profile.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%' }} />
-              : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
+              : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
             }
             <button onClick={signOut}
               style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
-                padding: '4px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 11, cursor: 'pointer' }}>
+                padding: '4px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 15, cursor: 'pointer' }}>
               Salir
             </button>
           </div>
@@ -1333,8 +1333,8 @@ export default function App() {
             <div style={{ marginBottom: 20 }}>
               <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Dashboard Ejecutivo</h1>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 14 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
-                <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
+                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
+                <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
               </div>
             </div>
             {(() => {
@@ -1355,7 +1355,7 @@ export default function App() {
               const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
               if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata`, color: C.red, bg: '#fef2f2' })
               if (!alertas.length) return null
-              return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}` }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 13, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span></div>))}</div>)
+              return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}` }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 15, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span></div>))}</div>)
             })()}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
@@ -1373,38 +1373,38 @@ export default function App() {
                 <div key={t.label} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `4px solid ${t.color}` }}>
                   <div style={{ fontSize: 34, fontWeight: 900, color: t.color }}>{t.value}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{t.label}</div>
-                  <div style={{ fontSize: 11, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{t.label}</div>
+                  <div style={{ fontSize: 15, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
                 </div>
               ))}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               {/* Semaforo chart */}
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
+                <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
                   ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'En gestion activa', stats.rojo]].map(([k, lbl, v]) => (
                   <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
                     <SemDot s={k} size={9} />
-                    <span style={{ fontSize: 12, color: C.muted, width: 140 }}>{lbl}</span>
+                    <span style={{ fontSize: 16, color: C.muted, width: 140 }}>{lbl}</span>
                     <div style={{ flex: 1 }}><Bar value={stats.total ? (v / stats.total) * 100 : 0} color={SEMAFORO[k].color} /></div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: SEMAFORO[k].color, width: 24, textAlign: 'right' }}>{v}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: SEMAFORO[k].color, width: 24, textAlign: 'right' }}>{v}</span>
                   </div>
                 ))}
               </div>
               {/* Agreements summary */}
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>Estado de acuerdos territoriales</h3>
+                <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Estado de acuerdos territoriales</h3>
                 {agreements.map(ag => {
                   const barColor = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }[ag.estado_code] || C.accent
                   return (
                     <div key={ag.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: C.muted, width: 22 }}>{ag.id}</span>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: C.muted, width: 22 }}>{ag.id}</span>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 11, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
+                        <div style={{ fontSize: 15, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
                         <Bar value={ag.avance} color={barColor} height={5} />
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, width: 30, textAlign: 'right', color: barColor }}>{ag.avance}%</span>
+                      <span style={{ fontSize: 16, fontWeight: 700, width: 30, textAlign: 'right', color: barColor }}>{ag.avance}%</span>
                     </div>
                   )
                 })}
@@ -1412,7 +1412,7 @@ export default function App() {
             </div>
             {/* Critical actors */}
             <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-              <h3 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
+              <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
                 {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').slice(0, 8).map(a => (
                   <div key={a.id} onClick={() => { setSelectedActor(a); setView('actores') }}
@@ -1420,8 +1420,8 @@ export default function App() {
                       padding: '10px 12px', border: '1px solid #fecaca', cursor: 'pointer', alignItems: 'flex-start' }}>
                     <Avatar name={a.nombre} size={30} color={getTipoColor(a.tipo)} />
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: '#991b1b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
-                      <div style={{ fontSize: 11, color: C.muted }}>{a.territorio} →  {a.tipo}</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: '#991b1b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
+                      <div style={{ fontSize: 15, color: C.muted }}>{a.territorio} →  {a.tipo}</div>
                     </div>
                   </div>
                 ))}
@@ -1435,20 +1435,20 @@ export default function App() {
           <div>
             <div style={{ marginBottom: 16 }}>
               <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{filtered.length} de {actors.length} actores</p>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{filtered.length} de {actors.length} actores</p>
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
                 style={{ flex: 1, minWidth: 180, border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 11px',
-                  fontSize: 13, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
+                  fontSize: 15, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
               {[
                 { val: filterT, set: setFilterT, label: 'Territorio', opts: ['Todos', 'Tolú', 'Barbosa', 'Nacional'] },
                 { val: filterS, set: setFilterS, label: 'Semáforo', opts: ['Todos', 'verde', 'amarillo', 'naranja', 'rojo'] },
                 { val: filterR, set: setFilterR, label: 'Riesgo', opts: ['Todos', 'Bajo', 'Medio', 'Alto', 'Muy Alto'] },
               ].map(f => (
                 <select key={f.label} value={f.val} onChange={e => f.set(e.target.value)}
-                  style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 12,
+                  style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 16,
                     outline: 'none', color: C.text, background: 'white', fontFamily: 'inherit', cursor: 'pointer' }}>
                   {f.opts.map(o => <option key={o} value={o}>{f.label}: {o}</option>)}
                 </select>
@@ -1469,7 +1469,7 @@ export default function App() {
           <div>
             <div style={{ marginBottom: 18 }}>
               <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>6 acuerdos →  3 Barbosa →  3 Tolú →  Co-responsabilidad comunitaria</p>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>6 acuerdos →  3 Barbosa →  3 Tolú →  Co-responsabilidad comunitaria</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               {['Barbosa', 'Tolú'].map(t => (
@@ -1477,8 +1477,8 @@ export default function App() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <div style={{ width: 4, height: 20, background: t === 'Tolú' ? C.tolu : C.barbosa, borderRadius: 2 }} />
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 800 }}>{t}</div>
-                      <div style={{ fontSize: 11, color: C.subtle }}>{t === 'Tolú' ? 'Terminal marítima' : 'Planta de regasificación'}</div>
+                      <div style={{ fontSize: 16, fontWeight: 800 }}>{t}</div>
+                      <div style={{ fontSize: 15, color: C.subtle }}>{t === 'Tolú' ? 'Terminal marítima' : 'Planta de regasificación'}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -1498,7 +1498,7 @@ export default function App() {
           <div>
             <div style={{ marginBottom: 18 }}>
               <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
             </div>
             {/* Progress summary */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
@@ -1513,7 +1513,7 @@ export default function App() {
                 ].map(s => (
                   <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '14px 18px', borderLeft: `4px solid ${s.color}` }}>
                     <div style={{ fontSize: 26, fontWeight: 900, color: s.color }}>{s.value}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
                   </div>
                 ))
               })()}
@@ -1523,7 +1523,7 @@ export default function App() {
               {['Todos', 'Tolú', 'Barbosa'].map(t => (
                 <button key={t} onClick={() => setCronoFilter(t)}
                   style={{ background: cronoFilter === t ? C.navy : '#f1f5f9', color: cronoFilter === t ? 'white' : C.text,
-                    border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                    border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600 }}>
                   {t}
                 </button>
               ))}
@@ -1539,11 +1539,11 @@ export default function App() {
                     <div style={{ width: 4, height: 24, background: territorio === 'Tolú' ? C.tolu : C.barbosa, borderRadius: 2 }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{territorio}</div>
-                      <div style={{ fontSize: 11, color: C.subtle }}>{territorio === 'Tolú' ? 'Terminal marítima' : 'Planta de regasificación'} → {items.length} eventos</div>
+                      <div style={{ fontSize: 15, color: C.subtle }}>{territorio === 'Tolú' ? 'Terminal marítima' : 'Planta de regasificación'} → {items.length} eventos</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: 18, fontWeight: 900, color: territorio === 'Tolú' ? C.tolu : C.barbosa }}>{pct}%</div>
-                      <div style={{ fontSize: 10, color: C.subtle }}>avance</div>
+                      <div style={{ fontSize: 16, color: C.subtle }}>avance</div>
                     </div>
                   </div>
                   <Bar value={pct} color={territorio === 'Tolú' ? C.tolu : C.barbosa} height={6} />
@@ -1556,23 +1556,23 @@ export default function App() {
                           boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${stColor}`, position: 'relative' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                              <span style={{ fontSize: 11, fontWeight: 800, color: territorio === 'Tolú' ? C.tolu : C.barbosa,
+                              <span style={{ fontSize: 15, fontWeight: 800, color: territorio === 'Tolú' ? C.tolu : C.barbosa,
                                 background: territorio === 'Tolú' ? '#e0f2fe' : '#ede9fe', padding: '2px 8px', borderRadius: 10 }}>
                                 #{ev.numero}
                               </span>
-                              <span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
+                              <span style={{ fontSize: 15, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
                               <Tag color={stColor} bg={stBg}>{ev.estado}</Tag>
                             </div>
-                            {ev.periodo && <span style={{ fontSize: 10, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
+                            {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
                           </div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{ev.evento}</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{ev.evento}</div>
                           {ev.producto && (
-                            <div style={{ fontSize: 11, color: C.muted, marginBottom: 4, lineHeight: 1.5 }}>
+                            <div style={{ fontSize: 15, color: C.muted, marginBottom: 4, lineHeight: 1.5 }}>
                               <span style={{ fontWeight: 700, color: C.text }}>Producto: </span>{ev.producto}
                             </div>
                           )}
                           {ev.resultado && (
-                            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5 }}>
+                            <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5 }}>
                               <span style={{ fontWeight: 700, color: C.text }}>Resultado: </span>{ev.resultado}
                             </div>
                           )}
@@ -1586,24 +1586,24 @@ export default function App() {
             {/* Huella Social */}
             <div style={{ marginTop: 20 }}>
               <h2 style={{ margin: '0 0 14px', fontSize: 18, fontWeight: 900, color: C.text }}>Huella Social Territorial</h2>
-              <p style={{ margin: '0 0 16px', color: C.muted, fontSize: 12 }}>Lo que queda instalado en el territorio, independientemente de si el proyecto sigue activo</p>
+              <p style={{ margin: '0 0 16px', color: C.muted, fontSize: 16 }}>Lo que queda instalado en el territorio, independientemente de si el proyecto sigue activo</p>
               {['Tolú', 'Barbosa'].filter(t => cronoFilter === 'Todos' || cronoFilter === t).map(territorio => (
                 <div key={territorio} style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <div style={{ width: 4, height: 20, background: territorio === 'Tolú' ? C.tolu : C.barbosa, borderRadius: 2 }} />
-                    <div style={{ fontSize: 14, fontWeight: 800 }}>{territorio}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800 }}>{territorio}</div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 10 }}>
                     {huellaSocial.filter(h => h.territorio === territorio).map(h => (
                       <div key={h.id} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
                         boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `3px solid ${territorio === 'Tolú' ? C.tolu : C.barbosa}` }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: territorio === 'Tolú' ? C.tolu : C.barbosa,
+                        <div style={{ fontSize: 16, fontWeight: 700, color: territorio === 'Tolú' ? C.tolu : C.barbosa,
                           textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{h.eje}</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{h.intervencion}</div>
-                        <div style={{ fontSize: 11, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 6 }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{h.intervencion}</div>
+                        <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 6 }}>
                           <span style={{ fontWeight: 700 }}>Huella: </span>{h.huella}
                         </div>
-                        <div style={{ fontSize: 10, color: C.muted, lineHeight: 1.5 }}>
+                        <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5 }}>
                           <span style={{ fontWeight: 700 }}>Indicador: </span>{h.indicador}
                         </div>
                       </div>
@@ -1639,27 +1639,27 @@ export default function App() {
           <div>
             <div style={{ marginBottom: 18 }}>
               <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
             </div>
             {/* Priority actors */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
+              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
               {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => (
                 <div key={a.id} onClick={() => setSelectedActor(a)}
                   style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '9px 0',
                     borderBottom: `1px solid ${C.border}`, cursor: 'pointer' }}>
                   <SemDot s={a.semaforo} size={10} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{a.nombre}</div>
-                    <div style={{ fontSize: 11, color: C.subtle }}>{a.tipo}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600 }}>{a.nombre}</div>
+                    <div style={{ fontSize: 15, color: C.subtle }}>{a.tipo}</div>
                   </div>
-                  <span style={{ fontSize: 13, color: C.subtle }}>›</span>
+                  <span style={{ fontSize: 15, color: C.subtle }}>›</span>
                 </div>
               ))}
             </div>
             {/* Birthday widget */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
+              <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
               {(() => {
                 const today = new Date()
                 const upcoming = actors.filter(a => a.cumpleanos).map(a => {
@@ -1669,21 +1669,21 @@ export default function App() {
                   const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
                   return { ...a, diff, dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) }
                 }).filter(a => a.diff <= 30).sort((a, b) => a.diff - b.diff)
-                if (!upcoming.length) return <div style={{ fontSize: 12, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 días — agrega fechas al abrir un actor comunitario.</div>
+                if (!upcoming.length) return <div style={{ fontSize: 16, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 días — agrega fechas al abrir un actor comunitario.</div>
                 return upcoming.map(a => (
                   <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 700 }}>{a.nombre}</div>
-                      <div style={{ fontSize: 11, color: C.subtle }}>{a.dateStr}</div>
+                      <div style={{ fontSize: 16, fontWeight: 700 }}>{a.nombre}</div>
+                      <div style={{ fontSize: 15, color: C.subtle }}>{a.dateStr}</div>
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: a.diff <= 7 ? C.red : C.orange }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: a.diff <= 7 ? C.red : C.orange }}>
                       {a.diff === 0 ? '¡Hoy! 🎉' : `En ${a.diff} días`}
                     </div>
                   </div>
                 ))
               })()}
             </div>
-            <p style={{ fontSize: 12, color: C.subtle, textAlign: 'center' }}>
+            <p style={{ fontSize: 16, color: C.subtle, textAlign: 'center' }}>
               Abre cualquier actor desde "Actores" para registrar novedades en tiempo real.
             </p>
           </div>
