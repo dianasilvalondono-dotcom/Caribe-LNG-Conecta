@@ -431,7 +431,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   const [tab, setTab] = useState('reporte')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const myTerr = territorio || 'Barbosa'
+ const [myTerr, setMyTerr] = useState(territorio || 'Barbosa')
 
   // Reporte semanal form
   const [semana, setSemana] = useState('')
@@ -527,7 +527,16 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
     <div style={{ maxWidth: 640, margin: '0 auto' }}>
       <div style={{ marginBottom: 18 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
-        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} &rarr; {myTerr} &rarr; Cada viernes</p>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} &rarr; Cada viernes</p>
+            <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+              {['Barbosa', 'Tolú'].map(t => (
+                <button key={t} onClick={() => setMyTerr(t)}
+                  style={{ flex: 1, background: myTerr === t ? C.navy : '#f1f5f9', color: myTerr === t ? 'white' : C.text,
+                    border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                  {t}
+                </button>
+              ))}
+            </div>
       </div>
 
       {saved && (
@@ -582,7 +591,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* P2: Huella Social */}
+          P2 &mdash; Diagnóstico Territorial
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Huella Social</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
