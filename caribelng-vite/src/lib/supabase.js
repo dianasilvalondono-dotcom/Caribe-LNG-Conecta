@@ -141,3 +141,31 @@ export async function updateCronogramaEstado(id, estado) {
   const { data } = await supabase.from('cronograma').update({ estado }).eq('id', id)
   return data
 }
+export async function getReportesSemanales(territorio) {
+  let q = supabase.from('reportes_semanales').select('*').order('semana', { ascending: false })
+  if (territorio) q = q.eq('territorio', territorio)
+  const { data } = await q
+  return data
+}
+
+export async function addReporteSemanal(reporte) {
+  const { data } = await supabase.from('reportes_semanales').insert(reporte)
+  return data
+}
+
+export async function getSeguimientoAcuerdos(territorio) {
+  let q = supabase.from('seguimiento_acuerdos').select('*').order('id')
+  if (territorio) q = q.eq('territorio', territorio)
+  const { data } = await q
+  return data
+}
+
+export async function addSeguimientoAcuerdo(acuerdo) {
+  const { data } = await supabase.from('seguimiento_acuerdos').insert(acuerdo)
+  return data
+}
+
+export async function updateSeguimientoAcuerdo(id, updates) {
+  const { data } = await supabase.from('seguimiento_acuerdos').update(updates).eq('id', id)
+  return data
+}
