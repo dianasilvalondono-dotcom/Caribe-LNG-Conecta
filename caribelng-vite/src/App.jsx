@@ -1075,8 +1075,8 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
                 <select value={sgAcuerdo} onChange={e => setSgAcuerdo(e.target.value)}
                   style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
                   <option value="">Seleccionar acuerdo...</option>
-                  {myTerr === 'Barbosa' ? ['B1: Corresponsabilidad Comunitaria', 'B2: Infraestructura y Entorno', 'B3: Gestion Social y Control de Conflictos'].map(a => <option key={a} value={a}>{a}</option>)
-                    : ['T1: Sector Pesquero, Maritimo y Turistico', 'T2: Desarrollo de Capacidades y Convivencia', 'T3: Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)}
+                  {myTerr === 'Barbosa' ? ['B1: Jornada Educativa y Corresponsabilidad', 'B2: Infraestructura Deportiva y Entorno Ambiental', 'B3: Aprobacion del Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)
+                    : ['T1: Medio Ambiente y Ecosistemas', 'T2: Desarrollo de Capacidades Educativas', 'T3: Aprobacion del Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
               </div>
               <Field label="Compromiso especifico" value={sgCompromiso} onChange={setSgCompromiso} placeholder="Que se comprometio..." />
