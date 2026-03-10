@@ -1054,7 +1054,8 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
               border: 'none', borderRadius: 10, padding: '13px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', marginBottom: 20 }}>
             {saving ? 'Guardando...' : 'Guardar Reporte Semanal'}
           </button>
-        </div> <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgC30umcdhdBRY5F1Sjx_MMrAa8c1li2QamoYiBNuVLR3LE?e=ZvD6QH" target="_blank" rel="noopener"
+        </div> 
+             <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgC30umcdhdBRY5F1Sjx_MMrAa8c1li2QamoYiBNuVLR3LE?e=ZvD6QH" target="_blank" rel="noopener"
             style={{ display: 'block', width: '100%', background: '#f1f5f9', border: '1px solid #e2e8f0',
               borderRadius: 10, padding: '11px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
               textAlign: 'center', textDecoration: 'none', color: C.accent, marginBottom: 20, boxSizing: 'border-box' }}>
