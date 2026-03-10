@@ -492,7 +492,7 @@ export default function App() {
       <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>Cargando...</div>
     </div>
   )
-  if (!session) return <LoginScreen loading={loginLoading} onLogin={() => { setLoginLoading(true); signInWithGoogle() }} />
+  if (!session) return <LoginScreen loading={loginLoading} onLogin={() => { setLoginLoading(true); signInWithMicrosoft() }} />
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
