@@ -90,8 +90,8 @@ function StatCard({ label, value, sub, color = C.navy, icon }) {
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${color}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ fontSize: 30, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
-          <div style={{ fontSize: 11, color: C.muted, marginTop: 3, fontWeight: 700,
+          <div style={{ fontSize: 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
+          <div style={{ fontSize: 13, color: C.muted, marginTop: 3, fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
           {sub && <div style={{ fontSize: 11, color: C.subtle, marginTop: 2 }}>{sub}</div>}
         </div>
@@ -132,7 +132,7 @@ function LoginScreen() {
         <div style={{ width: 56, height: 56, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`,
           borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 26, margin: '0 auto 16px' }}><svg viewBox="0 0 863.64 794.92" width="28" height="28"><path fill="#1565c0" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#08306b" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
-        <h1 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>
           Caribe LNG
         </h1>
         <p style={{ margin: '0 0 8px', color: C.muted, fontSize: 13 }}>
@@ -471,7 +471,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
   return (
     <div>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
+        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
       </div>
 
@@ -797,7 +797,7 @@ function KPIsView({ reportes, seguimiento }) {
   return (
     <div>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs Gestion Social</h1>
+        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs Gestion Social</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
       </div>
 
@@ -934,7 +934,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   return (
     <div style={{ maxWidth: 640, margin: '0 auto' }}>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
+        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{profile?.full_name} &rarr; Cada viernes</p>
             <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
               {['Barbosa', 'Tolú'].map(t => (
@@ -1289,14 +1289,14 @@ export default function App() {
   ]
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 54 }}>
+        <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><svg viewBox="0 0 863.64 794.92" width="18" height="18"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
+            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><svg viewBox="0 0 863.64 794.92" width="20" height="20"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
+              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
               <div style={{ fontSize: 9, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Centro de Relacionamiento 2026</div>
             </div>
           </div>
@@ -1325,15 +1325,17 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '100%', margin: '0 auto', padding: '24px 20px' }}>
+      <div style={{ padding: '24px 40px' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Dashboard Ejecutivo</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
-              <button onClick={() => window.print()} style={{ marginTop: 6, background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Dashboard Ejecutivo</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 14 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
+                <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
+              </div>
             </div>
             {(() => {
               const alertas = []
@@ -1343,10 +1345,9 @@ export default function App() {
               Object.values(ultimosReportes).forEach(r => {
                 if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} PQRS pendientes`, color: C.orange, bg: '#fff7ed' })
                 if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, bg: '#fef2f2' })
-                if (r.alertas_escaladas_dac > 0) alertas.push({ icon: '📢', text: `${r.territorio}: ${r.alertas_escaladas_dac} alerta(s) escalada(s) a DAC`, color: C.red, bg: '#fef2f2' })
               })
               seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
-                if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 50)}... (${s.territorio})`, color: C.red, bg: '#fef2f2' })
+                if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 50)}...`, color: C.red, bg: '#fef2f2' })
               })
               cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
                 alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 60)}...`, color: C.accent, bg: '#eff6ff' })
@@ -1354,25 +1355,16 @@ export default function App() {
               const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
               if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata`, color: C.red, bg: '#fef2f2' })
               if (!alertas.length) return null
-              return (
-                <div style={{ marginBottom: 16 }}>
-                  {alertas.slice(0, 6).map((a, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: a.bg, borderRadius: 8, padding: '8px 12px', marginBottom: 4, borderLeft: `3px solid ${a.color}` }}>
-                      <span style={{ fontSize: 14 }}>{a.icon}</span>
-                      <span style={{ fontSize: 12, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span>
-                    </div>
-                  ))}
-                </div>
-              )
+              return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}` }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 13, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span></div>))}</div>)
             })()}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 16, marginBottom: 24 }}>
               <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
               <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
               <StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" />
               <StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" />
               <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
               {[
                 { label: 'Tolú', value: stats.tolu, color: C.tolu, desc: 'Terminal marítima →  Sucre' },
                 { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
@@ -1380,7 +1372,7 @@ export default function App() {
               ].map(t => (
                 <div key={t.label} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `4px solid ${t.color}` }}>
-                  <div style={{ fontSize: 26, fontWeight: 900, color: t.color }}>{t.value}</div>
+                  <div style={{ fontSize: 34, fontWeight: 900, color: t.color }}>{t.value}</div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{t.label}</div>
                   <div style={{ fontSize: 11, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
                 </div>
@@ -1442,7 +1434,7 @@ export default function App() {
         {view === 'actores' && (
           <div>
             <div style={{ marginBottom: 16 }}>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>{filtered.length} de {actors.length} actores</p>
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
@@ -1476,7 +1468,7 @@ export default function App() {
         {view === 'acuerdos' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>6 acuerdos →  3 Barbosa →  3 Tolú →  Co-responsabilidad comunitaria</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
@@ -1505,11 +1497,11 @@ export default function App() {
         {view === 'cronograma' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
             </div>
             {/* Progress summary */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
               {(() => {
                 const cumplido = cronograma.filter(c => c.estado === 'Cumplido').length
                 const enProceso = cronograma.filter(c => c.estado === 'En proceso').length
