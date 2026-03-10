@@ -1328,6 +1328,56 @@ export default function App() {
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Dashboard Ejecutivo</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 12 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
             </div>
+            {/* Alertas inteligentes */}
+            {(() => {
+              const alertas = []
+              const hoy = new Date()
+              
+              // PQRS pendientes del ultimo reporte
+              const ultimosReportes = {}
+              reportes.forEach(r => {
+                if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r
+              })
+              Object.values(ultimosReportes).forEach(r => {
+                if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} PQRS pendientes`, color: C.orange, bg: '#fff7ed' })
+                if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s) reportado(s)`, color: C.red, bg: '#fef2f2' })
+                if (r.alertas_escaladas_dac > 0) alertas.push({ icon: '📢', text: `${r.territorio}: ${r.alertas_escaladas_dac} alerta(s) escalada(s) a DAC`, color: C.red, bg: '#fef2f2' })
+              })
+
+              // Compromisos vencidos
+              seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
+                const fecha = new Date(s.fecha_pactada)
+                if (fecha < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 60)}... (${s.territorio})`, color: C.red, bg: '#fef2f2' })
+              })
+
+              // Eventos proximos del cronograma (esta semana)
+              const enUnaSemana = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000)
+              cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
+                alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 60)}...`, color: C.accent, bg: '#eff6ff' })
+              })
+
+              // Riesgos en accion inmediata
+              const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
+              if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata requieren gestion`, color: C.red, bg: '#fef2f2' })
+
+              // Sin reportes esta semana
+              const semanActual = Math.ceil((hoy - new Date(hoy.getFullYear(), 0, 1)) / (7 * 24 * 60 * 60 * 1000))
+              const reportesSemana = reportes.filter(r => r.semana === semanActual)
+              if (reportesSemana.length === 0 && hoy.getDay() >= 4) alertas.push({ icon: '📝', text: 'Faltan reportes semanales de las gestoras', color: C.orange, bg: '#fff7ed' })
+
+              if (!alertas.length) return null
+              return (
+                <div style={{ marginBottom: 16 }}>
+                  {alertas.slice(0, 6).map((a, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: a.bg,
+                      borderRadius: 8, padding: '8px 12px', marginBottom: 4, borderLeft: `3px solid ${a.color}` }}>
+                      <span style={{ fontSize: 14 }}>{a.icon}</span>
+                      <span style={{ fontSize: 12, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 20 }}>
               <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
               <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
