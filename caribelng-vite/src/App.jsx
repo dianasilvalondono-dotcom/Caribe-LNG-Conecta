@@ -656,8 +656,8 @@ function KPIsView({ reportes, seguimiento }) {
 
   const KPIS_BARBOSA = [
     { cat: 'EVENTOS Y REUNIONES', items: [
-      { name: 'Eventos area de influencia directa', field: 'eventos_aid', meta: 12, base: '1/mes' },
-      { name: 'Eventos area de influencia indirecta', field: 'eventos_aii', meta: 4, base: '1/trim' },
+      { name: 'Eventos area influencia directa', field: 'eventos_aid', meta: 12, base: '1/mes' },
+      { name: 'Eventos area influencia indirecta', field: 'eventos_aii', meta: 4, base: '1/trim' },
       { name: 'Reuniones institucionales', field: 'eventos_institucional', meta: 4, base: '1/trim' },
     ]},
     { cat: 'DIAGNOSTICO EN TERRITORIO', items: [
@@ -682,8 +682,8 @@ function KPIsView({ reportes, seguimiento }) {
 
   const KPIS_TOLU = [
     { cat: 'EVENTOS Y REUNIONES', items: [
-      { name: 'Eventos area de influencia directa', field: 'eventos_aid', meta: 12, base: '1/mes' },
-      { name: 'Eventos area de influencia indirecta', field: 'eventos_aii', meta: 4, base: '1/trim' },
+      { name: 'Eventos area influencia directa', field: 'eventos_aid', meta: 12, base: '1/mes' },
+      { name: 'Eventos area influencia indirecta', field: 'eventos_aii', meta: 4, base: '1/trim' },
       { name: 'Reuniones institucionales', field: 'eventos_institucional', meta: 4, base: '1/trim' },
     ]},
     { cat: 'DIAGNOSTICO EN TERRITORIO', items: [
@@ -1031,8 +1031,8 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P3 &mdash; Eventos y Socializaciones</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="Eventos area de influencia directa" value={eventosAid} onChange={setEventosAid} />
-              <NumField label="Eventos area de influencia indirecta" value={eventosAii} onChange={setEventosAii} />
+              <NumField label="Eventos area influencia directa" value={eventosAid} onChange={setEventosAid} />
+              <NumField label="Eventos area influencia indirecta" value={eventosAii} onChange={setEventosAii} />
               <NumField label="Institucional" value={eventosInst} onChange={setEventosInst} />
               <NumField label="Asistentes total" value={asistentes} onChange={setAsistentes} />
             </div>
@@ -1376,10 +1376,10 @@ export default function App() {
               return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}` }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 15, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span></div>))}</div>)
             })()}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
-              <StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" />
-              <StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" />
-              <StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" />
-              <StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" />
+              <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" /></div>
+              <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" /></div>
+              <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" /></div>
+              <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" /></div>
               <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
