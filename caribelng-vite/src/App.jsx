@@ -548,6 +548,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       const nuevoAvance = Math.max(0, (ag.avance || 0) - (h.avance_porcentaje || 0))
       await updateAgreementAvance(ag.id, nuevoAvance, ag.notas)
       setHistorial([])
+      setUltimoAvance(null)
       await loadHistorial()
       if (onAvanceAdded) onAvanceAdded()
     } catch(e) {
@@ -558,7 +559,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
   return (
     <>
     <div style={{ background: C.card, borderRadius: 12, padding: '18px 20px',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `5px solid ${isT ? C.tolu : C.barbosa}` }}>
+      boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `5px solid ${isT ? C.tolu : C.barbosa}`, overflow: 'hidden', minWidth: 0 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
@@ -581,12 +582,12 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       <div style={{ marginTop: 8, background: '#f0fdf4', borderRadius: 8, padding: '8px 11px', fontSize: 16, color: '#166534', lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
-      {ag.notas && <div style={{ marginTop: 6, fontSize: 15, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>⚠️ {ag.notas}</div>}
+      {ag.notas && <div style={{ marginTop: 6, fontSize: 14, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>⚠️ {ag.notas}</div>}
       {ultimoAvance && (
-        <div style={{ marginTop: 10, background: '#f8fafc', borderRadius: 8, padding: '8px 12px', borderLeft: `3px solid ${barColor}` }}>
+        <div style={{ marginTop: 10, background: '#f8fafc', borderRadius: 8, padding: '8px 12px', borderLeft: `3px solid ${barColor}`, overflow: 'hidden' }}>
           <div style={{ fontSize: 12, color: C.muted, marginBottom: 2 }}>Último avance · {ultimoAvance.fecha_pactada}</div>
-          <div style={{ fontSize: 14, color: C.text, fontWeight: 600 }}>{ultimoAvance.compromiso}</div>
-          {ultimoAvance.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{ultimoAvance.notas}</div>}
+          <div style={{ fontSize: 14, color: C.text, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ultimoAvance.compromiso}</div>
+          {ultimoAvance.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ultimoAvance.notas}</div>}
         </div>
       )}
       {/* Buttons */}
