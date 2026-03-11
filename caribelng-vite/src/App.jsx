@@ -1398,8 +1398,16 @@ export default function App() {
               <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" /></div>
               <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" /></div>
               <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" /></div>
-              <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" /></div>
-              <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer' }}><StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" /></div>
+              <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Acercamiento por iniciar 🔴" value={stats.rojo} color={C.red} icon="🚨" /></div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
+              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapa de Riesgos</span>
+            </div>
+            <div style={{ marginBottom: 24 }}>
+              <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer', display: 'inline-block', minWidth: 220 }}>
+                <StatCard label="Riesgos en acción inmediata" value={riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))).length} sub="Ver mapa completo →" color='#dc2626' icon="🗺️" />
+              </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <div style={{ width: 3, height: 18, background: C.tolu, borderRadius: 2 }} />
