@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
          getCronograma, getHuellaSocial, updateCronogramaEstado,
-         getReportesSemanales, addReporteSemanal, getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo,
-         getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo } from './lib/supabase'
+         getReportesSemanales, addReporteSemanal, deleteReporteSemanal, deleteKpiEntry, deleteCronogramaEvent, deleteRiesgo,
+         getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
+         getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo, sendAlerta } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -487,7 +488,7 @@ function Field({ label, value, onChange, type = 'text', placeholder }) {
 }
 
 // ━━ Agreement card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
+function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
   const isT = ag.territorio === 'Tolú'
   const stC = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }
   const barColor = stC[ag.estado_code] || C.accent
@@ -536,9 +537,21 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
     }
   }
 
-  return (
-    <>
-    <div style={{ background: C.card, borderRadius: 12, padding: '18px 20px',
+  async function handleBorrar(h) {
+    if (!confirm(`¿Borrar "${h.compromiso}"? El avance del acuerdo se reducirá en ${h.avance_porcentaje || 0}%.`)) return
+    try {
+      await deleteSeguimientoAcuerdo(h.id)
+      const nuevoAvance = Math.max(0, (ag.avance || 0) - (h.avance_porcentaje || 0))
+      await updateAgreementAvance(ag.id, nuevoAvance, ag.notas)
+      setHistorialLoaded(false)
+      await loadHistorial()
+      if (onAvanceAdded) onAvanceAdded()
+    } catch(e) {
+      alert('Error borrando: ' + e.message)
+    }
+  }
+
+
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `5px solid ${isT ? C.tolu : C.barbosa}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div>
@@ -582,10 +595,15 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
           {historial.length === 0
             ? <div style={{ fontSize: 14, color: C.subtle, padding: '8px 0' }}>Sin actividades registradas aún.</div>
             : historial.map((h, i) => (
-              <div key={i} style={{ borderLeft: `3px solid ${C.accent}`, paddingLeft: 10, marginBottom: 10 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{h.compromiso}</div>
-                <div style={{ fontSize: 13, color: C.muted }}>{h.fecha_pactada} · +{h.avance_porcentaje || 0}%</div>
-                {h.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{h.notas}</div>}
+              <div key={i} style={{ borderLeft: `3px solid ${C.accent}`, paddingLeft: 10, marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{h.compromiso}</div>
+                  <div style={{ fontSize: 13, color: C.muted }}>{h.fecha_pactada} · +{h.avance_porcentaje || 0}%</div>
+                  {h.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{h.notas}</div>}
+                </div>
+                <button onClick={() => handleBorrar(h)}
+                  style={{ background: 'none', border: 'none', color: C.red, fontSize: 16, cursor: 'pointer', padding: '0 4px', flexShrink: 0, display: isAdmin ? 'block' : 'none' }}
+                  title="Borrar esta actividad">🗑</button>
               </div>
             ))
           }
@@ -665,7 +683,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
 
 
 // RiesgosView component
-function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
+function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   const [tab, setTab] = useState('mapa')
   const [expandedRisk, setExpandedRisk] = useState(null)
   const [bowTieData, setBowTieData] = useState({})
@@ -766,6 +784,11 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
                     <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                       <Tag color={C.muted}>P: {r.probabilidad}</Tag>
                       <Tag color={semColor}>I: {r.impacto}</Tag>
+                      {isAdmin && (
+                        <button onClick={async (e) => { e.stopPropagation(); if (confirm('¿Borrar este riesgo?')) { await deleteRiesgo(r.id); onDeleted() } }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
+                          title="Borrar">🗑</button>
+                      )}
                     </div>
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
@@ -859,7 +882,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
 
 
 // KPIs Gestoras component
-function KPIsView({ reportes, seguimiento }) {
+function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
   const [terrFilter, setTerrFilter] = useState('Todos')
 
   const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -1097,7 +1120,7 @@ function KPIsView({ reportes, seguimiento }) {
 }
 
 // InputSemanal component
-function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved }) {
+function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -1127,14 +1150,10 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   const [escalamientos, setEscalamientos] = useState('')
   const [prioridades, setPrioridades] = useState('')
 
-  // Seguimiento form
-  const [sgAcuerdo, setSgAcuerdo] = useState('')
-  const [sgCompromiso, setSgCompromiso] = useState('')
-  const [sgFecha, setSgFecha] = useState('')
-  const [sgResponsableCl, setSgResponsableCl] = useState('')
-  const [sgResponsableCom, setSgResponsableCom] = useState('')
-  const [sgEstado, setSgEstado] = useState('Pendiente')
-  const [sgObservacion, setSgObservacion] = useState('')
+  // Alerta form
+  const [alertaMensaje, setAlertaMensaje] = useState('')
+  const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
+  const [alertaEnviada, setAlertaEnviada] = useState(false)
 
   async function handleSaveReporte() {
     if (!semana || !fechaCorte) return
@@ -1155,25 +1174,25 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
     } finally { setSaving(false) }
   }
 
-  async function handleSaveSeguimiento() {
-    if (!sgAcuerdo || !sgCompromiso) return
+  async function handleSendAlerta() {
+    if (!alertaMensaje.trim()) return
     setSaving(true)
     try {
-      await addSeguimientoAcuerdo({
-        territorio: myTerr, acuerdo: sgAcuerdo, compromiso: sgCompromiso,
-        fecha_pactada: sgFecha || null, responsable_cl: sgResponsableCl, responsable_comunidad: sgResponsableCom,
-        estado: sgEstado, observacion: sgObservacion, user_id: session.user.id,
-        semana_reporte: semana ? parseInt(semana) : null
+      await sendAlerta({
+        gestora: profile?.full_name || session?.user?.email,
+        territorio: myTerr,
+        mensaje: alertaMensaje,
+        urgencia: alertaUrgencia
       })
-      setSgAcuerdo(''); setSgCompromiso(''); setSgFecha(''); setSgResponsableCl(''); setSgResponsableCom(''); setSgObservacion('')
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
-      onSaved()
+      setAlertaMensaje('')
+      setAlertaEnviada(true)
+      setTimeout(() => setAlertaEnviada(false), 4000)
+    } catch(e) {
+      alert('Error enviando alerta: ' + e.message)
     } finally { setSaving(false) }
   }
 
   const myReportes = reportes.filter(r => r.territorio === myTerr)
-  const mySeguimiento = seguimiento.filter(s => s.territorio === myTerr)
 
   const NumField = ({ label, value, onChange }) => (
     <div style={{ flex: 1, minWidth: 120 }}>
@@ -1219,11 +1238,12 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
         {[
           { id: 'reporte', label: 'Reporte Semanal' },
-          { id: 'seguimiento', label: 'Seguimiento Acuerdos' },
-          { id: 'historico', label: 'Historico' },
+          { id: 'alerta', label: '🚨 Escalar alerta' },
+          { id: 'historico', label: 'Histórico' },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
+            style={{ flex: 1, background: tab === t.id ? (t.id === 'alerta' ? C.red : C.navy) : '#f1f5f9',
+              color: tab === t.id ? 'white' : C.text,
               border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
             {t.label}
           </button>
@@ -1326,64 +1346,50 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
       )}
 
       {/* SEGUIMIENTO ACUERDOS */}
-      {tab === 'seguimiento' && (
+      {tab === 'alerta' && (
         <div>
-          {/* Add new */}
-          <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Nuevo Compromiso</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div>
-                <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Acuerdo</label>
-                <select value={sgAcuerdo} onChange={e => setSgAcuerdo(e.target.value)}
-                  style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
-                  <option value="">Seleccionar acuerdo...</option>
-                  {myTerr === 'Barbosa' ? ['B1: Jornada Educativa y Corresponsabilidad', 'B2: Infraestructura Deportiva y Entorno Ambiental', 'B3: Aprobacion del Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)
-                    : ['T1: Medio Ambiente y Ecosistemas', 'T2: Desarrollo de Capacidades Educativas', 'T3: Aprobacion del Cronograma Social Anual'].map(a => <option key={a} value={a}>{a}</option>)}
-                </select>
-              </div>
-              <Field label="Compromiso especifico" value={sgCompromiso} onChange={setSgCompromiso} placeholder="Que se comprometio..." />
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}><Field label="Fecha pactada" value={sgFecha} onChange={setSgFecha} type="date" /></div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>Estado</label>
-                  <select value={sgEstado} onChange={e => setSgEstado(e.target.value)}
-                    style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 16, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}>
-                    {['Pendiente', 'En proceso', 'Cumplido', 'Incumplido', 'Escalado'].map(e => <option key={e} value={e}>{e}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}><Field label="Responsable CL" value={sgResponsableCl} onChange={setSgResponsableCl} placeholder="Caribe LNG" /></div>
-                <div style={{ flex: 1 }}><Field label="Responsable Comunidad" value={sgResponsableCom} onChange={setSgResponsableCom} placeholder="Comunidad" /></div>
-              </div>
-              <Field label="Observacion" value={sgObservacion} onChange={setSgObservacion} placeholder="Notas adicionales..." />
-              <button onClick={handleSaveSeguimiento} disabled={saving || !sgAcuerdo || !sgCompromiso}
-                style={{ width: '100%', background: saving ? '#94a3b8' : C.accent, color: 'white',
-                  border: 'none', borderRadius: 10, padding: '11px', fontSize: 15, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
-                {saving ? 'Guardando...' : 'Agregar Compromiso'}
-              </button>
-            </div>
-          </div>
+          <div style={{ background: '#fff1f2', border: '1.5px solid #fecdd3', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>🚨 Escalar alerta a Diana Silva</div>
+            <div style={{ fontSize: 14, color: C.muted, marginBottom: 16 }}>El mensaje llega directamente al correo de la Directora de Asuntos Corporativos.</div>
 
-          {/* List existing */}
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
-            Compromisos registrados ({mySeguimiento.length})
-          </div>
-          {mySeguimiento.map(s => {
-            const stColor = s.estado === 'Cumplido' ? C.green : s.estado === 'En proceso' ? C.orange : s.estado === 'Incumplido' || s.estado === 'Escalado' ? C.red : C.subtle
-            return (
-              <div key={s.id} style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderLeft: `4px solid ${stColor}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: C.accent }}>{s.acuerdo}</div>
-                  <Tag color={stColor}>{s.estado}</Tag>
-                </div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 2 }}>{s.compromiso}</div>
-                {s.fecha_pactada && <div style={{ fontSize: 16, color: C.subtle }}>Fecha: {new Date(s.fecha_pactada).toLocaleDateString('es-CO')}</div>}
-                {s.observacion && <div style={{ fontSize: 16, color: C.muted, marginTop: 3 }}>{s.observacion}</div>}
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Nivel de urgencia</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {['Alta', 'Media', 'Baja'].map(u => (
+                  <button key={u} onClick={() => setAlertaUrgencia(u)}
+                    style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1.5px solid',
+                      borderColor: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : '#e2e8f0',
+                      background: alertaUrgencia === u ? (u === 'Alta' ? '#fee2e2' : u === 'Media' ? '#fff7ed' : '#fefce8') : 'white',
+                      color: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : C.muted,
+                      fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                    {u === 'Alta' ? '🔴' : u === 'Media' ? '🟠' : '🟡'} {u}
+                  </button>
+                ))}
               </div>
-            )
-          })}
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Mensaje *</label>
+              <textarea value={alertaMensaje} onChange={e => setAlertaMensaje(e.target.value)} rows={5}
+                placeholder="Describe la situación que necesitas escalar: qué pasó, quiénes están involucrados, qué necesitas de Diana..."
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #fecdd3',
+                  fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }} />
+            </div>
+
+            {alertaEnviada && (
+              <div style={{ background: '#dcfce7', borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 14, color: '#166534', fontWeight: 600 }}>
+                ✅ Alerta enviada a diana.silva@caribelng.com
+              </div>
+            )}
+
+            <button onClick={handleSendAlerta} disabled={saving || !alertaMensaje.trim()}
+              style={{ width: '100%', background: saving || !alertaMensaje.trim() ? '#f1f5f9' : C.red,
+                color: saving || !alertaMensaje.trim() ? C.muted : 'white',
+                border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
+                cursor: saving || !alertaMensaje.trim() ? 'not-allowed' : 'pointer' }}>
+              {saving ? 'Enviando...' : '🚨 Enviar alerta'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -1407,7 +1413,14 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
                     <span style={{ fontSize: 16, fontWeight: 800, color: C.text }}>Semana {r.semana}</span>
                     <span style={{ fontSize: 15, color: C.subtle, marginLeft: 8 }}>{new Date(r.fecha_corte).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   </div>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: semaforo }} />
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {(isAdmin || profile?.role === 'gestora') && (
+                      <button onClick={async () => { if (confirm('¿Borrar este reporte?')) { await deleteReporteSemanal(r.id); onSaved() } }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
+                        title="Borrar">🗑</button>
+                    )}
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: semaforo }} />
+                  </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 8 }}>
                   {[
@@ -1806,7 +1819,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {agreements.filter(a => a.territorio === t).map(ag => (
-                      <AgreementCard key={ag.id} ag={ag} canEdit={isGestora} onEdit={() => {}} onAvanceAdded={loadData} />
+                      <AgreementCard key={ag.id} ag={ag} canEdit={isGestora} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
                     ))}
                   </div>
                 </div>
@@ -1901,6 +1914,11 @@ export default function App() {
                                   <option key={op} value={op}>{op}</option>
                                 ))}
                               </select>
+                              {isAdmin && (
+                                <button onClick={async () => { if (confirm('¿Borrar este evento del cronograma?')) { await deleteCronogramaEvent(ev.id); loadData() } }}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
+                                  title="Borrar">🗑</button>
+                              )}
                             </div>
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{ev.evento}</div>
@@ -1957,19 +1975,22 @@ export default function App() {
         {/* INPUT SEMANAL */}
         {view === 'input' && (
           <InputSemanal session={session} profile={profile} territorio={myTerritorio}
-            reportes={reportes} seguimiento={seguimiento} onSaved={loadData} />
+            reportes={reportes} seguimiento={seguimiento} onSaved={loadData}
+            isAdmin={isAdmin} />
         )}
 
 
         {/* KPIs GESTORAS */}
         {view === 'kpis' && (
-          <KPIsView reportes={reportes} seguimiento={seguimiento} />
+          <KPIsView reportes={reportes} seguimiento={seguimiento}
+            isAdmin={isAdmin} onDeleted={loadData} agreements={agreements} />
         )}
 
 
         {/* RIESGOS */}
         {view === 'riesgos' && (
-          <RiesgosView riesgos={riesgos} riesgosLeg={riesgosLeg} cronoLeg={cronoLeg} />
+          <RiesgosView riesgos={riesgos} riesgosLeg={riesgosLeg} cronoLeg={cronoLeg}
+            isAdmin={isAdmin} onDeleted={loadData} />
         )}
 
         {/* ━━ GESTORA VIEW ━━ */}
