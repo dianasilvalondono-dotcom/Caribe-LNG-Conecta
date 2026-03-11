@@ -109,18 +109,32 @@ function SemDot({ s, size = 9 }) {
 
 // ━━ Login screen ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function LoginScreen() {
+  const [loading, setLoading] = useState(false)
+  const [loadingEmail, setLoadingEmail] = useState(false)
+  const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [showEmail, setShowEmail] = useState(false)
 
-  const handleLogin = async () => {
+  const handleMicrosoft = async () => {
     setLoading(true)
+    setError('')
+    try {
+      await signInWithMicrosoft()
+    } catch (e) {
+      setError('No se pudo conectar. Intenta de nuevo.')
+      setLoading(false)
+    }
+  }
+
+  const handleEmail = async () => {
+    if (!email || !password) return
+    setLoadingEmail(true)
     setError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setError('Correo o contraseña incorrectos')
-      setLoading(false)
+      setLoadingEmail(false)
     }
   }
 
@@ -138,26 +152,61 @@ function LoginScreen() {
         <p style={{ margin: '0 0 8px', color: C.muted, fontSize: 15 }}>
           Conecta! | Plan de Gestion Social 2026
         </p>
-        <p style={{ margin: '0 0 28px', color: C.subtle, fontSize: 16 }}>
+        <p style={{ margin: '0 0 32px', color: C.subtle, fontSize: 16 }}>
           Tolú →  Barbosa →  Nacional
         </p>
-        <input type="email" placeholder="Correo electrónico" value={email}
-          onChange={e => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0',
-            fontSize: 16, marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
-        <input type="password" placeholder="Contraseña" value={password}
-          onChange={e => setPassword(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleLogin()}
-          style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0',
-            fontSize: 16, marginBottom: 16, boxSizing: 'border-box', outline: 'none' }} />
-        {error && <p style={{ color: C.red, fontSize: 15, margin: '0 0 12px' }}>{error}</p>}
-        <button onClick={handleLogin} disabled={loading}
-          style={{ width: '100%', background: loading ? '#f1f5f9' : C.navy, border: 'none',
-            borderRadius: 10, padding: '12px 16px', fontSize: 16, fontWeight: 600,
-            cursor: loading ? 'wait' : 'pointer', color: 'white', transition: 'all 0.15s' }}>
-          {loading ? 'Conectando...' : 'Entrar'}
+
+        {/* Microsoft */}
+        <button onClick={handleMicrosoft} disabled={loading}
+          style={{ width: '100%', background: loading ? '#f1f5f9' : '#2f2f2f', border: 'none',
+            borderRadius: 10, padding: '13px 16px', fontSize: 15, fontWeight: 600,
+            cursor: loading ? 'wait' : 'pointer', color: 'white', transition: 'all 0.15s',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 21 21">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+          </svg>
+          {loading ? 'Conectando...' : 'Entrar con Microsoft'}
         </button>
-        <p style={{ margin: '16px 0 0', fontSize: 15, color: C.subtle }}>
+
+        {/* Divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
+          <span style={{ fontSize: 13, color: C.subtle }}>o</span>
+          <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
+        </div>
+
+        {/* Email fallback toggle */}
+        {!showEmail ? (
+          <button onClick={() => setShowEmail(true)}
+            style={{ background: 'none', border: 'none', color: C.muted, fontSize: 14,
+              cursor: 'pointer', textDecoration: 'underline' }}>
+            Entrar con correo y contraseña
+          </button>
+        ) : (
+          <div>
+            <input type="email" placeholder="Correo electrónico" value={email}
+              onChange={e => setEmail(e.target.value)}
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0',
+                fontSize: 15, marginBottom: 10, boxSizing: 'border-box', outline: 'none' }} />
+            <input type="password" placeholder="Contraseña" value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleEmail()}
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0',
+                fontSize: 15, marginBottom: 12, boxSizing: 'border-box', outline: 'none' }} />
+            <button onClick={handleEmail} disabled={loadingEmail}
+              style={{ width: '100%', background: loadingEmail ? '#f1f5f9' : C.navy, border: 'none',
+                borderRadius: 10, padding: '12px 16px', fontSize: 15, fontWeight: 600,
+                cursor: loadingEmail ? 'wait' : 'pointer', color: 'white' }}>
+              {loadingEmail ? 'Conectando...' : 'Entrar'}
+            </button>
+          </div>
+        )}
+
+        {error && <p style={{ color: C.red, fontSize: 14, margin: '12px 0 0' }}>{error}</p>}
+        <p style={{ margin: '20px 0 0', fontSize: 13, color: C.subtle }}>
           Solo para equipo Caribe LNG →  Acceso controlado por rol
         </p>
       </div>
