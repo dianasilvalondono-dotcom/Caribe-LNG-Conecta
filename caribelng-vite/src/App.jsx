@@ -543,7 +543,6 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       await deleteSeguimientoAcuerdo(h.id)
       const nuevoAvance = Math.max(0, (ag.avance || 0) - (h.avance_porcentaje || 0))
       await updateAgreementAvance(ag.id, nuevoAvance, ag.notas)
-      setHistorialLoaded(false)
       await loadHistorial()
       if (onAvanceAdded) onAvanceAdded()
     } catch(e) {
@@ -551,7 +550,9 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
     }
   }
 
-
+  return (
+    <>
+    <div style={{ background: C.card, borderRadius: 12, padding: '18px 20px',
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `5px solid ${isT ? C.tolu : C.barbosa}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div>
