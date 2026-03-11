@@ -1317,6 +1317,8 @@ export default function App() {
       if (fresh) setSelectedActor(fresh)
     }
   }, [actors])
+
+  const stats = useMemo(() => ({
     total: actors.length,
     verde: actors.filter(a => a.semaforo === 'verde').length,
     amarillo: actors.filter(a => a.semaforo === 'amarillo').length,
