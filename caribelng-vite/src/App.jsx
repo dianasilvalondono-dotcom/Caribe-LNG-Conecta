@@ -1459,26 +1459,10 @@ export default function App() {
                 <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
               </div>
             </div>
-            {(() => {
-              const alertas = []
-              const hoy = new Date()
-              const ultimosReportes = {}
-              reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
-              Object.values(ultimosReportes).forEach(r => {
-                if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} Quejas sin resolver`, color: C.orange, bg: '#fff7ed', nav: () => setView('input') })
-                if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, bg: '#fef2f2', nav: () => setView('input') })
-              })
-              seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
-                if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 50)}...`, color: C.red, bg: '#fef2f2', nav: () => setView('input') })
-              })
-              cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
-                alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 60)}...`, color: C.accent, bg: '#eff6ff', nav: () => setView('cronograma') })
-              })
-              const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
-              if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata`, color: C.red, bg: '#fef2f2', nav: () => setView('riesgos') })
-              if (!alertas.length) return null
-              return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} onClick={a.nav} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}`, cursor: 'pointer' }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 15, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span><span style={{ fontSize: 15, color: a.color }}>→</span></div>))}</div>)
-            })()}
+            {/* Two-column layout */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start' }}>
+            {/* LEFT: main content */}
+            <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
                 <div style={{ width: 3, height: 18, background: C.navy, borderRadius: 2 }} />
@@ -1573,6 +1557,52 @@ export default function App() {
                 ))}
               </div>
             </div>
+            </div>{/* end left column */}
+
+            {/* RIGHT: Novedades panel */}
+            <div style={{ position: 'sticky', top: 80 }}>
+              <div style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+                <div style={{ background: C.navy, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 16 }}>🔔</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: 'white', letterSpacing: '0.04em' }}>NOVEDADES</span>
+                </div>
+                <div style={{ padding: 12 }}>
+                  {(() => {
+                    const alertas = []
+                    const hoy = new Date()
+                    const ultimosReportes = {}
+                    reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
+                    Object.values(ultimosReportes).forEach(r => {
+                      if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} quejas sin resolver`, color: C.orange, nav: () => setView('input') })
+                      if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, nav: () => setView('input') })
+                    })
+                    seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
+                      if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 45)}...`, color: C.red, nav: () => setView('input') })
+                    })
+                    cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
+                      alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 50)}...`, color: C.accent, nav: () => setView('cronograma') })
+                    })
+                    const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
+                    if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en acción inmediata`, color: C.red, nav: () => setView('riesgos') })
+                    if (!alertas.length) return (
+                      <div style={{ padding: '20px 8px', textAlign: 'center', color: C.subtle, fontSize: 14 }}>
+                        <div style={{ fontSize: 24, marginBottom: 6 }}>✅</div>
+                        Sin novedades por ahora
+                      </div>
+                    )
+                    return alertas.map((a, i) => (
+                      <div key={i} onClick={a.nav} style={{ display: 'flex', gap: 8, alignItems: 'flex-start',
+                        padding: '9px 10px', marginBottom: 6, borderRadius: 8, cursor: 'pointer',
+                        borderLeft: `3px solid ${a.color}`, background: a.color === C.red ? '#fef2f2' : a.color === C.orange ? '#fff7ed' : '#eff6ff' }}>
+                        <span style={{ fontSize: 14, marginTop: 1 }}>{a.icon}</span>
+                        <span style={{ fontSize: 13, color: a.color, fontWeight: 600, lineHeight: 1.4 }}>{a.text}</span>
+                      </div>
+                    ))
+                  })()}
+                </div>
+              </div>
+            </div>
+            </div>{/* end two-column grid */}
           </div>
         )}
 
