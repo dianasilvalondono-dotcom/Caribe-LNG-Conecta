@@ -500,6 +500,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
   const [saving, setSaving] = useState(false)
   const [historial, setHistorial] = useState([])
   const [showHistorial, setShowHistorial] = useState(false)
+  const [ultimoAvance, setUltimoAvance] = useState(null)
 
   async function loadHistorial() {
     const { data } = await supabase
@@ -508,7 +509,10 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       .eq('acuerdo_id', ag.id)
       .order('fecha_pactada', { ascending: false })
     setHistorial(data || [])
+    setUltimoAvance(data && data.length > 0 ? data[0] : null)
   }
+
+  useEffect(() => { loadHistorial() }, [ag.id])
 
   async function handleGuardar() {
     if (!actividad || !porcentaje) return
@@ -543,6 +547,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       await deleteSeguimientoAcuerdo(h.id)
       const nuevoAvance = Math.max(0, (ag.avance || 0) - (h.avance_porcentaje || 0))
       await updateAgreementAvance(ag.id, nuevoAvance, ag.notas)
+      setHistorial([])
       await loadHistorial()
       if (onAvanceAdded) onAvanceAdded()
     } catch(e) {
@@ -577,6 +582,13 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
       {ag.notas && <div style={{ marginTop: 6, fontSize: 15, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>⚠️ {ag.notas}</div>}
+      {ultimoAvance && (
+        <div style={{ marginTop: 10, background: '#f8fafc', borderRadius: 8, padding: '8px 12px', borderLeft: `3px solid ${barColor}` }}>
+          <div style={{ fontSize: 12, color: C.muted, marginBottom: 2 }}>Último avance · {ultimoAvance.fecha_pactada}</div>
+          <div style={{ fontSize: 14, color: C.text, fontWeight: 600 }}>{ultimoAvance.compromiso}</div>
+          {ultimoAvance.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{ultimoAvance.notas}</div>}
+        </div>
+      )}
       {/* Buttons */}
       <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
         <button onClick={() => setShowModal(true)}
@@ -597,10 +609,10 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
             ? <div style={{ fontSize: 14, color: C.subtle, padding: '8px 0' }}>Sin actividades registradas aún.</div>
             : historial.map((h, i) => (
               <div key={i} style={{ borderLeft: `3px solid ${C.accent}`, paddingLeft: 10, marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{h.compromiso}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{h.compromiso}</div>
                   <div style={{ fontSize: 13, color: C.muted }}>{h.fecha_pactada} · +{h.avance_porcentaje || 0}%</div>
-                  {h.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{h.notas}</div>}
+                  {h.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{h.notas}</div>}
                 </div>
                 <button onClick={() => handleBorrar(h)}
                   style={{ background: 'none', border: 'none', color: C.red, fontSize: 16, cursor: 'pointer', padding: '0 4px', flexShrink: 0, visibility: isAdmin ? 'visible' : 'hidden' }}
