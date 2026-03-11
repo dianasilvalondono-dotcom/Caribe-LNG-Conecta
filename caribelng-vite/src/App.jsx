@@ -215,7 +215,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
     if (!resumen.trim()) return
     setSaving(true)
     try {
-      await addInteraction({ actorId: actor.id, tipo, resumen, semaforo_nuevo: newSemaforo, userId: session.user.id })
+      await addInteraction({ actorId: actor.id, tipo, resumen, semaforo_nuevo: newSemaforo, userId: session.user.id, accion_tomada: accionTomada, fecha_accion: fechaAccion })
       await updateActor(actor.id, { semaforo: newSemaforo, cumpleanos: cumple || null, hijos, notas_personales: notasPer, proximo_paso: proximoPaso, accion_tomada: accionTomada, fecha_accion: fechaAccion || null })
       setResumen('')
       setAccionTomada('')
@@ -391,6 +391,11 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
                     {i.profiles?.full_name && <span style={{ fontSize: 16, color: C.subtle }}>— {i.profiles.full_name}</span>}
                   </div>
                   <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5 }}>{i.resumen}</div>
+                  {i.accion_tomada && (
+                    <div style={{ fontSize: 14, color: C.accent, marginTop: 3, fontStyle: 'italic' }}>
+                      ✅ {i.accion_tomada}{i.fecha_accion ? ` — ${new Date(i.fecha_accion).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}` : ''}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -1306,7 +1311,12 @@ export default function App() {
     return () => supabase.removeChannel(ch)
   }, [session, loadData])
 
-  const stats = useMemo(() => ({
+  useEffect(() => {
+    if (selectedActor) {
+      const fresh = actors.find(a => a.id === selectedActor.id)
+      if (fresh) setSelectedActor(fresh)
+    }
+  }, [actors])
     total: actors.length,
     verde: actors.filter(a => a.semaforo === 'verde').length,
     amarillo: actors.filter(a => a.semaforo === 'amarillo').length,
