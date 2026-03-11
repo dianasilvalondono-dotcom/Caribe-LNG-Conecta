@@ -204,6 +204,8 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
   const [hijos, setHijos] = useState(actor.hijos || '')
   const [notasPer, setNotasPer] = useState(actor.notas_personales || '')
   const [proximoPaso, setProximoPaso] = useState(actor.proximo_paso || '')
+  const [accionTomada, setAccionTomada] = useState(actor.accion_tomada || '')
+  const [fechaAccion, setFechaAccion] = useState(actor.fecha_accion || new Date().toISOString().split('T')[0])
 
   useEffect(() => {
     getInteractions(actor.id).then(d => { setInteractions(d || []); setLoading(false) })
@@ -214,8 +216,10 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
     setSaving(true)
     try {
       await addInteraction({ actorId: actor.id, tipo, resumen, semaforo_nuevo: newSemaforo, userId: session.user.id })
-      await updateActor(actor.id, { cumpleanos: cumple || null, hijos, notas_personales: notasPer, proximo_paso: proximoPaso })
+      await updateActor(actor.id, { semaforo: newSemaforo, cumpleanos: cumple || null, hijos, notas_personales: notasPer, proximo_paso: proximoPaso, accion_tomada: accionTomada, fecha_accion: fechaAccion || null })
       setResumen('')
+      setAccionTomada('')
+      setFechaAccion(new Date().toISOString().split('T')[0])
       const fresh = await getInteractions(actor.id)
       setInteractions(fresh || [])
       onUpdated()
@@ -286,6 +290,14 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
         {actor.owner && <InfoRow label="Owner Caribe LNG" val={actor.owner} />}
         {actor.frecuencia && <InfoRow label="Frecuencia" val={actor.frecuencia} />}
         {actor.contacto && <InfoRow label="Contacto" val={actor.contacto} />}
+        {actor.accion_tomada && (
+          <div style={{ background: '#eff6ff', borderRadius: 8, padding: '8px 12px', marginBottom: 8, borderLeft: `3px solid ${C.accent}` }}>
+            <div style={{ fontSize: 13, color: C.accent, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>
+              Última acción {actor.fecha_accion ? `— ${new Date(actor.fecha_accion).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
+            </div>
+            <div style={{ fontSize: 15, color: C.text }}>{actor.accion_tomada}</div>
+          </div>
+        )}
 
         {actor.que_hacemos && (
           <Block label="Qué hacemos" bg="#f0fdf4" color="#166534">{actor.que_hacemos}</Block>
@@ -342,6 +354,22 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             placeholder="¿Qué pasó? ¿Qué dijo? ¿Hay algo urgente que escalar?"
             style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '9px 11px', fontSize: 15,
               resize: 'none', height: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
+          {/* Accion tomada + fecha */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, marginTop: 8 }}>
+            <div>
+              <label style={{ fontSize: 13, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acción tomada</label>
+              <input value={accionTomada} onChange={e => setAccionTomada(e.target.value)}
+                placeholder="Ej: Se llamó para acordar reunión, se envió propuesta..."
+                style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px',
+                  fontSize: 15, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: C.text }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 13, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha</label>
+              <input type="date" value={fechaAccion} onChange={e => setFechaAccion(e.target.value)}
+                style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px',
+                  fontSize: 15, outline: 'none', fontFamily: 'inherit', color: C.text }} />
+            </div>
+          </div>
           <button onClick={handleSave} disabled={saving || !resumen.trim()}
             style={{ marginTop: 8, width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
               border: 'none', borderRadius: 10, padding: '11px', fontSize: 15, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
