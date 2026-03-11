@@ -222,11 +222,6 @@ export async function deleteCronogramaEvent(id) {
   if (error) throw error
 }
 
-export async function deleteSeguimientoAcuerdo(id) {
-  const { error } = await supabase.from('seguimiento_acuerdos').delete().eq('id', id)
-  if (error) throw error
-}
-
 export async function deleteRiesgo(id) {
   const { error } = await supabase.from('riesgos').delete().eq('id', id)
   if (error) throw error
