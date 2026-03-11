@@ -100,12 +100,20 @@ export async function getAgreements() {
   const { data, error } = await supabase
     .from('agreements')
     .select('*')
-    .order('territorio', { ascending: true })
+    .order('id', { ascending: true })
   if (error) throw error
   return data
 }
 
-export async function updateAgreementAvance(id, avance, notas) {
+export async function deleteSeguimientoAcuerdo(id) {
+  const { error } = await supabase
+    .from('seguimiento_acuerdos')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
+}
+
+
   const estado_code = avance >= 100 ? 'cumplido' : avance > 0 ? 'en_curso' : 'por_estructurar'
   const estado = avance >= 100 ? 'Cumplido' : avance > 0 ? 'En curso' : 'Por estructurar'
   const { error } = await supabase
@@ -194,5 +202,42 @@ export async function getRiesgosLegislativos() {
 
 export async function getCronogramaLegislativo() {
   const { data } = await supabase.from('cronograma_legislativo').select('*').order('id')
+  return data
+}
+
+// ── Delete functions ──────────────────────────────────────────────────────────
+
+export async function deleteReporteSemanal(id) {
+  const { error } = await supabase.from('reportes_semanales').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteKpiEntry(id) {
+  const { error } = await supabase.from('kpis').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteCronogramaEvent(id) {
+  const { error } = await supabase.from('cronograma').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteSeguimientoAcuerdo(id) {
+  const { error } = await supabase.from('seguimiento_acuerdos').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteRiesgo(id) {
+  const { error } = await supabase.from('riesgos').delete().eq('id', id)
+  if (error) throw error
+}
+
+// ── Alertas ───────────────────────────────────────────────────────────────────
+
+export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
+  const { data, error } = await supabase.functions.invoke('super-action', {
+    body: { gestora, territorio, mensaje, urgencia }
+  })
+  if (error) throw error
   return data
 }
