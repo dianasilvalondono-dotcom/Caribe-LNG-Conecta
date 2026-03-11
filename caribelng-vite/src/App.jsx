@@ -1361,26 +1361,26 @@ export default function App() {
               const ultimosReportes = {}
               reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
               Object.values(ultimosReportes).forEach(r => {
-                if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} Quejas sin resolver`, color: C.orange, bg: '#fff7ed' })
-                if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, bg: '#fef2f2' })
+                if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} Quejas sin resolver`, color: C.orange, bg: '#fff7ed', nav: () => setView('input') })
+                if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, bg: '#fef2f2', nav: () => setView('input') })
               })
               seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
-                if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 50)}...`, color: C.red, bg: '#fef2f2' })
+                if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 50)}...`, color: C.red, bg: '#fef2f2', nav: () => setView('input') })
               })
               cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
-                alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 60)}...`, color: C.accent, bg: '#eff6ff' })
+                alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 60)}...`, color: C.accent, bg: '#eff6ff', nav: () => setView('cronograma') })
               })
               const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
-              if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata`, color: C.red, bg: '#fef2f2' })
+              if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en accion inmediata`, color: C.red, bg: '#fef2f2', nav: () => setView('riesgos') })
               if (!alertas.length) return null
-              return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}` }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 15, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span></div>))}</div>)
+              return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} onClick={a.nav} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}`, cursor: 'pointer' }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 15, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span><span style={{ fontSize: 15, color: a.color }}>→</span></div>))}</div>)
             })()}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" /></div>
               <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" /></div>
               <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" /></div>
               <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" /></div>
-              <StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" />
+              <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer' }}><StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" /></div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {[
@@ -1388,8 +1388,8 @@ export default function App() {
                 { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
                 { label: 'Nacional', value: stats.nacional, color: C.muted, desc: 'Legislativo →  Regulatorio' },
               ].map(t => (
-                <div key={t.label} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `4px solid ${t.color}` }}>
+                <div key={t.label} onClick={() => { setView('actores'); setFilterT(t.label) }} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `4px solid ${t.color}`, cursor: 'pointer' }}>
                   <div style={{ fontSize: 34, fontWeight: 900, color: t.color }}>{t.value}</div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{t.label}</div>
                   <div style={{ fontSize: 15, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
@@ -1402,7 +1402,7 @@ export default function App() {
                 <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
                   ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'En gestion activa', stats.rojo]].map(([k, lbl, v]) => (
-                  <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
+                  <div key={k} onClick={() => { setView('actores'); setFilterS(k) }} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9, cursor: 'pointer' }}>
                     <SemDot s={k} size={9} />
                     <span style={{ fontSize: 16, color: C.muted, width: 140 }}>{lbl}</span>
                     <div style={{ flex: 1 }}><Bar value={stats.total ? (v / stats.total) * 100 : 0} color={SEMAFORO[k].color} /></div>
@@ -1416,7 +1416,7 @@ export default function App() {
                 {agreements.map(ag => {
                   const barColor = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }[ag.estado_code] || C.accent
                   return (
-                    <div key={ag.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <div key={ag.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
                       <span style={{ fontSize: 16, fontWeight: 700, color: C.muted, width: 22 }}>{ag.id}</span>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 15, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
