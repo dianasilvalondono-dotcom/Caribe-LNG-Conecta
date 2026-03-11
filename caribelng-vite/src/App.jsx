@@ -272,6 +272,8 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
       const fresh = await getInteractions(actor.id)
       setInteractions(fresh || [])
       onUpdated()
+    } catch(e) {
+      alert('Error guardando: ' + e.message)
     } finally { setSaving(false) }
   }
 
@@ -515,6 +517,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
       const nuevoAvance = Math.min((ag.avance || 0) + pct, 100)
       await addSeguimientoAcuerdo({
         acuerdo_id: ag.id,
+        acuerdo: ag.nombre,
         territorio: ag.territorio,
         compromiso: actividad,
         fecha_pactada: fecha,
