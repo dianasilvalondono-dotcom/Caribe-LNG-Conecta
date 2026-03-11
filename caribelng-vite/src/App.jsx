@@ -485,12 +485,55 @@ function Field({ label, value, onChange, type = 'text', placeholder }) {
 }
 
 // ━━ Agreement card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function AgreementCard({ ag, canEdit, onEdit }) {
+function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
   const isT = ag.territorio === 'Tolú'
   const stC = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }
   const barColor = stC[ag.estado_code] || C.accent
+  const [showModal, setShowModal] = useState(false)
+  const [actividad, setActividad] = useState('')
+  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+  const [porcentaje, setPorcentaje] = useState('')
+  const [notas, setNotas] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [historial, setHistorial] = useState([])
+  const [showHistorial, setShowHistorial] = useState(false)
+
+  async function loadHistorial() {
+    const { data } = await supabase
+      .from('seguimiento_acuerdos')
+      .select('*')
+      .eq('acuerdo_id', ag.id)
+      .order('fecha_pactada', { ascending: false })
+    setHistorial(data || [])
+  }
+
+  async function handleGuardar() {
+    if (!actividad || !porcentaje) return
+    setSaving(true)
+    try {
+      const pct = Math.min(parseInt(porcentaje) || 0, 100)
+      const nuevoAvance = Math.min((ag.avance || 0) + pct, 100)
+      await addSeguimientoAcuerdo({
+        acuerdo_id: ag.id,
+        compromiso: actividad,
+        fecha_pactada: fecha,
+        estado: 'Cumplido',
+        notas: notas,
+        avance_porcentaje: pct,
+      })
+      await updateAgreementAvance(ag.id, nuevoAvance, notas || ag.notas)
+      setActividad(''); setPorcentaje(''); setNotas('')
+      setShowModal(false)
+      if (onAvanceAdded) onAvanceAdded()
+    } catch(e) {
+      alert('Error guardando: ' + e.message)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
+    <>
     <div style={{ background: C.card, borderRadius: 12, padding: '18px 20px',
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `5px solid ${isT ? C.tolu : C.barbosa}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
@@ -503,12 +546,6 @@ function AgreementCard({ ag, canEdit, onEdit }) {
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 10 }}>
           <div style={{ fontSize: 24, fontWeight: 900, color: barColor, lineHeight: 1 }}>{ag.avance}%</div>
-          {canEdit && (
-            <button onClick={() => onEdit(ag)} style={{ marginTop: 4, background: '#f1f5f9', border: 'none',
-              borderRadius: 6, padding: '3px 8px', fontSize: 16, cursor: 'pointer', color: C.muted }}>
-              Editar
-            </button>
-          )}
         </div>
       </div>
       <Bar value={ag.avance} color={barColor} height={5} />
@@ -522,7 +559,101 @@ function AgreementCard({ ag, canEdit, onEdit }) {
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
       {ag.notas && <div style={{ marginTop: 6, fontSize: 15, color: C.orange, fontWeight: 600 }}>{ag.notas}</div>}
+      {/* Buttons */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+        <button onClick={() => setShowModal(true)}
+          style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
+            padding: '7px 14px', fontSize: 14, fontWeight: 700, cursor: 'pointer', flex: 1 }}>
+          + Registrar avance
+        </button>
+        <button onClick={() => { setShowHistorial(!showHistorial); if (!showHistorial) loadHistorial() }}
+          style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8,
+            padding: '7px 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+          {showHistorial ? 'Ocultar' : 'Ver historial'}
+        </button>
+      </div>
+      {/* Historial */}
+      {showHistorial && (
+        <div style={{ marginTop: 12 }}>
+          {historial.length === 0
+            ? <div style={{ fontSize: 14, color: C.subtle, padding: '8px 0' }}>Sin actividades registradas aún.</div>
+            : historial.map((h, i) => (
+              <div key={i} style={{ borderLeft: `3px solid ${C.accent}`, paddingLeft: 10, marginBottom: 10 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{h.compromiso}</div>
+                <div style={{ fontSize: 13, color: C.muted }}>{h.fecha_pactada} · +{h.avance_porcentaje || 0}%</div>
+                {h.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{h.notas}</div>}
+              </div>
+            ))
+          }
+        </div>
+      )}
     </div>
+
+    {/* Modal registrar avance */}
+    {showModal && (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 28, maxWidth: 460, width: '100%',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: C.text }}>Registrar avance</h2>
+              <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>{ag.nombre}</div>
+            </div>
+            <button onClick={() => setShowModal(false)}
+              style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: C.muted }}>✕</button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Actividad *</label>
+              <input value={actividad} onChange={e => setActividad(e.target.value)}
+                placeholder="ej: Reunión con Suragás y directora operativa"
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0',
+                  fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Fecha</label>
+                <input type="date" value={fecha} onChange={e => setFecha(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0',
+                    fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>
+                  % que representa *
+                  <span style={{ fontWeight: 400, color: C.muted }}> (avance actual: {ag.avance}%)</span>
+                </label>
+                <input type="number" min="1" max={100 - (ag.avance || 0)} value={porcentaje}
+                  onChange={e => setPorcentaje(e.target.value)}
+                  placeholder="ej: 10"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0',
+                    fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit' }} />
+              </div>
+            </div>
+            {porcentaje && (
+              <div style={{ background: '#eff6ff', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: C.accent, fontWeight: 600 }}>
+                El acuerdo quedará en {Math.min((ag.avance || 0) + (parseInt(porcentaje) || 0), 100)}% de avance
+              </div>
+            )}
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Notas (opcional)</label>
+              <textarea value={notas} onChange={e => setNotas(e.target.value)} rows={2}
+                placeholder="Observaciones, compromisos, próximos pasos..."
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0',
+                  fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }} />
+            </div>
+            <button onClick={handleGuardar} disabled={saving || !actividad || !porcentaje}
+              style={{ background: saving || !actividad || !porcentaje ? '#f1f5f9' : C.navy,
+                color: saving || !actividad || !porcentaje ? C.muted : 'white',
+                border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
+                cursor: saving || !actividad || !porcentaje ? 'not-allowed' : 'pointer' }}>
+              {saving ? 'Guardando...' : 'Guardar avance'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 
@@ -1659,7 +1790,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {agreements.filter(a => a.territorio === t).map(ag => (
-                      <AgreementCard key={ag.id} ag={ag} canEdit={isGestora} onEdit={() => {}} />
+                      <AgreementCard key={ag.id} ag={ag} canEdit={isGestora} onEdit={() => {}} onAvanceAdded={loadData} />
                     ))}
                   </div>
                 </div>

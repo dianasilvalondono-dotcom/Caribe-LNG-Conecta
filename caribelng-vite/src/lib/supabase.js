@@ -166,7 +166,8 @@ export async function getSeguimientoAcuerdos(territorio) {
 }
 
 export async function addSeguimientoAcuerdo(acuerdo) {
-  const { data } = await supabase.from('seguimiento_acuerdos').insert(acuerdo)
+  const { data, error } = await supabase.from('seguimiento_acuerdos').insert(acuerdo).select()
+  if (error) throw error
   return data
 }
 
