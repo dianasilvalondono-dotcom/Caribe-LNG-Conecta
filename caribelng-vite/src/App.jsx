@@ -602,7 +602,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
                   {h.notas && <div style={{ fontSize: 13, color: C.subtle, marginTop: 2 }}>{h.notas}</div>}
                 </div>
                 <button onClick={() => handleBorrar(h)}
-                  style={{ background: 'none', border: 'none', color: C.red, fontSize: 16, cursor: 'pointer', padding: '0 4px', flexShrink: 0, display: isAdmin ? 'block' : 'none' }}
+                  style={{ background: 'none', border: 'none', color: C.red, fontSize: 16, cursor: 'pointer', padding: '0 4px', flexShrink: 0, visibility: isAdmin ? 'visible' : 'hidden' }}
                   title="Borrar esta actividad">🗑</button>
               </div>
             ))
