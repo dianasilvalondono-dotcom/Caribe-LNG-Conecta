@@ -1453,7 +1453,7 @@ export default function App() {
         {view === 'dashboard' && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Dashboard Ejecutivo</h1>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Caribe LNG Conecta | Estado del territorio</h1>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
                 <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
