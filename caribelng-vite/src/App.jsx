@@ -250,9 +250,9 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Estado de la relacion</div>
             <div style={{ fontSize: 16, color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</div>
             <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
-              {actor.semaforo === 'rojo' && 'No se ha logrado acercamiento o hay oposicion activa'}
-              {actor.semaforo === 'naranja' && 'Relacion inactiva o sin contacto reciente'}
-              {actor.semaforo === 'amarillo' && 'En proceso de acercamiento, falta consolidar la relacion'}
+              {actor.semaforo === 'rojo' && 'No se ha iniciado acercamiento — oportunidad de relacionamiento prioritaria'}
+              {actor.semaforo === 'naranja' && 'Relación en construcción — requiere seguimiento cercano'}
+              {actor.semaforo === 'amarillo' && 'Acercamiento en curso — avanzar hacia consolidacion de la relacion'}
               {actor.semaforo === 'verde' && 'Relacion activa con comunicacion regular'}
             </div>
           </div>
@@ -269,9 +269,9 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Nivel de riesgo</div>
             <div style={{ fontSize: 16, color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</div>
             <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
-              {(actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') && 'Este actor puede activar un riesgo importante para el proyecto'}
-              {actor.riesgo === 'Medio' && 'Tiene influencia moderada sobre algun riesgo del proyecto'}
-              {actor.riesgo === 'Bajo' && 'Bajo impacto en los riesgos del proyecto'}
+              {(actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') && 'Gestion proactiva prioritaria — requiere atencion sostenida'}
+              {actor.riesgo === 'Medio' && 'Seguimiento regular para anticipar cualquier variacion'}
+              {actor.riesgo === 'Bajo' && 'Monitoreo de rutina — relacion estable'}
             </div>
           </div>
         </div>
@@ -452,6 +452,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
   const [tab, setTab] = useState('mapa')
   const [expandedRisk, setExpandedRisk] = useState(null)
   const [bowTieData, setBowTieData] = useState({})
+  const [riesgoFilter, setRiesgoFilter] = useState('Todos')
 
   async function toggleRisk(rid) {
     if (expandedRisk === rid) { setExpandedRisk(null); return }
@@ -495,16 +496,23 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 18 }}>
         {[
-          { label: 'Accion inmediata', count: rojos.length, color: C.red, bg: '#fee2e2' },
-          { label: 'Vigilar', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
-          { label: 'Bajo control', count: verdes.length, color: C.green, bg: '#dcfce7' },
-          { label: 'En revision', count: azules.length, color: C.accent, bg: '#dbeafe' },
-        ].map(s => (
-          <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '14px 16px', borderLeft: `4px solid ${s.color}`, textAlign: 'center' }}>
-            <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.count}</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
-          </div>
-        ))}
+          { label: 'Accion inmediata', key: 'Alto', count: rojos.length, color: C.red, bg: '#fee2e2' },
+          { label: 'Vigilar', key: 'Medio', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
+          { label: 'Bajo control', key: 'Bajo', count: verdes.length, color: C.green, bg: '#dcfce7' },
+          { label: 'En revision', key: 'Revision', count: azules.length, color: C.accent, bg: '#dbeafe' },
+        ].map(s => {
+          const isActive = riesgoFilter === s.key
+          return (
+            <div key={s.label} onClick={() => { setRiesgoFilter(isActive ? 'Todos' : s.key); setTab('mapa') }}
+              style={{ background: isActive ? s.color : s.bg, borderRadius: 12, padding: '14px 16px',
+                borderLeft: `4px solid ${s.color}`, textAlign: 'center', cursor: 'pointer',
+                transition: 'all 0.15s', boxShadow: isActive ? `0 4px 14px ${s.color}44` : 'none',
+                transform: isActive ? 'translateY(-2px)' : 'none' }}>
+              <div style={{ fontSize: 28, fontWeight: 900, color: isActive ? 'white' : s.color }}>{s.count}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: isActive ? 'white' : s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+            </div>
+          )
+        })}
       </div>
 
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
@@ -519,7 +527,14 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
 
       {tab === 'mapa' && (
         <div>
-          {riesgos.map(r => {
+          {riesgos.filter(r => {
+            if (riesgoFilter === 'Todos') return true
+            if (riesgoFilter === 'Alto') return r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))
+            if (riesgoFilter === 'Medio') return r.semaforo && (r.semaforo.includes('Medio') || r.semaforo.includes('Vigilar'))
+            if (riesgoFilter === 'Bajo') return r.semaforo && (r.semaforo.includes('Bajo') || r.semaforo.includes('control'))
+            if (riesgoFilter === 'Revision') return r.semaforo && r.semaforo.includes('Revision')
+            return true
+          }).map(r => {
             const semColor = getSemaforoColor(r.semaforo)
             const isExp = expandedRisk === r.id
             const bt = bowTieData[r.id] || []
@@ -543,7 +558,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg }) {
                   <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
                     <div style={{ paddingTop: 12 }}>
                       {r.descripcion && <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
-                      {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Quien puede activar este riesgo: </span>{r.quien_detona}</div>}
+                      {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Actores clave a gestionar: </span>{r.quien_detona}</div>}
                       {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien nos ayuda a controlarlo: </span>{r.quien_mitiga}</div>}
                       {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo hoy: </span>{r.que_hacemos}</div>}
                       {bt.length > 0 && (
@@ -1376,11 +1391,19 @@ export default function App() {
               return (<div style={{ marginBottom: 16 }}>{alertas.slice(0, 6).map((a, i) => (<div key={i} onClick={a.nav} style={{ display: 'flex', gap: 10, alignItems: 'center', background: a.bg, borderRadius: 10, padding: '10px 14px', marginBottom: 6, borderLeft: `3px solid ${a.color}`, cursor: 'pointer' }}><span style={{ fontSize: 16 }}>{a.icon}</span><span style={{ fontSize: 15, color: a.color, fontWeight: 600, flex: 1 }}>{a.text}</span><span style={{ fontSize: 15, color: a.color }}>→</span></div>))}</div>)
             })()}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+              <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
+                <div style={{ width: 3, height: 18, background: C.navy, borderRadius: 2 }} />
+                <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapeo de Actores</span>
+              </div>
               <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" /></div>
               <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" /></div>
               <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" /></div>
               <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Accion inmediata 🔴" value={stats.rojo} color={C.red} icon="🚨" /></div>
               <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer' }}><StatCard label="Riesgo alto" value={stats.alto} color='#dc2626' icon="⚠️" /></div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 3, height: 18, background: C.tolu, borderRadius: 2 }} />
+              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores por Territorio</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {[
@@ -1396,12 +1419,16 @@ export default function App() {
                 </div>
               ))}
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 3, height: 18, background: C.accent, borderRadius: 2 }} />
+              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Semáforo de Relacionamiento & Acuerdos</span>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               {/* Semaforo chart */}
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
                 <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
-                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'En gestion activa', stats.rojo]].map(([k, lbl, v]) => (
+                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Acercamiento por iniciar', stats.rojo]].map(([k, lbl, v]) => (
                   <div key={k} onClick={() => { setView('actores'); setFilterS(k) }} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9, cursor: 'pointer' }}>
                     <SemDot s={k} size={9} />
                     <span style={{ fontSize: 16, color: C.muted, width: 140 }}>{lbl}</span>
@@ -1429,6 +1456,10 @@ export default function App() {
               </div>
             </div>
             {/* Critical actors */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
+              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores en Gestión Prioritaria</span>
+            </div>
             <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
               <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
