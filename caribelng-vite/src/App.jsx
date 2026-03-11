@@ -999,36 +999,48 @@ function KPIsView({ reportes, seguimiento }) {
           </div>
         ))}
 
-        {/* Seguimiento acuerdos summary */}
+        {/* Acuerdos territoriales summary */}
         {(() => {
-          const sg = seguimiento.filter(s => s.territorio === territorio)
-          if (!sg.length) return null
-          const cumplidos = sg.filter(s => s.estado === 'Cumplido').length
-          const total = sg.length
-          const pct = total ? Math.round((cumplidos / total) * 100) : 0
+          const agTerritory = agreements.filter(a => a.territorio === territorio)
+          if (!agTerritory.length) return null
+          const cumplidos = agTerritory.filter(a => a.estado_code === 'cumplido').length
+          const enCurso = agTerritory.filter(a => a.estado_code === 'en_curso').length
+          const porEstructurar = agTerritory.filter(a => a.estado_code === 'por_estructurar' || a.estado_code === 'estructural').length
+          const avgAvance = Math.round(agTerritory.reduce((sum, a) => sum + (a.avance || 0), 0) / agTerritory.length)
           return (
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>COMPROMISOS DE ACUERDOS</div>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>ACUERDOS TERRITORIALES</div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 12 }}>
                 <div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: pct >= 90 ? C.green : pct >= 60 ? C.orange : C.red }}>{pct}%</div>
-                  <div style={{ fontSize: 16, color: C.muted }}>cumplimiento</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: avgAvance >= 90 ? C.green : avgAvance >= 50 ? C.orange : C.red }}>{avgAvance}%</div>
+                  <div style={{ fontSize: 13, color: C.muted }}>avance promedio</div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <Bar value={pct} color={pct >= 90 ? C.green : pct >= 60 ? C.orange : C.red} height={8} />
+                  <Bar value={avgAvance} color={avgAvance >= 90 ? C.green : avgAvance >= 50 ? C.orange : C.red} height={8} />
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 16, fontWeight: 700 }}>{cumplidos}/{total}</div>
-                  <div style={{ fontSize: 16, color: C.subtle }}>compromisos</div>
+                  <div style={{ fontSize: 16, fontWeight: 700 }}>{agTerritory.length} acuerdos</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {['Cumplido', 'En proceso', 'Pendiente', 'Incumplido', 'Escalado'].map(est => {
-                  const count = sg.filter(s => s.estado === est).length
-                  if (!count) return null
-                  const c = est === 'Cumplido' ? C.green : est === 'En proceso' ? C.orange : est === 'Pendiente' ? C.subtle : C.red
-                  return <Tag key={est} color={c}>{est}: {count}</Tag>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {agTerritory.map(a => {
+                  const ac = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }[a.estado_code] || C.accent
+                  return (
+                    <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.muted, width: 24 }}>{a.id}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, color: C.text, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
+                        <Bar value={a.avance} color={ac} height={5} />
+                      </div>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: ac, width: 36, textAlign: 'right' }}>{a.avance}%</span>
+                    </div>
+                  )
                 })}
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+                {cumplidos > 0 && <Tag color={C.green}>Cumplido: {cumplidos}</Tag>}
+                {enCurso > 0 && <Tag color={C.accent}>En curso: {enCurso}</Tag>}
+                {porEstructurar > 0 && <Tag color={C.yellow}>Por estructurar: {porEstructurar}</Tag>}
               </div>
             </div>
           )

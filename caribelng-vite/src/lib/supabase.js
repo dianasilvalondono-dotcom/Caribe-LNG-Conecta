@@ -106,9 +106,11 @@ export async function getAgreements() {
 }
 
 export async function updateAgreementAvance(id, avance, notas) {
+  const estado_code = avance >= 100 ? 'cumplido' : avance > 0 ? 'en_curso' : 'por_estructurar'
+  const estado = avance >= 100 ? 'Cumplido' : avance > 0 ? 'En curso' : 'Por estructurar'
   const { error } = await supabase
     .from('agreements')
-    .update({ avance, notas, updated_at: new Date().toISOString() })
+    .update({ avance, notas, estado_code, estado, updated_at: new Date().toISOString() })
     .eq('id', id)
   if (error) throw error
 }
