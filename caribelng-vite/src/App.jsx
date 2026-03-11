@@ -515,6 +515,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded }) {
       const nuevoAvance = Math.min((ag.avance || 0) + pct, 100)
       await addSeguimientoAcuerdo({
         acuerdo_id: ag.id,
+        territorio: ag.territorio,
         compromiso: actividad,
         fecha_pactada: fecha,
         estado: 'Cumplido',
