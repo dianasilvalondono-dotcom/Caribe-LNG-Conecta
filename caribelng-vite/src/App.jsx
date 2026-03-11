@@ -576,7 +576,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       <div style={{ marginTop: 8, background: '#f0fdf4', borderRadius: 8, padding: '8px 11px', fontSize: 16, color: '#166534', lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
-      {ag.notas && <div style={{ marginTop: 6, fontSize: 15, color: C.orange, fontWeight: 600 }}>{ag.notas}</div>}
+      {ag.notas && <div style={{ marginTop: 6, fontSize: 15, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>⚠️ {ag.notas}</div>}
       {/* Buttons */}
       <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
         <button onClick={() => setShowModal(true)}
