@@ -1818,7 +1818,9 @@ export default function App() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    {agreements.filter(a => a.territorio === t).map(ag => (
+                    {agreements.filter(a => a.territorio === t)
+                      .sort((a, b) => parseInt(a.id.slice(1)) - parseInt(b.id.slice(1)))
+                      .map(ag => (
                       <AgreementCard key={ag.id} ag={ag} canEdit={isGestora} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
                     ))}
                   </div>
