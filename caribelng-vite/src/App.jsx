@@ -1618,9 +1618,24 @@ export default function App() {
                                 #{ev.numero}
                               </span>
                               <span style={{ fontSize: 15, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
-                              <Tag color={stColor} bg={stBg}>{ev.estado}</Tag>
                             </div>
-                            {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
+                              <select
+                                value={ev.estado}
+                                onChange={async e => {
+                                  const nuevoEstado = e.target.value
+                                  await updateCronogramaEstado(ev.id, nuevoEstado)
+                                  loadData()
+                                }}
+                                style={{ border: `1.5px solid ${stColor}`, borderRadius: 20, padding: '3px 10px',
+                                  fontSize: 14, fontWeight: 700, color: stColor, background: stBg,
+                                  cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
+                                {['Pendiente', 'En proceso', 'Cumplido'].map(op => (
+                                  <option key={op} value={op}>{op}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{ev.evento}</div>
                           {ev.producto && (
