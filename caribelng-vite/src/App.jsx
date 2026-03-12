@@ -1090,7 +1090,7 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
           <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>{cat.cat}</div>
             <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center', minWidth: 380 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center', minWidth: 300 }}>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700 }}>KPI</div>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q1</div>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q2</div>
@@ -1109,7 +1109,7 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
 
               return (
                 <div key={kpi.name} style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, alignItems: 'center',
-                  padding: '6px 0', borderBottom: '1px solid #f1f5f9', minWidth: 380 }}>
+                  padding: '6px 0', borderBottom: '1px solid #f1f5f9', minWidth: 300 }}>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{kpi.name}</div>
                     <div style={{ fontSize: 15, color: C.subtle }}>{kpi.base}</div>
@@ -1794,7 +1794,7 @@ export default function App() {
         )}
       </div>
 
-      <div style={{ padding: isMobile ? '16px 14px' : '24px 40px', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'clip' }}>
+      <div style={{ padding: isMobile ? '16px 14px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
@@ -1856,7 +1856,7 @@ export default function App() {
                   ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Acercamiento por iniciar', stats.rojo]].map(([k, lbl, v]) => (
                   <div key={k} onClick={() => { setView('actores'); setFilterS(k) }} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9, cursor: 'pointer' }}>
                     <SemDot s={k} size={9} />
-                    <span style={{ fontSize: 16, color: C.muted, width: 140 }}>{lbl}</span>
+                    <span style={{ fontSize: 16, color: C.muted, minWidth: 0, flex: '0 1 130px' }}>{lbl}</span>
                     <div style={{ flex: 1 }}><Bar value={stats.total ? (v / stats.total) * 100 : 0} color={SEMAFORO[k].color} /></div>
                     <span style={{ fontSize: 15, fontWeight: 700, color: SEMAFORO[k].color, width: 24, textAlign: 'right' }}>{v}</span>
                   </div>
