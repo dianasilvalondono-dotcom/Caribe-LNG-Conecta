@@ -1676,10 +1676,27 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+      <style>{`
+        /* CSS responsive — bypasses JS isMobile detection */
+        .clng-mobile-nav { display: none; }
+        .clng-desktop-nav { display: flex; }
+        @media (max-width: 960px) {
+          .clng-mobile-nav { display: block !important; }
+          .clng-desktop-nav { display: none !important; }
+          .clng-content { padding: 10px !important; }
+          .clng-g1  { grid-template-columns: 1fr !important; }
+          .clng-g2  { grid-template-columns: 1fr !important; }
+          .clng-g3  { grid-template-columns: 1fr !important; }
+          .clng-g4  { grid-template-columns: repeat(2,1fr) !important; }
+          .clng-novedades { display: none !important; }
+          .clng-stat-value { font-size: 22px !important; }
+          .clng-stat-pad { padding: 8px 10px !important; }
+        }
+      `}</style>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
-        {isMobile ? (
-          <>
+        {/* Mobile nav — shown via CSS at ≤960px */}
+        <div className="clng-mobile-nav">
             {/* Mobile: top bar — hamburger + logo + user */}
             <div style={{ paddingTop: 'env(safe-area-inset-top)', paddingLeft: 14, paddingRight: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 56 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
