@@ -1579,14 +1579,14 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'actores', label: 'Actores', icon: '' },
-    { id: 'acuerdos', label: 'Acuerdos', icon: '' },
-    { id: 'cronograma', label: 'Cronograma', icon: '' },
+    { id: 'actores', label: 'Actores', icon: '👥' },
+    { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
+    { id: 'cronograma', label: 'Cronograma', icon: '📅' },
     { id: 'huella', label: 'Huella Social', icon: '🌱' },
-    { id: 'input', label: 'Input Semanal', icon: '' },
-    { id: 'kpis', label: 'KPIs', icon: '' },
-    { id: 'riesgos', label: 'Riesgos', icon: '' },
-    ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '' }] : []),
+    { id: 'input', label: 'Input Semanal', icon: '✍️' },
+    { id: 'kpis', label: 'KPIs', icon: '🎯' },
+    { id: 'riesgos', label: 'Riesgos', icon: '⚠️' },
+    ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '📍' }] : []),
   ]
 
   return (
@@ -1999,44 +1999,62 @@ export default function App() {
 
         {view === 'huella' && (
           <div>
-            {['Tolú', 'Barbosa'].map(territorio => {
-              const items = huellaSocial.filter(h => h.territorio === territorio)
-              const color = territorio === 'Tolú' ? C.tolu : C.barbosa
-              return (
-                <div key={territorio} style={{ marginBottom: 48 }}>
-                  <div style={{ borderTop: `5px solid ${color}`, borderRadius: 12, background: C.card,
-                    padding: '28px 32px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)', marginBottom: 24 }}>
-                    <h1 style={{ margin: '0 0 6px', fontSize: 26, fontWeight: 900, color, letterSpacing: -0.5, textTransform: 'uppercase' }}>
-                      Huella Social Territorial — {territorio}
-                    </h1>
-                    <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: C.muted }}>
-                      Lo que Caribe LNG deja instalado en el territorio
-                    </p>
+            <div style={{ marginBottom: 20 }}>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Huella Social Territorial</h1>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Lo que Caribe LNG deja instalado en el territorio</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
+              {['Tolú', 'Barbosa'].map(territorio => {
+                const items = huellaSocial.filter(h => h.territorio === territorio)
+                const color = territorio === 'Tolú' ? C.tolu : C.barbosa
+                return (
+                  <div key={territorio}>
+                    <div style={{ borderTop: `5px solid ${color}`, borderRadius: 12, background: C.card,
+                      padding: '20px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)', marginBottom: 16 }}>
+                      <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 900, color, letterSpacing: -0.3, textTransform: 'uppercase' }}>
+                        {territorio}
+                      </h2>
+                      <p style={{ margin: 0, fontSize: 14, color: C.muted }}>
+                        {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta de regasificación · Antioquia'}
+                      </p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      {items.map(h => (
+                        <div key={h.id} style={{ background: C.card, borderRadius: 12, padding: '18px 16px',
+                          boxShadow: '0 1px 6px rgba(0,0,0,0.07)', borderTop: `3px solid ${color}`,
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 8 }}>
+                          <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${color}18`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+                            {h.icono || ({
+                              'Ambiental-Marítimo': '⚓', 'Ambiental': '⚓', 'Marítimo': '⚓',
+                              'Formación Marítima': '🎓', 'Formación Local': '💡', 'Formación': '💡',
+                              'Seguridad y Convivencia': '🛡️', 'Seguridad': '🛡️', 'Convivencia': '🛡️',
+                              'Presencia Territorial': '🗺️', 'Presencia permanente': '🗺️', 'Presencia': '🗺️',
+                              'Prevención Conflictos': '⚠️', 'Prevención': '⚠️',
+                              'Vida comunitaria': '👥', 'Vida Comunitaria': '👥',
+                              'Cuidado del entorno': '🌳', 'Cuidado del Entorno': '🌳',
+                              'Deporte e infraestructura': '🏆', 'Deporte': '🏆',
+                              'Datos para decidir': '📊', 'Datos': '📊',
+                              'Roles claros': '🤝', 'Roles Claros': '🤝',
+                              'Economía Costera': '🎣', 'Economía costera': '🎣',
+                            }[h.eje] || '🌱')}
+                          </div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            {h.eje}
+                          </div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>
+                            {h.intervencion}
+                          </div>
+                          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5 }}>
+                            {h.huella}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-                    {items.map(h => (
-                      <div key={h.id} style={{ background: C.card, borderRadius: 12, padding: '24px 20px',
-                        boxShadow: '0 1px 6px rgba(0,0,0,0.07)', borderTop: `3px solid ${color}`,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 10 }}>
-                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${color}18`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>
-                          {h.icono || '🌱'}
-                        </div>
-                        <div style={{ fontSize: 16, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          {h.eje}
-                        </div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>
-                          {h.intervencion}
-                        </div>
-                        <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.5 }}>
-                          {h.huella}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         )}
 
