@@ -828,40 +828,85 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   const verdes = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Bajo') || r.semaforo.includes('control')))
   const azules = riesgos.filter(r => r.semaforo && r.semaforo.includes('Revision'))
 
+  const total = riesgos.length
+  const pct = (n) => total ? Math.round((n / total) * 100) : 0
+
   return (
     <div>
-      <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
-        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
+      {/* Header */}
+      <div style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em',
+              background: C.navy, color: 'white', padding: '3px 8px', borderRadius: 6 }}>DAC</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dirección de Asuntos Corporativos</span>
+          </div>
+          <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Gestión de Riesgos</h1>
+          <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 13 : 15 }}>
+            {total} riesgos registrados · {rojos.length} requieren acción inmediata
+          </p>
+        </div>
+        {/* Mini status bar */}
+        {total > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: isMobile ? '100%' : 180 }}>
+          <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', gap: 1 }}>
+            {rojos.length > 0 && <div style={{ background: C.red, flex: rojos.length }} title={`${rojos.length} acción inmediata`} />}
+            {amarillos.length > 0 && <div style={{ background: C.yellow, flex: amarillos.length }} title={`${amarillos.length} vigilar`} />}
+            {verdes.length > 0 && <div style={{ background: C.green, flex: verdes.length }} title={`${verdes.length} bajo control`} />}
+            {azules.length > 0 && <div style={{ background: C.accent, flex: azules.length }} title={`${azules.length} en revisión`} />}
+          </div>
+          <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
+            <span style={{ color: C.red, fontWeight: 700 }}>🔴 {rojos.length}</span>
+            <span style={{ color: C.yellow, fontWeight: 700 }}>🟡 {amarillos.length}</span>
+            <span style={{ color: C.green, fontWeight: 700 }}>🟢 {verdes.length}</span>
+            <span style={{ color: C.accent, fontWeight: 700 }}>🔵 {azules.length}</span>
+          </div>
+        </div>}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 16, marginBottom: 18 }}>
+      {/* Filter cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
-          { label: 'Accion inmediata', key: 'Alto', count: rojos.length, color: C.red, bg: '#fee2e2' },
-          { label: 'Vigilar', key: 'Medio', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
-          { label: 'Bajo control', key: 'Bajo', count: verdes.length, color: C.green, bg: '#dcfce7' },
-          { label: 'En revision', key: 'Revision', count: azules.length, color: C.accent, bg: '#dbeafe' },
+          { label: 'Acción inmediata', key: 'Alto', count: rojos.length, pct: pct(rojos.length), color: C.red, bg: '#fee2e2', icon: '🔴' },
+          { label: 'Vigilar', key: 'Medio', count: amarillos.length, pct: pct(amarillos.length), color: C.yellow, bg: '#fef9c3', icon: '🟡' },
+          { label: 'Bajo control', key: 'Bajo', count: verdes.length, pct: pct(verdes.length), color: C.green, bg: '#dcfce7', icon: '🟢' },
+          { label: 'En revisión', key: 'Revision', count: azules.length, pct: pct(azules.length), color: C.accent, bg: '#dbeafe', icon: '🔵' },
         ].map(s => {
           const isActive = riesgoFilter === s.key
           return (
-            <div key={s.label} onClick={() => { setRiesgoFilter(isActive ? 'Todos' : s.key); setTab('mapa') }}
-              style={{ background: isActive ? s.color : s.bg, borderRadius: 12, padding: '14px 16px',
-                borderLeft: `4px solid ${s.color}`, textAlign: 'center', cursor: 'pointer',
-                transition: 'all 0.15s', boxShadow: isActive ? `0 4px 14px ${s.color}44` : 'none',
-                transform: isActive ? 'translateY(-2px)' : 'none' }}>
-              <div style={{ fontSize: 28, fontWeight: 900, color: isActive ? 'white' : s.color }}>{s.count}</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: isActive ? 'white' : s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+            <div key={s.key} onClick={() => { setRiesgoFilter(isActive ? 'Todos' : s.key); setTab('mapa') }}
+              style={{ background: isActive ? s.color : C.card, borderRadius: 12,
+                padding: isMobile ? '10px 12px' : '14px 16px',
+                borderTop: `3px solid ${s.color}`, cursor: 'pointer',
+                boxShadow: isActive ? `0 4px 14px ${s.color}44` : '0 1px 4px rgba(0,0,0,0.07)',
+                transform: isActive ? 'translateY(-2px)' : 'none', transition: 'all 0.15s' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 900, color: isActive ? 'white' : s.color, lineHeight: 1 }}>{s.count}</div>
+                <span style={{ fontSize: isMobile ? 16 : 20 }}>{s.icon}</span>
+              </div>
+              <div style={{ fontSize: isMobile ? 11 : 13, fontWeight: 700, color: isActive ? 'rgba(255,255,255,0.9)' : s.color, marginTop: 6 }}>{s.label}</div>
+              {total > 0 && <div style={{ marginTop: 6, height: 3, borderRadius: 2, background: isActive ? 'rgba(255,255,255,0.3)' : `${s.color}30` }}>
+                <div style={{ height: '100%', width: `${s.pct}%`, background: isActive ? 'white' : s.color, borderRadius: 2, transition: 'width 0.6s' }} />
+              </div>}
             </div>
           )
         })}
       </div>
 
+      {/* Sub-tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-        {[{ id: 'mapa', label: 'Mapa de Riesgos' }, { id: 'legislativo', label: 'Riesgos Legislativos' }, { id: 'cronograma', label: 'Calendario de seguimiento' }].map(t => (
+        {[
+          { id: 'mapa', label: '🗺 Riesgos Sociales', count: riesgos.length },
+          { id: 'legislativo', label: '⚖️ Riesgos Legislativos', count: riesgosLeg.length },
+          { id: 'cronograma', label: '📅 Agenda Legislativa', count: cronoLeg.length },
+        ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9', color: tab === t.id ? 'white' : C.text,
-              border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
-            {t.label}
+            style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9',
+              color: tab === t.id ? 'white' : C.text,
+              border: 'none', borderRadius: 8, padding: isMobile ? '7px 4px' : '9px 4px',
+              fontSize: isMobile ? 11 : 13, fontWeight: 700, cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <span>{t.label}</span>
+            {t.count > 0 && <span style={{ fontSize: 10, opacity: 0.7, fontWeight: 600 }}>{t.count} registros</span>}
           </button>
         ))}
       </div>
@@ -1690,7 +1735,7 @@ export default function App() {
     { id: 'huella', label: 'Huella Social', icon: '🌱' },
     { id: 'input', label: 'Input Semanal', icon: '✍️' },
     { id: 'kpis', label: 'KPIs', icon: '🎯' },
-    { id: 'riesgos', label: 'Riesgos', icon: '⚠️' },
+    { id: 'riesgos', label: 'Riesgos DAC', icon: '⚠️' },
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '📍' }] : []),
   ]
 
