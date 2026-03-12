@@ -1957,41 +1957,28 @@ export default function App() {
             </div>
 
             {/* ── Banner territorial ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
-              {/* Total */}
-              <div style={{ background: C.navy, borderRadius: 14, padding: '20px 22px', color: 'white',
-                cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => { setFilterT('Todos'); setFilterS('Todos'); setFilterR('Todos'); setSearch('') }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.55, marginBottom: 8 }}>Total actores</div>
-                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.total}</div>
-                <div style={{ fontSize: 13, opacity: 0.5, marginTop: 6 }}>{stats.prioA} prioridad A</div>
-              </div>
-              {/* Tolú */}
-              <div style={{ background: C.tolu, borderRadius: 14, padding: '20px 22px', color: 'white',
-                cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => setFilterT('Tolú')}>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Tolú</div>
-                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.tolu}</div>
-                <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Terminal marítima · Sucre</div>
-              </div>
-              {/* Barbosa */}
-              <div style={{ background: C.barbosa, borderRadius: 14, padding: '20px 22px', color: 'white',
-                cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => setFilterT('Barbosa')}>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Barbosa</div>
-                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.barbosa}</div>
-                <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Planta regasificación · Antioquia</div>
-              </div>
-              {/* Nacional */}
-              <div style={{ background: C.blue, borderRadius: 14, padding: '20px 22px', color: 'white',
-                cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => setFilterT('Nacional')}>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Nacional</div>
-                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.nacional}</div>
-                <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Legislativo · Regulatorio</div>
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
+              {[
+                { label: 'Todos', sub: `${stats.prioA} prioridad A`, value: stats.total, color: C.navy, onClick: () => { setFilterT('Todos'); setFilterS('Todos'); setFilterR('Todos'); setSearch('') } },
+                { label: 'Tolú', sub: 'Terminal marítima · Sucre', value: stats.tolu, color: C.tolu, onClick: () => setFilterT('Tolú') },
+                { label: 'Barbosa', sub: 'Planta regasificación · Antioquia', value: stats.barbosa, color: C.barbosa, onClick: () => setFilterT('Barbosa') },
+                { label: 'Nacional', sub: 'Legislativo · Regulatorio', value: stats.nacional, color: C.blue, onClick: () => setFilterT('Nacional') },
+              ].map(card => (
+                <div key={card.label} onClick={card.onClick}
+                  style={{ background: C.card, borderRadius: 12, padding: isMobile ? '10px 12px' : '14px 16px',
+                    borderLeft: `4px solid ${card.color}`, cursor: 'pointer',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+                    transition: 'box-shadow 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.11)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)'}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 800, color: card.color, letterSpacing: -0.3 }}>{card.label}</div>
+                    <div style={{ fontSize: isMobile ? 10 : 12, color: C.subtle, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.sub}</div>
+                  </div>
+                  <div style={{ fontSize: isMobile ? 30 : 38, fontWeight: 900, color: card.color, letterSpacing: -2, lineHeight: 1, flexShrink: 0 }}>{card.value}</div>
+                </div>
+              ))}
             </div>
 
             {/* Filtros */}
@@ -2019,7 +2006,7 @@ export default function App() {
             {dataLoading ? (
               <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>Cargando actores...</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(290px, 1fr))', gap: 8 }}>
                 {filtered.map(a => <ActorCard key={a.id} actor={a} onClick={setSelectedActor} />)}
               </div>
             )}
