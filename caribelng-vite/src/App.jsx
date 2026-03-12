@@ -216,9 +216,10 @@ function LoginScreen() {
 function ActorCard({ actor, onClick }) {
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
   return (
-    <div onClick={() => onClick(actor)} style={{ background: C.card, borderRadius: 10, padding: '13px 15px',
-      cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.07)', border: `1px solid ${C.border}`,
-      transition: 'all 0.15s', display: 'flex', gap: 11, alignItems: 'flex-start' }}
+    <div onClick={() => onClick(actor)} style={{ background: C.card, borderRadius: 10, padding: '12px 14px',
+      cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.07)',
+      border: `1px solid ${C.border}`, borderLeft: `3px solid ${sc.color}`,
+      transition: 'all 0.15s', display: 'flex', gap: 10, alignItems: 'flex-start' }}
       onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.11)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
       onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.07)'; e.currentTarget.style.transform = 'none' }}>
       <Avatar name={actor.nombre} size={38} color={getTipoColor(actor.tipo)} />
@@ -1623,18 +1624,33 @@ export default function App() {
     }
   }, [actors])
 
-  const stats = useMemo(() => ({
-    total: actors.length,
-    verde: actors.filter(a => a.semaforo === 'verde').length,
-    amarillo: actors.filter(a => a.semaforo === 'amarillo').length,
-    naranja: actors.filter(a => a.semaforo === 'naranja').length,
-    rojo: actors.filter(a => a.semaforo === 'rojo').length,
-    prioA: actors.filter(a => a.prioridad === 'A').length,
-    alto: actors.filter(a => a.riesgo === 'Alto' || a.riesgo === 'Muy Alto').length,
-    tolu: actors.filter(a => a.territorio === 'Tolú').length,
-    barbosa: actors.filter(a => a.territorio === 'Barbosa').length,
-    nacional: actors.filter(a => a.territorio === 'Nacional').length,
-  }), [actors])
+  const stats = useMemo(() => {
+    const semBreak = arr => ({
+      verde: arr.filter(a => a.semaforo === 'verde').length,
+      amarillo: arr.filter(a => a.semaforo === 'amarillo').length,
+      naranja: arr.filter(a => a.semaforo === 'naranja').length,
+      rojo: arr.filter(a => a.semaforo === 'rojo').length,
+    })
+    const toluArr = actors.filter(a => a.territorio === 'Tolú')
+    const barbosaArr = actors.filter(a => a.territorio === 'Barbosa')
+    const nacionalArr = actors.filter(a => a.territorio === 'Nacional')
+    return {
+      total: actors.length,
+      verde: actors.filter(a => a.semaforo === 'verde').length,
+      amarillo: actors.filter(a => a.semaforo === 'amarillo').length,
+      naranja: actors.filter(a => a.semaforo === 'naranja').length,
+      rojo: actors.filter(a => a.semaforo === 'rojo').length,
+      prioA: actors.filter(a => a.prioridad === 'A').length,
+      alto: actors.filter(a => a.riesgo === 'Alto' || a.riesgo === 'Muy Alto').length,
+      tolu: toluArr.length,
+      barbosa: barbosaArr.length,
+      nacional: nacionalArr.length,
+      semTodos: semBreak(actors),
+      semTolu: semBreak(toluArr),
+      semBarbosa: semBreak(barbosaArr),
+      semNacional: semBreak(nacionalArr),
+    }
+  }, [actors])
 
   const filtered = useMemo(() => actors.filter(a => {
     if (search && !a.nombre?.toLowerCase().includes(search.toLowerCase()) && !a.tipo?.toLowerCase().includes(search.toLowerCase()) && !(a.contacto || '').toLowerCase().includes(search.toLowerCase())) return false
@@ -1957,28 +1973,74 @@ export default function App() {
             </div>
 
             {/* ── Banner territorial ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
               {[
-                { label: 'Todos', sub: `${stats.prioA} prioridad A`, value: stats.total, color: C.navy, onClick: () => { setFilterT('Todos'); setFilterS('Todos'); setFilterR('Todos'); setSearch('') } },
-                { label: 'Tolú', sub: 'Terminal marítima · Sucre', value: stats.tolu, color: C.tolu, onClick: () => setFilterT('Tolú') },
-                { label: 'Barbosa', sub: 'Planta regasificación · Antioquia', value: stats.barbosa, color: C.barbosa, onClick: () => setFilterT('Barbosa') },
-                { label: 'Nacional', sub: 'Legislativo · Regulatorio', value: stats.nacional, color: C.blue, onClick: () => setFilterT('Nacional') },
+                { label: 'Todos', sub: `${stats.prioA} prioridad A`, value: stats.total, color: C.navy, sem: stats.semTodos, onClick: () => { setFilterT('Todos'); setFilterS('Todos'); setFilterR('Todos'); setSearch('') } },
+                { label: 'Tolú', sub: 'Terminal marítima · Sucre', value: stats.tolu, color: C.tolu, sem: stats.semTolu, onClick: () => setFilterT('Tolú') },
+                { label: 'Barbosa', sub: 'Planta regasificación · Antioquia', value: stats.barbosa, color: C.barbosa, sem: stats.semBarbosa, onClick: () => setFilterT('Barbosa') },
+                { label: 'Nacional', sub: 'Legislativo · Regulatorio', value: stats.nacional, color: C.blue, sem: stats.semNacional, onClick: () => setFilterT('Nacional') },
               ].map(card => (
                 <div key={card.label} onClick={card.onClick}
                   style={{ background: C.card, borderRadius: 12, padding: isMobile ? '10px 12px' : '14px 16px',
-                    borderLeft: `4px solid ${card.color}`, cursor: 'pointer',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
-                    transition: 'box-shadow 0.15s' }}
+                    borderTop: `3px solid ${card.color}`, cursor: 'pointer',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.07)', transition: 'box-shadow 0.15s' }}
                   onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.11)'}
                   onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)'}>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 800, color: card.color, letterSpacing: -0.3 }}>{card.label}</div>
-                    <div style={{ fontSize: isMobile ? 10 : 12, color: C.subtle, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.sub}</div>
+                  {/* Name + number row */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 800, color: card.color, letterSpacing: -0.3 }}>{card.label}</div>
+                      <div style={{ fontSize: isMobile ? 10 : 11, color: C.subtle, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.sub}</div>
+                    </div>
+                    <div style={{ fontSize: isMobile ? 28 : 34, fontWeight: 900, color: card.color, letterSpacing: -2, lineHeight: 1, flexShrink: 0 }}>{card.value}</div>
                   </div>
-                  <div style={{ fontSize: isMobile ? 30 : 38, fontWeight: 900, color: card.color, letterSpacing: -2, lineHeight: 1, flexShrink: 0 }}>{card.value}</div>
+                  {/* Mini semáforo bar */}
+                  {card.value > 0 && <div style={{ display: 'flex', height: 5, borderRadius: 3, overflow: 'hidden', marginTop: 10, gap: 1 }}>
+                    {[['verde', SEMAFORO.verde.color, card.sem.verde], ['amarillo', SEMAFORO.amarillo.color, card.sem.amarillo],
+                      ['naranja', SEMAFORO.naranja.color, card.sem.naranja], ['rojo', SEMAFORO.rojo.color, card.sem.rojo]]
+                      .filter(([,, v]) => v > 0)
+                      .map(([k, col, v]) => <div key={k} style={{ background: col, flex: v, minWidth: 3 }} title={`${v} ${k}`} />)}
+                  </div>}
+                  {/* Semáforo dot counts */}
+                  {card.value > 0 && <div style={{ display: 'flex', gap: isMobile ? 6 : 10, marginTop: 6, flexWrap: 'wrap' }}>
+                    {[['verde', card.sem.verde], ['amarillo', card.sem.amarillo], ['naranja', card.sem.naranja], ['rojo', card.sem.rojo]]
+                      .filter(([, v]) => v > 0)
+                      .map(([k, v]) => (
+                        <span key={k} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <SemDot s={k} size={6} />
+                          <span style={{ fontSize: isMobile ? 10 : 11, fontWeight: 700, color: C.muted }}>{v}</span>
+                        </span>
+                      ))}
+                  </div>}
                 </div>
               ))}
+            </div>
+
+            {/* ── Chips de semáforo (filtros rápidos) ── */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+              {[
+                { key: 'Todos', label: 'Todos', count: stats.total, color: C.navy, bg: '#f1f5f9' },
+                { key: 'verde', label: 'Relación estable', count: stats.verde, color: SEMAFORO.verde.color, bg: '#dcfce7' },
+                { key: 'amarillo', label: 'Requiere atención', count: stats.amarillo, color: SEMAFORO.amarillo.color, bg: '#fef9c3' },
+                { key: 'naranja', label: 'Riesgo moderado', count: stats.naranja, color: SEMAFORO.naranja.color, bg: '#ffedd5' },
+                { key: 'rojo', label: 'Por iniciar', count: stats.rojo, color: SEMAFORO.rojo.color, bg: '#fee2e2' },
+              ].map(chip => {
+                const active = filterS === chip.key
+                return (
+                  <button key={chip.key} onClick={() => setFilterS(chip.key)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6,
+                      background: active ? chip.color : chip.bg,
+                      color: active ? 'white' : chip.color,
+                      border: `1.5px solid ${active ? chip.color : 'transparent'}`,
+                      borderRadius: 20, padding: isMobile ? '5px 10px' : '5px 12px',
+                      fontSize: isMobile ? 11 : 12, fontWeight: 700, cursor: 'pointer',
+                      transition: 'all 0.15s' }}>
+                    {chip.key !== 'Todos' && <SemDot s={chip.key} size={7} />}
+                    <span>{chip.label}</span>
+                    <span style={{ fontWeight: 900, opacity: active ? 0.85 : 1 }}>{chip.count}</span>
+                  </button>
+                )
+              })}
             </div>
 
             {/* Filtros */}
