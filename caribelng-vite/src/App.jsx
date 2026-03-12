@@ -1675,6 +1675,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+      <style>{`html,body{overflow-x:hidden;max-width:100vw;}*{box-sizing:border-box;}`}</style>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         {isMobile ? (
