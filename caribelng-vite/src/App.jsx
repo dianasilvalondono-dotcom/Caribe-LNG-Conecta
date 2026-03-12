@@ -1485,6 +1485,7 @@ export default function App() {
   const [cronograma, setCronograma] = useState([])
   const [huellaSocial, setHuellaSocial] = useState([])
   const [cronoFilter, setCronoFilter] = useState('Todos')
+  const [cronoEstadoFilter, setCronoEstadoFilter] = useState('Todos')
   const [riesgos, setRiesgos] = useState([])
   const [riesgosLeg, setRiesgosLeg] = useState([])
   const [cronoLeg, setCronoLeg] = useState([])
@@ -1903,15 +1904,24 @@ export default function App() {
                 const enProceso = cronograma.filter(c => c.estado === 'En proceso').length
                 const pendiente = cronograma.filter(c => c.estado === 'Pendiente').length
                 return [
-                  { label: 'Cumplido', value: cumplido, color: C.green, bg: '#dcfce7' },
-                  { label: 'En proceso', value: enProceso, color: C.orange, bg: '#ffedd5' },
-                  { label: 'Pendiente', value: pendiente, color: C.subtle, bg: '#f1f5f9' },
-                ].map(s => (
-                  <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '14px 18px', borderLeft: `4px solid ${s.color}` }}>
-                    <div style={{ fontSize: 26, fontWeight: 900, color: s.color }}>{s.value}</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
-                  </div>
-                ))
+                  { label: 'Cumplido', key: 'Cumplido', value: cumplido, color: C.green, bg: '#dcfce7' },
+                  { label: 'En proceso', key: 'En proceso', value: enProceso, color: C.orange, bg: '#ffedd5' },
+                  { label: 'Pendiente', key: 'Pendiente', value: pendiente, color: C.subtle, bg: '#f1f5f9' },
+                ].map(s => {
+                  const isActive = cronoEstadoFilter === s.key
+                  return (
+                    <div key={s.label}
+                      onClick={() => setCronoEstadoFilter(isActive ? 'Todos' : s.key)}
+                      style={{ background: isActive ? s.color : s.bg, borderRadius: 12, padding: '14px 18px',
+                        borderLeft: `4px solid ${s.color}`, cursor: 'pointer', transition: 'all 0.15s',
+                        transform: isActive ? 'translateY(-2px)' : 'none',
+                        boxShadow: isActive ? `0 4px 14px ${s.color}44` : 'none' }}>
+                      <div style={{ fontSize: 26, fontWeight: 900, color: isActive ? 'white' : s.color }}>{s.value}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: isActive ? 'white' : s.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                      {isActive && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>Clic para quitar filtro</div>}
+                    </div>
+                  )
+                })
               })()}
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
@@ -1942,7 +1952,7 @@ export default function App() {
                   </div>
                   <Bar value={pct} color={territorio === 'Tolú' ? C.tolu : C.barbosa} height={6} />
                   <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {items.map(ev => {
+                    {items.filter(ev => cronoEstadoFilter === 'Todos' || ev.estado === cronoEstadoFilter).map(ev => {
                       const stColor = ev.estado === 'Cumplido' ? C.green : ev.estado === 'En proceso' ? C.orange : C.subtle
                       const stBg = ev.estado === 'Cumplido' ? '#dcfce7' : ev.estado === 'En proceso' ? '#fff7ed' : '#f8fafc'
                       return (
