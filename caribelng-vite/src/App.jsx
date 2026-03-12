@@ -824,13 +824,20 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
     return C.subtle
   }
 
+  // Social risks
   const rojos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
   const amarillos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Medio') || r.semaforo.includes('Vigilar')))
   const verdes = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Bajo') || r.semaforo.includes('control')))
   const azules = riesgos.filter(r => r.semaforo && r.semaforo.includes('Revision'))
-
   const total = riesgos.length
   const pct = (n) => total ? Math.round((n / total) * 100) : 0
+
+  // Legislative risks bucketed by nivel_riesgo
+  const legAlto = (riesgosLeg || []).filter(r => { const n = (r.nivel_riesgo || '').toUpperCase(); return n.includes('MUY ALTO') || n.includes('ALTO') })
+  const legMedio = (riesgosLeg || []).filter(r => (r.nivel_riesgo || '').toUpperCase().includes('MEDIO'))
+  const legBajo = (riesgosLeg || []).filter(r => (r.nivel_riesgo || '').toUpperCase().includes('BAJO'))
+  const totalLeg = (riesgosLeg || []).length
+  const pctLeg = (n) => totalLeg ? Math.round((n / totalLeg) * 100) : 0
 
   return (
     <div>
@@ -844,27 +851,46 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
           </div>
           <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Gestión de Riesgos</h1>
           <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 13 : 15 }}>
-            {total} riesgos registrados · {rojos.length} requieren acción inmediata
+            {total} riesgos sociales · {totalLeg} legislativos · {rojos.length + legAlto.length} requieren acción inmediata
           </p>
         </div>
-        {/* Mini status bar */}
-        {total > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: isMobile ? '100%' : 180 }}>
-          <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', gap: 1 }}>
-            {rojos.length > 0 && <div style={{ background: C.red, flex: rojos.length }} title={`${rojos.length} acción inmediata`} />}
-            {amarillos.length > 0 && <div style={{ background: C.yellow, flex: amarillos.length }} title={`${amarillos.length} vigilar`} />}
-            {verdes.length > 0 && <div style={{ background: C.green, flex: verdes.length }} title={`${verdes.length} bajo control`} />}
-            {azules.length > 0 && <div style={{ background: C.accent, flex: azules.length }} title={`${azules.length} en revisión`} />}
-          </div>
-          <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
-            <span style={{ color: C.red, fontWeight: 700 }}>🔴 {rojos.length}</span>
-            <span style={{ color: C.yellow, fontWeight: 700 }}>🟡 {amarillos.length}</span>
-            <span style={{ color: C.green, fontWeight: 700 }}>🟢 {verdes.length}</span>
-            <span style={{ color: C.accent, fontWeight: 700 }}>🔵 {azules.length}</span>
-          </div>
-        </div>}
+        {/* Dual mini status bars */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: isMobile ? '100%' : 200 }}>
+          {/* Social risks bar */}
+          {total > 0 && <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Sociales y Comunitarios</div>
+            <div style={{ display: 'flex', height: 7, borderRadius: 4, overflow: 'hidden', gap: 1, marginBottom: 3 }}>
+              {rojos.length > 0 && <div style={{ background: C.red, flex: rojos.length }} title={`${rojos.length} acción inmediata`} />}
+              {amarillos.length > 0 && <div style={{ background: C.yellow, flex: amarillos.length }} title={`${amarillos.length} vigilar`} />}
+              {verdes.length > 0 && <div style={{ background: C.green, flex: verdes.length }} title={`${verdes.length} bajo control`} />}
+              {azules.length > 0 && <div style={{ background: C.accent, flex: azules.length }} title={`${azules.length} en revisión`} />}
+            </div>
+            <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
+              <span style={{ color: C.red, fontWeight: 700 }}>🔴 {rojos.length}</span>
+              <span style={{ color: C.yellow, fontWeight: 700 }}>🟡 {amarillos.length}</span>
+              <span style={{ color: C.green, fontWeight: 700 }}>🟢 {verdes.length}</span>
+              <span style={{ color: C.accent, fontWeight: 700 }}>🔵 {azules.length}</span>
+            </div>
+          </div>}
+          {/* Legislative risks bar */}
+          {totalLeg > 0 && <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Legislativos y Regulatorios</div>
+            <div style={{ display: 'flex', height: 7, borderRadius: 4, overflow: 'hidden', gap: 1, marginBottom: 3 }}>
+              {legAlto.length > 0 && <div style={{ background: C.red, flex: legAlto.length }} title={`${legAlto.length} alto`} />}
+              {legMedio.length > 0 && <div style={{ background: C.orange, flex: legMedio.length }} title={`${legMedio.length} medio`} />}
+              {legBajo.length > 0 && <div style={{ background: C.green, flex: legBajo.length }} title={`${legBajo.length} bajo`} />}
+            </div>
+            <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
+              <span style={{ color: C.red, fontWeight: 700 }}>🔴 {legAlto.length}</span>
+              <span style={{ color: C.orange, fontWeight: 700 }}>🟠 {legMedio.length}</span>
+              <span style={{ color: C.green, fontWeight: 700 }}>🟢 {legBajo.length}</span>
+            </div>
+          </div>}
+        </div>
       </div>
 
-      {/* Filter cards */}
+      {/* Filter cards — social risks only */}
+      <div style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Riesgos Sociales y Comunitarios</div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
           { label: 'Acción inmediata', key: 'Alto', count: rojos.length, pct: pct(rojos.length), color: C.red, bg: '#fee2e2', icon: '🔴' },
