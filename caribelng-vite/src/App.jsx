@@ -157,7 +157,6 @@ function LoginScreen() {
           Tolú →  Barbosa →  Nacional
         </p>
 
-        {/* Microsoft */}
         <button onClick={handleMicrosoft} disabled={loading}
           style={{ width: '100%', background: loading ? '#f1f5f9' : '#2f2f2f', border: 'none',
             borderRadius: 10, padding: '13px 16px', fontSize: 15, fontWeight: 600,
@@ -172,14 +171,12 @@ function LoginScreen() {
           {loading ? 'Conectando...' : 'Entrar con Microsoft'}
         </button>
 
-        {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
           <span style={{ fontSize: 13, color: C.subtle }}>o</span>
           <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
         </div>
 
-        {/* Email fallback toggle */}
         {!showEmail ? (
           <button onClick={() => setShowEmail(true)}
             style={{ background: 'none', border: 'none', color: C.muted, fontSize: 14,
@@ -249,7 +246,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
   const [resumen, setResumen] = useState('')
   const [newSemaforo, setNewSemaforo] = useState(actor.semaforo)
   const [saving, setSaving] = useState(false)
-  // community fields
   const [cumple, setCumple] = useState(actor.cumpleanos || '')
   const [hijos, setHijos] = useState(actor.hijos || '')
   const [notasPer, setNotasPer] = useState(actor.notas_personales || '')
@@ -287,7 +283,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 560,
         maxHeight: '88vh', overflowY: 'auto', padding: 24 }}>
-        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <Avatar name={actor.nombre} size={48} color={getTipoColor(actor.tipo)} />
@@ -300,7 +295,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: C.subtle, padding: 0 }}>✕</button>
         </div>
 
-        {/* Key info grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
           <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
             <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Estado de la relacion</div>
@@ -332,7 +326,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           </div>
         </div>
 
-        {/* Power/interest */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 14, background: '#f8fafc', borderRadius: 8, padding: '10px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div><div style={{ fontSize: 16, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>PODER</div><Pill value={actor.poder} color={C.accent} /></div>
           <div><div style={{ fontSize: 16, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>INTERÉS</div><Pill value={actor.interes} color={C.barbosa} /></div>
@@ -358,7 +351,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           <Block label="Riesgo identificado" bg="#fff7ed" color="#9a3412">{actor.riesgo_desc}</Block>
         )}
 
-        {/* Community fields */}
         {isCommunity && (
           <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, marginTop: 14 }}>
             <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Datos comunitarios</div>
@@ -377,10 +369,8 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           </div>
         )}
 
-        {/* Log interaction */}
         <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, marginTop: 14 }}>
           <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registrar novedad</div>
-          {/* Tipo */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
             {['Visita', 'Llamada', 'Reunión', 'Evento', 'WhatsApp'].map(t => (
               <button key={t} onClick={() => setTipo(t)}
@@ -390,7 +380,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
               </button>
             ))}
           </div>
-          {/* New semaforo */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
             {Object.entries(SEMAFORO).map(([k, v]) => (
               <button key={k} onClick={() => setNewSemaforo(k)}
@@ -406,7 +395,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
             placeholder="¿Qué pasó? ¿Qué dijo? ¿Hay algo urgente que escalar?"
             style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '9px 11px', fontSize: 15,
               resize: 'none', height: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
-          {/* Accion tomada + fecha */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, marginTop: 8 }}>
             <div>
               <label style={{ fontSize: 13, color: C.muted, fontWeight: 700, display: 'block', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acción tomada</label>
@@ -429,7 +417,6 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
           </button>
         </div>
 
-        {/* History */}
         {interactions.length > 0 && (
           <div style={{ marginTop: 14, borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
             <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Historial</div>
@@ -603,7 +590,6 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       <div style={{ marginTop: 8, background: '#f0fdf4', borderRadius: 8, padding: '8px 11px', fontSize: 16, color: '#166534', lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
-      {/* Notas editables */}
       {editingNotas ? (
         <div style={{ marginTop: 8, display: 'flex', gap: 6, alignItems: 'center' }}>
           <input value={notasInput} onChange={e => setNotasInput(e.target.value)}
@@ -638,7 +624,6 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
           <div style={{ fontSize: 14, color: C.text, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ultimoAvance.compromiso}</div>
         </div>
       )}
-      {/* Buttons */}
       <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
         <button onClick={() => setShowModal(true)}
           style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
@@ -651,7 +636,6 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
           {showHistorial ? 'Ocultar' : 'Ver historial'}
         </button>
       </div>
-      {/* Historial */}
       {showHistorial && (
         <div style={{ marginTop: 12 }}>
           {historial.length === 0
@@ -673,7 +657,6 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       )}
     </div>
 
-    {/* Modal registrar avance */}
     {showModal && (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
@@ -740,9 +723,6 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
     </>
   )
 }
-
-
-
 
 // RiesgosView component
 function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
@@ -942,7 +922,6 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   )
 }
 
-
 // KPIs Gestoras component
 function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
   const [terrFilter, setTerrFilter] = useState('Todos')
@@ -1041,8 +1020,6 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
         {kpis.map(cat => (
           <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>{cat.cat}</div>
-            
-            {/* Header row */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center' }}>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700 }}>KPI</div>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q1</div>
@@ -1084,7 +1061,6 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
           </div>
         ))}
 
-        {/* Acuerdos territoriales summary */}
         {(() => {
           const agTerritory = agreements.filter(a => a.territorio === territorio)
           if (!agTerritory.length) return null
@@ -1134,7 +1110,6 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
     )
   }
 
-  // Overall summary stats
   const totalReportes = reportes.length
   const totalCompromisos = seguimiento.length
   const compromisosCumplidos = seguimiento.filter(s => s.estado === 'Cumplido').length
@@ -1148,7 +1123,6 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
       </div>
 
-      {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 18 }}>
         <StatCard label="Reportes" value={totalReportes} color={C.navy} />
         <StatCard label="Eventos" value={totalEventos} color={C.tolu} />
@@ -1156,7 +1130,6 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
         <StatCard label="Incidentes" value={totalIncidentes} color={totalIncidentes === 0 ? C.green : C.red} />
       </div>
 
-      {/* Filter */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
         {['Todos', 'Barbosa', 'Tolu'].map(t => (
           <button key={t} onClick={() => setTerrFilter(t)}
@@ -1167,7 +1140,6 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
         ))}
       </div>
 
-      {/* KPI tables by territory */}
       {(terrFilter === 'Todos' || terrFilter === 'Barbosa') && renderTerritory('Barbosa', KPIS_BARBOSA)}
       {(terrFilter === 'Todos' || terrFilter === 'Tolu') && renderTerritory('Tolú', KPIS_TOLU)}
 
@@ -1188,7 +1160,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   const [saved, setSaved] = useState(false)
   const [myTerr, setMyTerr] = useState(territorio || 'Barbosa')
 
-  // Reporte semanal form
   const [semana, setSemana] = useState('')
   const [fechaCorte, setFechaCorte] = useState(new Date().toISOString().split('T')[0])
   const [acuerdosFirmados, setAcuerdosFirmados] = useState(0)
@@ -1212,7 +1183,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   const [escalamientos, setEscalamientos] = useState('')
   const [prioridades, setPrioridades] = useState('')
 
-  // Alerta form
   const [alertaMensaje, setAlertaMensaje] = useState('')
   const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
   const [alertaEnviada, setAlertaEnviada] = useState(false)
@@ -1296,7 +1266,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
         </div>
       )}
 
-      {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
         {[
           { id: 'reporte', label: 'Reporte Semanal' },
@@ -1312,10 +1281,8 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
         ))}
       </div>
 
-      {/* REPORTE SEMANAL */}
       {tab === 'reporte' && (
         <div>
-          {/* Header */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: 0 }}>
               <div style={{ flex: 1 }}>
@@ -1333,7 +1300,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* P1: Acuerdos */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P1 &mdash; Acuerdos Sociales</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1343,7 +1309,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* P2: Huella Social */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P2 &mdash; Diagnóstico Territorial</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1353,7 +1318,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* P3: Eventos */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>P3 &mdash; Eventos y Socializaciones</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1364,7 +1328,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* quejas */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Quejas, peticiones y reclamos</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1375,7 +1338,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* Actores */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Contactos y alertas</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1384,7 +1346,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
             </div>
           </div>
 
-          {/* Narrativo */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Resumen Narrativo</div>
             <TextArea label="Que se logro esta semana" value={logros} onChange={setLogros} placeholder="Que se logro esta semana..." />
@@ -1407,7 +1368,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
         </div>
       )}
 
-      {/* SEGUIMIENTO ACUERDOS */}
       {tab === 'alerta' && (
         <div>
           <div style={{ background: '#fff1f2', border: '1.5px solid #fecdd3', borderRadius: 12, padding: 20, marginBottom: 16 }}>
@@ -1455,7 +1415,6 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
         </div>
       )}
 
-      {/* HISTORICO */}
       {tab === 'historico' && (
         <div>
           <div style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
@@ -1513,7 +1472,6 @@ export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
-  const [loginLoading, setLoginLoading] = useState(false)
 
   const [view, setView] = useState('dashboard')
   const [actors, setActors] = useState([])
@@ -1533,7 +1491,6 @@ export default function App() {
   const [reportes, setReportes] = useState([])
   const [seguimiento, setSeguimiento] = useState([])
 
-  // ━━ Auth ━━
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
@@ -1550,7 +1507,6 @@ export default function App() {
     getProfile(u.id).then(setProfile)
   }, [session])
 
-  // ━━ Data ━━
   const loadData = useCallback(async () => {
     if (!session) return
     setDataLoading(true)
@@ -1570,7 +1526,6 @@ export default function App() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // ━━ Realtime ━━
   useEffect(() => {
     if (!session) return
     const ch = supabase.channel('crm-updates')
@@ -1681,9 +1636,7 @@ export default function App() {
                 <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
               </div>
             </div>
-            {/* Two-column layout */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start' }}>
-            {/* LEFT: main content */}
             <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
@@ -1727,7 +1680,6 @@ export default function App() {
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Semáforo de Relacionamiento & Acuerdos</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
-              {/* Semaforo chart */}
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
                 <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
@@ -1740,7 +1692,6 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              {/* Agreements summary */}
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
                 <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Estado de acuerdos territoriales</h3>
                 {agreements.map(ag => {
@@ -1758,7 +1709,6 @@ export default function App() {
                 })}
               </div>
             </div>
-            {/* Critical actors */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores en Gestión Prioritaria</span>
@@ -1779,9 +1729,8 @@ export default function App() {
                 ))}
               </div>
             </div>
-            </div>{/* end left column */}
+            </div>
 
-            {/* RIGHT: Novedades panel */}
             <div style={{ position: 'sticky', top: 80 }}>
               <div style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
                 <div style={{ background: C.navy, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1824,17 +1773,64 @@ export default function App() {
                 </div>
               </div>
             </div>
-            </div>{/* end two-column grid */}
+            </div>
           </div>
         )}
 
         {/* ━━ ACTORES ━━ */}
         {view === 'actores' && (
           <div>
-            <div style={{ marginBottom: 16 }}>
+            {/* Header */}
+            <div style={{ marginBottom: 20 }}>
               <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{filtered.length} de {actors.length} actores</p>
             </div>
+
+            {/* ── Banner territorial ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+              {/* Total */}
+              <div style={{ background: C.navy, borderRadius: 14, padding: '20px 22px', color: 'white',
+                cursor: 'pointer', transition: 'opacity 0.15s' }}
+                onClick={() => { setFilterT('Todos'); setFilterS('Todos'); setFilterR('Todos'); setSearch('') }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.55, marginBottom: 8 }}>Total actores</div>
+                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.total}</div>
+                <div style={{ fontSize: 13, opacity: 0.5, marginTop: 6 }}>{stats.prioA} prioridad A</div>
+              </div>
+              {/* Tolú */}
+              <div style={{ background: C.tolu, borderRadius: 14, padding: '20px 22px', color: 'white',
+                cursor: 'pointer', transition: 'opacity 0.15s' }}
+                onClick={() => setFilterT(filterT === 'Tolú' ? 'Todos' : 'Tolú')}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Tolú</div>
+                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.tolu}</div>
+                <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Terminal marítima · Sucre</div>
+              </div>
+              {/* Barbosa */}
+              <div style={{ background: C.barbosa, borderRadius: 14, padding: '20px 22px', color: 'white',
+                cursor: 'pointer', transition: 'opacity 0.15s' }}
+                onClick={() => setFilterT(filterT === 'Barbosa' ? 'Todos' : 'Barbosa')}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Barbosa</div>
+                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.barbosa}</div>
+                <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Planta regasificación · Antioquia</div>
+              </div>
+              {/* Nacional */}
+              <div style={{ background: C.blue, borderRadius: 14, padding: '20px 22px', color: 'white',
+                cursor: 'pointer', transition: 'opacity 0.15s' }}
+                onClick={() => setFilterT(filterT === 'Nacional' ? 'Todos' : 'Nacional')}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Nacional</div>
+                <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.nacional}</div>
+                <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Legislativo · Regulatorio</div>
+              </div>
+            </div>
+
+            {/* Filtros */}
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
@@ -1852,6 +1848,8 @@ export default function App() {
                 </select>
               ))}
             </div>
+
+            {/* Grilla */}
             {dataLoading ? (
               <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>Cargando actores...</div>
             ) : (
@@ -1892,7 +1890,6 @@ export default function App() {
           </div>
         )}
 
-
         {/* ━━ CRONOGRAMA ━━ */}
         {view === 'cronograma' && (
           <div>
@@ -1900,7 +1897,6 @@ export default function App() {
               <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
             </div>
-            {/* Progress summary */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {(() => {
                 const cumplido = cronograma.filter(c => c.estado === 'Cumplido').length
@@ -1918,7 +1914,6 @@ export default function App() {
                 ))
               })()}
             </div>
-            {/* Territory filter */}
             <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
               {['Todos', 'Tolú', 'Barbosa'].map(t => (
                 <button key={t} onClick={() => setCronoFilter(t)}
@@ -1928,7 +1923,6 @@ export default function App() {
                 </button>
               ))}
             </div>
-            {/* Timeline */}
             {['Tolú', 'Barbosa'].filter(t => cronoFilter === 'Todos' || cronoFilter === t).map(territorio => {
               const items = cronograma.filter(c => c.territorio === territorio)
               const cumplidos = items.filter(c => c.estado === 'Cumplido').length
@@ -1964,13 +1958,8 @@ export default function App() {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
-                              <select
-                                value={ev.estado}
-                                onChange={async e => {
-                                  const nuevoEstado = e.target.value
-                                  await updateCronogramaEstado(ev.id, nuevoEstado)
-                                  loadData()
-                                }}
+                              <select value={ev.estado}
+                                onChange={async e => { await updateCronogramaEstado(ev.id, e.target.value); loadData() }}
                                 style={{ border: `1.5px solid ${stColor}`, borderRadius: 20, padding: '3px 10px',
                                   fontSize: 14, fontWeight: 700, color: stColor, background: stBg,
                                   cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
@@ -1980,22 +1969,13 @@ export default function App() {
                               </select>
                               {isAdmin && (
                                 <button onClick={async () => { if (confirm('¿Borrar este evento del cronograma?')) { await deleteCronogramaEvent(ev.id); loadData() } }}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
-                                  title="Borrar">🗑</button>
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}>🗑</button>
                               )}
                             </div>
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{ev.evento}</div>
-                          {ev.producto && (
-                            <div style={{ fontSize: 15, color: C.muted, marginBottom: 4, lineHeight: 1.5 }}>
-                              <span style={{ fontWeight: 700, color: C.text }}>Producto: </span>{ev.producto}
-                            </div>
-                          )}
-                          {ev.resultado && (
-                            <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5 }}>
-                              <span style={{ fontWeight: 700, color: C.text }}>Resultado: </span>{ev.resultado}
-                            </div>
-                          )}
+                          {ev.producto && <div style={{ fontSize: 15, color: C.muted, marginBottom: 4, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Producto: </span>{ev.producto}</div>}
+                          {ev.resultado && <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Resultado: </span>{ev.resultado}</div>}
                         </div>
                       )
                     })}
@@ -2003,7 +1983,6 @@ export default function App() {
                 </div>
               )
             })}
-            {/* Huella Social */}
             <div style={{ marginTop: 20 }}>
               <h2 style={{ margin: '0 0 14px', fontSize: 18, fontWeight: 900, color: C.text }}>Huella Social Territorial</h2>
               <p style={{ margin: '0 0 16px', color: C.muted, fontSize: 16 }}>Lo que queda instalado en el territorio, independientemente de si el proyecto sigue activo</p>
@@ -2035,36 +2014,27 @@ export default function App() {
           </div>
         )}
 
-
-        {/* INPUT SEMANAL */}
         {view === 'input' && (
           <InputSemanal session={session} profile={profile} territorio={myTerritorio}
-            reportes={reportes} seguimiento={seguimiento} onSaved={loadData}
-            isAdmin={isAdmin} />
+            reportes={reportes} seguimiento={seguimiento} onSaved={loadData} isAdmin={isAdmin} />
         )}
 
-
-        {/* KPIs GESTORAS */}
         {view === 'kpis' && (
           <KPIsView reportes={reportes} seguimiento={seguimiento}
             isAdmin={isAdmin} onDeleted={loadData} agreements={agreements} />
         )}
 
-
-        {/* RIESGOS */}
         {view === 'riesgos' && (
           <RiesgosView riesgos={riesgos} riesgosLeg={riesgosLeg} cronoLeg={cronoLeg}
             isAdmin={isAdmin} onDeleted={loadData} />
         )}
 
-        {/* ━━ GESTORA VIEW ━━ */}
         {view === 'gestora' && isGestora && (
           <div>
             <div style={{ marginBottom: 18 }}>
               <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
             </div>
-            {/* Priority actors */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
               <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
               {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => (
@@ -2080,7 +2050,6 @@ export default function App() {
                 </div>
               ))}
             </div>
-            {/* Birthday widget */}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
               <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
               {(() => {
@@ -2092,7 +2061,7 @@ export default function App() {
                   const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
                   return { ...a, diff, dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) }
                 }).filter(a => a.diff <= 30).sort((a, b) => a.diff - b.diff)
-                if (!upcoming.length) return <div style={{ fontSize: 16, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 días — agrega fechas al abrir un actor comunitario.</div>
+                if (!upcoming.length) return <div style={{ fontSize: 16, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 días.</div>
                 return upcoming.map(a => (
                   <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
                     <div>
@@ -2113,19 +2082,19 @@ export default function App() {
         )}
       </div>
 
-        <div style={{ padding: '30px 40px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <svg viewBox="0 0 863.64 794.92" width="36" height="36"><path fill="#1565c0" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#08306b" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>Caribe LNG <span style={{ color: C.accent, fontWeight: 900 }}>Conecta!</span></div>
-              <div style={{ fontSize: 13, color: C.subtle }}>Plan de Gestion Social &mdash; 2026</div>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 13, color: C.subtle }}>Direccion de Asuntos Corporativos</div>
-            <div style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>Diana Silva</div>
+      <div style={{ padding: '30px 40px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <svg viewBox="0 0 863.64 794.92" width="36" height="36"><path fill="#1565c0" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#08306b" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>Caribe LNG <span style={{ color: C.accent, fontWeight: 900 }}>Conecta!</span></div>
+            <div style={{ fontSize: 13, color: C.subtle }}>Plan de Gestion Social &mdash; 2026</div>
           </div>
         </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 13, color: C.subtle }}>Direccion de Asuntos Corporativos</div>
+          <div style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>Diana Silva</div>
+        </div>
+      </div>
 
       {selectedActor && (
         <ActorModal actor={selectedActor} session={session}
