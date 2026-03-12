@@ -1775,7 +1775,7 @@ export default function App() {
                 </div>
               </>
             )}
-          </>
+          </div>
         ) : (
           <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, overflow: 'hidden', maxWidth: '100vw' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
