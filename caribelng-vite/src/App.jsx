@@ -824,7 +824,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   return (
     <div>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Mapa de Riesgos</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
       </div>
 
@@ -1176,7 +1176,7 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
   return (
     <div>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs Gestion Social</h1>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs Gestion Social</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
       </div>
 
@@ -1304,7 +1304,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   return (
     <div>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Input Semanal</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} &rarr; Cada viernes</p>
             <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
               {['Barbosa', 'Tolú'].map(t => (
@@ -1646,56 +1646,100 @@ export default function App() {
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '📍' }] : []),
   ]
 
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}><svg viewBox="0 0 863.64 794.92" width="20" height="20"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
-              <div style={{ fontSize: 15, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Conecta! | Plan de Gestion Social 2026</div>
+        {isMobile ? (
+          <>
+            {/* Mobile: row 1 — logo + user */}
+            <div style={{ padding: '0 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 28, height: 28, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><svg viewBox="0 0 863.64 794.92" width="18" height="18"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
+                <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {profile?.avatar_url
+                  ? <img src={profile.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                  : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
+                }
+                <button onClick={signOut}
+                  style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
+                    padding: '6px 12px', color: 'rgba(255,255,255,0.6)', fontSize: 14, cursor: 'pointer' }}>
+                  Salir
+                </button>
+              </div>
+            </div>
+            {/* Mobile: row 2 — scrollable tabs */}
+            <div style={{ overflowX: 'auto', display: 'flex', gap: 2, padding: '0 10px 8px',
+              scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+              {NAV.map(n => (
+                <button key={n.id} onClick={() => setView(n.id)}
+                  style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                    color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.6)',
+                    border: 'none', borderRadius: 8, padding: '8px 12px', cursor: 'pointer',
+                    fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4,
+                    whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  <span>{n.icon}</span><span>{n.label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accent}, ${C.tolu})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}><svg viewBox="0 0 863.64 794.92" width="20" height="20"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#fff" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg></div>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3 }}>Caribe LNG</div>
+                <div style={{ fontSize: 15, opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Conecta! | Plan de Gestion Social 2026</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 2 }}>
+              {NAV.map(n => (
+                <button key={n.id} onClick={() => setView(n.id)}
+                  style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                    color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
+                    border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
+                    fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span>{n.icon}</span><span>{n.label}</span>
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
+              }
+              <button onClick={signOut}
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
+                  padding: '4px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 15, cursor: 'pointer' }}>
+                Salir
+              </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 2 }}>
-            {NAV.map(n => (
-              <button key={n.id} onClick={() => setView(n.id)}
-                style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                  color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
-                  border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
-                  fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span>{n.icon}</span><span>{n.label}</span>
-              </button>
-            ))}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {profile?.avatar_url
-              ? <img src={profile.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%' }} />
-              : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
-            }
-            <button onClick={signOut}
-              style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
-                padding: '4px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 15, cursor: 'pointer' }}>
-              Salir
-            </button>
-          </div>
-        </div>
+        )}
       </div>
 
-      <div style={{ padding: '24px 40px' }}>
+      <div style={{ padding: isMobile ? '16px 14px' : '24px 40px' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Caribe LNG Conecta | Estado del territorio</h1>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Caribe LNG Conecta | Estado del territorio</h1>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
                 <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
             <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
@@ -1720,7 +1764,7 @@ export default function App() {
               <div style={{ width: 3, height: 18, background: C.tolu, borderRadius: 2 }} />
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores por Territorio</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {[
                 { label: 'Tolú', value: stats.tolu, color: C.tolu, desc: 'Terminal marítima →  Sucre' },
                 { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
@@ -1738,7 +1782,7 @@ export default function App() {
               <div style={{ width: 3, height: 18, background: C.accent, borderRadius: 2 }} />
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Semáforo de Relacionamiento & Acuerdos</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
                 <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
@@ -1841,12 +1885,12 @@ export default function App() {
           <div>
             {/* Header */}
             <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{filtered.length} de {actors.length} actores</p>
             </div>
 
             {/* ── Banner territorial ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
               {/* Total */}
               <div style={{ background: C.navy, borderRadius: 14, padding: '20px 22px', color: 'white',
                 cursor: 'pointer', transition: 'opacity 0.15s' }}
@@ -1893,15 +1937,17 @@ export default function App() {
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
-                style={{ flex: 1, minWidth: 180, border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 11px',
-                  fontSize: 15, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
+                style={{ flex: 1, minWidth: 180, border: '1px solid #e2e8f0', borderRadius: 8,
+                  padding: isMobile ? '11px 14px' : '7px 11px',
+                  fontSize: isMobile ? 16 : 15, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
               {[
                 { val: filterT, set: setFilterT, label: 'Territorio', opts: ['Todos', 'Tolú', 'Barbosa', 'Nacional'] },
                 { val: filterS, set: setFilterS, label: 'Estado de la relación', opts: ['Todos', 'verde', 'amarillo', 'naranja', 'rojo'] },
                 { val: filterR, set: setFilterR, label: 'Riesgo', opts: ['Todos', 'Bajo', 'Medio', 'Alto', 'Muy Alto'] },
               ].map(f => (
                 <select key={f.label} value={f.val} onChange={e => f.set(e.target.value)}
-                  style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 16,
+                  style={{ border: '1px solid #e2e8f0', borderRadius: 8,
+                    padding: isMobile ? '11px 12px' : '7px 10px', fontSize: 16,
                     outline: 'none', color: C.text, background: 'white', fontFamily: 'inherit', cursor: 'pointer' }}>
                   {f.opts.map(o => <option key={o} value={o}>{f.label}: {o}</option>)}
                 </select>
@@ -1923,10 +1969,10 @@ export default function App() {
         {view === 'acuerdos' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>6 acuerdos →  3 Barbosa →  3 Tolú →  Co-responsabilidad comunitaria</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
               {['Barbosa', 'Tolú'].map(t => (
                 <div key={t}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -1953,10 +1999,10 @@ export default function App() {
         {view === 'cronograma' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {(() => {
                 const cumplido = cronograma.filter(c => c.estado === 'Cumplido').length
                 const enProceso = cronograma.filter(c => c.estado === 'En proceso').length
@@ -1982,7 +2028,7 @@ export default function App() {
                 })
               })()}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 24, alignItems: 'start' }}>
               {['Tolú', 'Barbosa'].map(territorio => {
                 const color = territorio === 'Tolú' ? C.tolu : C.barbosa
                 const items = cronograma.filter(c => c.territorio === territorio)
@@ -2054,10 +2100,10 @@ export default function App() {
         {view === 'huella' && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Huella Social Territorial</h1>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Huella Social Territorial</h1>
               <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Lo que Caribe LNG deja instalado en el territorio</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 24, alignItems: 'start' }}>
               {['Tolú', 'Barbosa'].map(territorio => {
                 const items = huellaSocial.filter(h => h.territorio === territorio)
                 const color = territorio === 'Tolú' ? C.tolu : C.barbosa
@@ -2072,7 +2118,7 @@ export default function App() {
                         {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta de regasificación · Antioquia'}
                       </p>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
                       {items.map(h => (
                         <div key={h.id} style={{ background: C.card, borderRadius: 12, padding: '18px 16px',
                           boxShadow: '0 1px 6px rgba(0,0,0,0.07)', borderTop: `3px solid ${color}`,
