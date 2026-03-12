@@ -1674,8 +1674,7 @@ export default function App() {
   ]
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
-      <style>{`html,body{overflow-x:hidden;max-width:100vw;}*{box-sizing:border-box;}`}</style>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'hidden', maxWidth: '100vw' }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         {isMobile ? (
@@ -1700,7 +1699,7 @@ export default function App() {
             </div>
             {/* Mobile: row 2 — scrollable tabs */}
             <div style={{ overflowX: 'auto', display: 'flex', gap: 2, padding: '0 10px 8px',
-              scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+              scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', width: '100%', maxWidth: '100vw' }}>
               {NAV.map(n => (
                 <button key={n.id} onClick={() => setView(n.id)}
                   style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
