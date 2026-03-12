@@ -897,7 +897,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
         {[
           { id: 'mapa', label: '🗺 Riesgos Sociales', count: riesgos.length },
           { id: 'legislativo', label: '⚖️ Riesgos Legislativos', count: riesgosLeg.length },
-          { id: 'cronograma', label: '📅 Agenda Legislativa', count: cronoLeg.length },
+          { id: 'cronograma', label: '🏛 Agenda Government Affairs', count: cronoLeg.length },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9',
