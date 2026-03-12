@@ -784,9 +784,9 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 // RiesgosView component
 function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   const [tab, setTab] = useState('mapa')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+    const h = () => setIsMobile(window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -988,9 +988,9 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
 // KPIs Gestoras component
 function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
   const [terrFilter, setTerrFilter] = useState('Todos')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+    const h = () => setIsMobile(window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -1227,9 +1227,9 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
 // InputSemanal component
 function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+    const h = () => setIsMobile(window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -1644,9 +1644,9 @@ export default function App() {
     return true
   }), [actors, search, filterT, filterS, filterR])
 
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 960 || Math.min(window.screen.width, window.screen.height) < 600)
+    const handleResize = () => setIsMobile(window.innerWidth < 960 || window.matchMedia('(pointer: coarse)').matches)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
