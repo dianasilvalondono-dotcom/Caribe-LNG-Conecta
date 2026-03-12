@@ -87,16 +87,16 @@ function Bar({ value, color = C.accent, height = 6 }) {
 
 function StatCard({ label, value, sub, color = C.navy, icon, compact }) {
   return (
-    <div style={{ background: C.card, borderRadius: 10, padding: compact ? '10px 12px' : '16px 20px',
+    <div style={{ background: C.card, borderRadius: 10, padding: compact ? '8px 10px' : '16px 20px',
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${color}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ fontSize: compact ? 28 : 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
-          <div style={{ fontSize: compact ? 11 : 15, color: C.muted, marginTop: 2, fontWeight: 700,
+          <div style={{ fontSize: compact ? 22 : 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
+          <div style={{ fontSize: compact ? 10 : 15, color: C.muted, marginTop: 2, fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-          {sub && <div style={{ fontSize: compact ? 11 : 15, color: C.subtle, marginTop: 1 }}>{sub}</div>}
+          {sub && <div style={{ fontSize: compact ? 10 : 15, color: C.subtle, marginTop: 1 }}>{sub}</div>}
         </div>
-        {icon && <div style={{ fontSize: compact ? 18 : 26, opacity: 0.12 }}>{icon}</div>}
+        {icon && <div style={{ fontSize: compact ? 14 : 26, opacity: 0.12 }}>{icon}</div>}
       </div>
     </div>
   )
@@ -1794,7 +1794,7 @@ export default function App() {
         )}
       </div>
 
-      <div style={{ padding: isMobile ? '16px 14px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ padding: isMobile ? '10px 10px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
@@ -1837,11 +1837,11 @@ export default function App() {
                 { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
                 { label: 'Nacional', value: stats.nacional, color: C.muted, desc: 'Legislativo →  Regulatorio' },
               ].map(t => (
-                <div key={t.label} onClick={() => { setView('actores'); setFilterT(t.label) }} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
+                <div key={t.label} onClick={() => { setView('actores'); setFilterT(t.label) }} style={{ background: C.card, borderRadius: 10, padding: isMobile ? '8px 10px' : '14px 18px',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `4px solid ${t.color}`, cursor: 'pointer' }}>
-                  <div style={{ fontSize: 34, fontWeight: 900, color: t.color }}>{t.value}</div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{t.label}</div>
-                  <div style={{ fontSize: 15, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
+                  <div style={{ fontSize: isMobile ? 24 : 34, fontWeight: 900, color: t.color }}>{t.value}</div>
+                  <div style={{ fontSize: isMobile ? 12 : 15, fontWeight: 700, color: C.text }}>{t.label}</div>
+                  <div style={{ fontSize: isMobile ? 11 : 15, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
                 </div>
               ))}
             </div>
@@ -1849,31 +1849,31 @@ export default function App() {
               <div style={{ width: 3, height: 18, background: C.accent, borderRadius: 2 }} />
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Semáforo de Relacionamiento & Acuerdos</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 20 }}>
-              <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: isMobile ? 12 : 20 }}>
+              <div style={{ background: C.card, borderRadius: 10, padding: isMobile ? '10px 12px' : 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                <h3 style={{ margin: isMobile ? '0 0 8px' : '0 0 14px', fontSize: isMobile ? 12 : 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
                 {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
                   ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Acercamiento por iniciar', stats.rojo]].map(([k, lbl, v]) => (
-                  <div key={k} onClick={() => { setView('actores'); setFilterS(k) }} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9, cursor: 'pointer' }}>
-                    <SemDot s={k} size={9} />
-                    <span style={{ fontSize: 16, color: C.muted, minWidth: 0, flex: '0 1 130px' }}>{lbl}</span>
+                  <div key={k} onClick={() => { setView('actores'); setFilterS(k) }} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: isMobile ? 6 : 9, cursor: 'pointer' }}>
+                    <SemDot s={k} size={8} />
+                    <span style={{ fontSize: isMobile ? 12 : 16, color: C.muted, minWidth: 0, flex: '0 1 120px' }}>{lbl}</span>
                     <div style={{ flex: 1 }}><Bar value={stats.total ? (v / stats.total) * 100 : 0} color={SEMAFORO[k].color} /></div>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: SEMAFORO[k].color, width: 24, textAlign: 'right' }}>{v}</span>
+                    <span style={{ fontSize: isMobile ? 12 : 15, fontWeight: 700, color: SEMAFORO[k].color, width: 22, textAlign: 'right' }}>{v}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>Estado de acuerdos territoriales</h3>
+              <div style={{ background: C.card, borderRadius: 10, padding: isMobile ? '10px 12px' : 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                <h3 style={{ margin: isMobile ? '0 0 8px' : '0 0 14px', fontSize: isMobile ? 12 : 15, fontWeight: 700, color: C.text }}>Estado de acuerdos territoriales</h3>
                 {agreements.map(ag => {
                   const barColor = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }[ag.estado_code] || C.accent
                   return (
-                    <div key={ag.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: C.muted, width: 22 }}>{ag.id}</span>
+                    <div key={ag.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: isMobile ? 6 : 8, cursor: 'pointer' }}>
+                      <span style={{ fontSize: isMobile ? 12 : 16, fontWeight: 700, color: C.muted, width: 20 }}>{ag.id}</span>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 15, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
-                        <Bar value={ag.avance} color={barColor} height={5} />
+                        <div style={{ fontSize: isMobile ? 12 : 15, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
+                        <Bar value={ag.avance} color={barColor} height={4} />
                       </div>
-                      <span style={{ fontSize: 16, fontWeight: 700, width: 30, textAlign: 'right', color: barColor }}>{ag.avance}%</span>
+                      <span style={{ fontSize: isMobile ? 12 : 16, fontWeight: 700, width: 28, textAlign: 'right', color: barColor }}>{ag.avance}%</span>
                     </div>
                   )
                 })}
