@@ -85,18 +85,18 @@ function Bar({ value, color = C.accent, height = 6 }) {
   )
 }
 
-function StatCard({ label, value, sub, color = C.navy, icon }) {
+function StatCard({ label, value, sub, color = C.navy, icon, compact }) {
   return (
-    <div style={{ background: C.card, borderRadius: 12, padding: '16px 20px',
+    <div style={{ background: C.card, borderRadius: 10, padding: compact ? '10px 12px' : '16px 20px',
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${color}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ fontSize: 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
-          <div style={{ fontSize: 15, color: C.muted, marginTop: 3, fontWeight: 700,
+          <div style={{ fontSize: compact ? 28 : 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
+          <div style={{ fontSize: compact ? 11 : 15, color: C.muted, marginTop: 2, fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-          {sub && <div style={{ fontSize: 15, color: C.subtle, marginTop: 2 }}>{sub}</div>}
+          {sub && <div style={{ fontSize: compact ? 11 : 15, color: C.subtle, marginTop: 1 }}>{sub}</div>}
         </div>
-        {icon && <div style={{ fontSize: 26, opacity: 0.12 }}>{icon}</div>}
+        {icon && <div style={{ fontSize: compact ? 18 : 26, opacity: 0.12 }}>{icon}</div>}
       </div>
     </div>
   )
@@ -784,9 +784,9 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 // RiesgosView component
 function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   const [tab, setTab] = useState('mapa')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 900)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 900)
+    const h = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -988,9 +988,9 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
 // KPIs Gestoras component
 function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
   const [terrFilter, setTerrFilter] = useState('Todos')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 900)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 900)
+    const h = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -1227,9 +1227,9 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
 // InputSemanal component
 function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 900)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 900)
+    const h = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -1644,9 +1644,9 @@ export default function App() {
     return true
   }), [actors, search, filterT, filterS, filterR])
 
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 900)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 900)
+    const handleResize = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -1808,15 +1808,15 @@ export default function App() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
             <div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
-              <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
-                <div style={{ width: 3, height: 18, background: C.navy, borderRadius: 2 }} />
-                <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapeo de Actores</span>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(220px, 1fr))', gap: isMobile ? 8 : 16, marginBottom: 20 }}>
+              <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -4 }}>
+                <div style={{ width: 3, height: 16, background: C.navy, borderRadius: 2 }} />
+                <span style={{ fontSize: isMobile ? 13 : 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapeo de Actores</span>
               </div>
-              <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" /></div>
-              <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable 🟢" value={stats.verde} color={C.green} icon="✅" /></div>
-              <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" /></div>
-              <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Acercamiento por iniciar 🔴" value={stats.rojo} color={C.red} icon="🚨" /></div>
+              <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" compact={isMobile} /></div>
+              <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable" value={stats.verde} color={C.green} icon="✅" compact={isMobile} /></div>
+              <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" compact={isMobile} /></div>
+              <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Por iniciar" value={stats.rojo} color={C.red} icon="🚨" compact={isMobile} /></div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
