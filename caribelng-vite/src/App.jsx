@@ -491,7 +491,13 @@ function Field({ label, value, onChange, type = 'text', placeholder }) {
 function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
   const isT = ag.territorio === 'Tolú'
   const stC = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }
-  const barColor = stC[ag.estado_code] || C.accent
+  const [localAvance, setLocalAvance] = useState(ag.avance || 0)
+  const [localEstadoCode, setLocalEstadoCode] = useState(ag.estado_code || 'por_estructurar')
+  const [localNotas, setLocalNotas] = useState(ag.notas || '')
+  const [editingNotas, setEditingNotas] = useState(false)
+  const [notasInput, setNotasInput] = useState(ag.notas || '')
+  const [savingNotas, setSavingNotas] = useState(false)
+  const barColor = stC[localEstadoCode] || C.accent
   const [showModal, setShowModal] = useState(false)
   const [actividad, setActividad] = useState('')
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
@@ -519,20 +525,19 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
     setSaving(true)
     try {
       const pct = Math.min(parseInt(porcentaje) || 0, 100)
-      const nuevoAvance = Math.min((ag.avance || 0) + pct, 100)
+      const nuevoAvance = Math.min((localAvance) + pct, 100)
+      const nuevoEstado = nuevoAvance >= 100 ? 'cumplido' : 'en_curso'
       await addSeguimientoAcuerdo({
-        acuerdo_id: ag.id,
-        acuerdo: ag.nombre,
-        territorio: ag.territorio,
-        compromiso: actividad,
-        fecha_pactada: fecha,
-        estado: 'Cumplido',
-        notas: notas,
-        avance_porcentaje: pct,
+        acuerdo_id: ag.id, acuerdo: ag.nombre, territorio: ag.territorio,
+        compromiso: actividad, fecha_pactada: fecha, estado: 'Cumplido',
+        notas: notas, avance_porcentaje: pct,
       })
       await updateAgreementAvance(ag.id, nuevoAvance, notas || ag.notas)
+      setLocalAvance(nuevoAvance)
+      setLocalEstadoCode(nuevoEstado)
       setActividad(''); setPorcentaje(''); setNotas('')
       setShowModal(false)
+      await loadHistorial()
       if (onAvanceAdded) onAvanceAdded()
     } catch(e) {
       alert('Error guardando: ' + e.message)
@@ -545,14 +550,30 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
     if (!confirm(`¿Borrar "${h.compromiso}"? El avance del acuerdo se reducirá en ${h.avance_porcentaje || 0}%.`)) return
     try {
       await deleteSeguimientoAcuerdo(h.id)
-      const nuevoAvance = Math.max(0, (ag.avance || 0) - (h.avance_porcentaje || 0))
+      const nuevoAvance = Math.max(0, localAvance - (h.avance_porcentaje || 0))
+      const nuevoEstado = nuevoAvance >= 100 ? 'cumplido' : nuevoAvance > 0 ? 'en_curso' : 'por_estructurar'
       await updateAgreementAvance(ag.id, nuevoAvance, ag.notas)
+      setLocalAvance(nuevoAvance)
+      setLocalEstadoCode(nuevoEstado)
       setHistorial([])
       setUltimoAvance(null)
       await loadHistorial()
       if (onAvanceAdded) onAvanceAdded()
     } catch(e) {
       alert('Error borrando: ' + e.message)
+    }
+  }
+
+  async function handleSaveNotas() {
+    setSavingNotas(true)
+    try {
+      await updateAgreementAvance(ag.id, localAvance, notasInput || null)
+      setLocalNotas(notasInput)
+      setEditingNotas(false)
+    } catch(e) {
+      alert('Error guardando nota: ' + e.message)
+    } finally {
+      setSavingNotas(false)
     }
   }
 
@@ -564,15 +585,15 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
         <div>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
             <Tag color={isT ? '#0369a1' : '#5b21b6'} bg={isT ? '#e0f2fe' : '#ede9fe'}>{ag.id} →  {ag.territorio}</Tag>
-            <Tag color={barColor}>{ag.estado}</Tag>
+            <Tag color={barColor}>{localEstadoCode === 'cumplido' ? 'Cumplido' : localEstadoCode === 'en_curso' ? 'En curso' : 'Por estructurar'}</Tag>
           </div>
           <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>{ag.nombre}</h3>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 10 }}>
-          <div style={{ fontSize: 24, fontWeight: 900, color: barColor, lineHeight: 1 }}>{ag.avance}%</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: barColor, lineHeight: 1 }}>{localAvance}%</div>
         </div>
       </div>
-      <Bar value={ag.avance} color={barColor} height={5} />
+      <Bar value={localAvance} color={barColor} height={5} />
       <div style={{ marginTop: 10, fontSize: 16, color: C.muted, lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700, color: C.text }}>Intervenciones: </span>{ag.intervenciones}
       </div>
@@ -582,7 +603,35 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       <div style={{ marginTop: 8, background: '#f0fdf4', borderRadius: 8, padding: '8px 11px', fontSize: 16, color: '#166534', lineHeight: 1.5 }}>
         <span style={{ fontWeight: 700 }}>Huella: </span>{ag.huella}
       </div>
-      {ag.notas && <div style={{ marginTop: 6, fontSize: 14, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>⚠️ {ag.notas}</div>}
+      {/* Notas editables */}
+      {editingNotas ? (
+        <div style={{ marginTop: 8, display: 'flex', gap: 6, alignItems: 'center' }}>
+          <input value={notasInput} onChange={e => setNotasInput(e.target.value)}
+            placeholder="Nota de seguimiento..."
+            style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+          <button onClick={handleSaveNotas} disabled={savingNotas}
+            style={{ background: C.green, color: 'white', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            {savingNotas ? '...' : '✓'}
+          </button>
+          <button onClick={() => { setEditingNotas(false); setNotasInput(localNotas) }}
+            style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 13, cursor: 'pointer' }}>
+            ✕
+          </button>
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+          {localNotas
+            ? <div style={{ fontSize: 14, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>⚠️ {localNotas}</div>
+            : isAdmin && <div style={{ fontSize: 13, color: C.subtle, fontStyle: 'italic', flex: 1 }}>Sin nota de seguimiento</div>
+          }
+          {isAdmin && (
+            <button onClick={() => setEditingNotas(true)}
+              style={{ background: 'none', border: 'none', color: C.muted, fontSize: 13, cursor: 'pointer', padding: '2px 6px', borderRadius: 6, flexShrink: 0 }}>
+              ✏️
+            </button>
+          )}
+        </div>
+      )}
       {ultimoAvance && (
         <div style={{ marginTop: 10, background: '#f8fafc', borderRadius: 8, padding: '8px 12px', borderLeft: `3px solid ${barColor}`, overflow: 'hidden' }}>
           <div style={{ fontSize: 12, color: C.muted, marginBottom: 2 }}>Último avance · {ultimoAvance.fecha_pactada}</div>
@@ -656,9 +705,9 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
               <div>
                 <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>
                   % que representa *
-                  <span style={{ fontWeight: 400, color: C.muted }}> (avance actual: {ag.avance}%)</span>
+                  <span style={{ fontWeight: 400, color: C.muted }}> (avance actual: {localAvance}%)</span>
                 </label>
-                <input type="number" min="1" max={100 - (ag.avance || 0)} value={porcentaje}
+                <input type="number" min="1" max={100 - localAvance} value={porcentaje}
                   onChange={e => setPorcentaje(e.target.value)}
                   placeholder="ej: 10"
                   style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0',
@@ -667,7 +716,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
             </div>
             {porcentaje && (
               <div style={{ background: '#eff6ff', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: C.accent, fontWeight: 600 }}>
-                El acuerdo quedará en {Math.min((ag.avance || 0) + (parseInt(porcentaje) || 0), 100)}% de avance
+                El acuerdo quedará en {Math.min(localAvance + (parseInt(porcentaje) || 0), 100)}% de avance
               </div>
             )}
             <div>
