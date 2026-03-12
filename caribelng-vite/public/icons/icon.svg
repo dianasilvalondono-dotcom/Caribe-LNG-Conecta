@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#0f2744"/>
+  <!-- Wave shape representing LNG/water -->
+  <path d="M80 320 Q140 270 200 320 Q260 370 320 320 Q380 270 432 320" stroke="#3b82f6" stroke-width="18" fill="none" stroke-linecap="round"/>
+  <path d="M80 360 Q140 310 200 360 Q260 410 320 360 Q380 310 432 360" stroke="#3b82f6" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <!-- C L C letters -->
+  <text x="256" y="260" font-family="Arial,sans-serif" font-weight="900" font-size="140" fill="white" text-anchor="middle" dominant-baseline="middle">CLC</text>
+</svg>
