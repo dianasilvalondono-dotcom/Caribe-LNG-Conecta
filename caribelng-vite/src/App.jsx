@@ -1194,7 +1194,7 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Seguimiento anual &rarr; Ene-Dic 2026 &rarr; Calculado de reportes semanales</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 18 }}>
         <StatCard label="Reportes" value={totalReportes} color={C.navy} />
         <StatCard label="Eventos" value={totalEventos} color={C.tolu} />
         <StatCard label="Compromisos" value={`${compromisosCumplidos}/${totalCompromisos}`} color={C.green} />
@@ -1675,7 +1675,7 @@ export default function App() {
   ]
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'hidden' }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         {isMobile ? (
@@ -1885,7 +1885,7 @@ export default function App() {
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
               <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
                 {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').slice(0, 8).map(a => (
                   <div key={a.id} onClick={() => { setSelectedActor(a); setView('actores') }}
                     style={{ display: 'flex', gap: 10, background: '#fff5f5', borderRadius: 8,
@@ -2019,7 +2019,7 @@ export default function App() {
             {dataLoading ? (
               <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>Cargando actores...</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(290px, 1fr))', gap: 10 }}>
                 {filtered.map(a => <ActorCard key={a.id} actor={a} onClick={setSelectedActor} />)}
               </div>
             )}
