@@ -4,7 +4,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getCronograma, getHuellaSocial, updateCronogramaEstado,
          getReportesSemanales, addReporteSemanal, deleteReporteSemanal, deleteKpiEntry, deleteCronogramaEvent, deleteRiesgo,
          getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
-         getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo, sendAlerta } from './lib/supabase'
+         getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo,
+         addCronogramaLegislativo, deleteCronogramaLegislativo, sendAlerta } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -1003,30 +1004,150 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
       )}
 
       {tab === 'cronograma' && (
-        <div>
-          <div style={{ position: 'relative', paddingLeft: 20 }}>
-            <div style={{ position: 'absolute', left: 8, top: 0, bottom: 0, width: 2, background: '#e2e8f0' }} />
-            {cronoLeg.map(ev => {
-              const nivelColor = getNivelColor(ev.nivel_riesgo)
-              return (
-                <div key={ev.id} style={{ position: 'relative', marginBottom: 16, paddingLeft: 20 }}>
-                  <div style={{ position: 'absolute', left: -16, top: 6, width: 12, height: 12, borderRadius: '50%', background: nivelColor, border: '2px solid white', boxShadow: '0 0 0 2px ' + nivelColor }} />
-                  <div style={{ background: C.card, borderRadius: 12, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                      <div><span style={{ fontSize: 16, fontWeight: 700, color: nivelColor, textTransform: 'uppercase' }}>{ev.fecha}</span> <Tag color={C.muted} bg="#f1f5f9">{ev.tipo}</Tag></div>
-                      <Tag color={nivelColor}>{ev.nivel_riesgo}</Tag>
-                    </div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.3, marginBottom: 4 }}>{ev.evento}</div>
-                    <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5, marginBottom: 4 }}>{ev.impacto}</div>
-                    {ev.accion && <div style={{ fontSize: 16, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.4 }}><span style={{ fontWeight: 700 }}>Accion: </span>{ev.accion}</div>}
-                    {ev.responsable && <div style={{ fontSize: 16, color: C.subtle, marginTop: 4 }}>Responsable: {ev.responsable}</div>}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        <AgendaGubernamental cronoLeg={cronoLeg} isAdmin={isAdmin} onReloaded={onDeleted} getNivelColor={getNivelColor} isMobile={isMobile} />
       )}
+    </div>
+  )
+}
+
+// Agenda Government Affairs component
+function AgendaGubernamental({ cronoLeg, isAdmin, onReloaded, getNivelColor, isMobile }) {
+  const NIVELES = ['Bajo', 'Medio', 'Alto', 'Muy Alto']
+  const TIPOS = ['Debate de control político', 'Proyecto de ley', 'Audiencia pública', 'Reunión', 'Comisión', 'Otro']
+
+  const [showForm, setShowForm] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({ fecha: '', tipo: '', nivel_riesgo: 'Medio', evento: '', impacto: '', accion: '', responsable: '' })
+
+  async function handleAdd(e) {
+    e.preventDefault()
+    if (!form.fecha || !form.evento) return
+    setSaving(true)
+    try {
+      await addCronogramaLegislativo(form)
+      setForm({ fecha: '', tipo: '', nivel_riesgo: 'Medio', evento: '', impacto: '', accion: '', responsable: '' })
+      setShowForm(false)
+      onReloaded()
+    } catch(err) { alert('Error al guardar: ' + err.message) }
+    finally { setSaving(false) }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm('¿Eliminar este evento?')) return
+    try {
+      await deleteCronogramaLegislativo(id)
+      onReloaded()
+    } catch(err) { alert('Error al eliminar: ' + err.message) }
+  }
+
+  const sorted = [...(cronoLeg || [])].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''))
+
+  return (
+    <div style={{ padding: isMobile ? '12px 8px' : '0 8px' }}>
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: C.text }}>
+          🏛 Agenda Government Affairs
+        </div>
+        {isAdmin && (
+          <button
+            onClick={() => setShowForm(v => !v)}
+            style={{ background: showForm ? C.muted : C.navy, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          >
+            {showForm ? '✕ Cancelar' : '+ Agregar evento'}
+          </button>
+        )}
+      </div>
+
+      {/* Add form */}
+      {showForm && isAdmin && (
+        <form onSubmit={handleAdd} style={{ background: '#f1f5f9', borderRadius: 12, padding: 16, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Fecha *</label>
+              <input type="date" value={form.fecha} onChange={e => setForm(f => ({ ...f, fecha: e.target.value }))} required
+                style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Tipo</label>
+              <select value={form.tipo} onChange={e => setForm(f => ({ ...f, tipo: e.target.value }))}
+                style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, boxSizing: 'border-box' }}>
+                <option value="">Seleccionar...</option>
+                {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Nivel de riesgo</label>
+              <select value={form.nivel_riesgo} onChange={e => setForm(f => ({ ...f, nivel_riesgo: e.target.value }))}
+                style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, boxSizing: 'border-box' }}>
+                {NIVELES.map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Responsable</label>
+              <input type="text" value={form.responsable} onChange={e => setForm(f => ({ ...f, responsable: e.target.value }))} placeholder="Nombre"
+                style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, boxSizing: 'border-box' }} />
+            </div>
+          </div>
+          <div>
+            <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Evento / Descripción *</label>
+            <input type="text" value={form.evento} onChange={e => setForm(f => ({ ...f, evento: e.target.value }))} required placeholder="Descripción del evento"
+              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, boxSizing: 'border-box' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Impacto</label>
+            <textarea value={form.impacto} onChange={e => setForm(f => ({ ...f, impacto: e.target.value }))} rows={2} placeholder="Posible impacto del evento"
+              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Acción</label>
+            <textarea value={form.accion} onChange={e => setForm(f => ({ ...f, accion: e.target.value }))} rows={2} placeholder="Acción a tomar"
+              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${C.border}`, fontSize: 14, marginTop: 3, resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button type="submit" disabled={saving}
+              style={{ background: C.navy, color: '#fff', border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+              {saving ? 'Guardando…' : 'Guardar evento'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Timeline */}
+      <div style={{ position: 'relative', paddingLeft: isMobile ? 16 : 20 }}>
+        {sorted.length === 0 && (
+          <div style={{ color: C.muted, fontSize: 14, padding: '20px 0' }}>No hay eventos registrados.</div>
+        )}
+        {sorted.map((ev, i) => {
+          const nivelColor = getNivelColor(ev.nivel_riesgo)
+          return (
+            <div key={ev.id || i} style={{ position: 'relative', paddingLeft: isMobile ? 20 : 28, paddingBottom: 20, borderLeft: `2px solid ${C.border}` }}>
+              {/* Dot */}
+              <div style={{ position: 'absolute', left: -7, top: 4, width: 12, height: 12, borderRadius: '50%', background: nivelColor, border: '2px solid #fff', boxShadow: '0 0 0 2px ' + nivelColor }} />
+              <div style={{ background: C.card, borderRadius: 10, padding: isMobile ? '10px 12px' : '12px 16px', border: `1px solid ${C.border}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                      <span style={{ fontSize: 12, background: nivelColor + '22', color: nivelColor, borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>{ev.nivel_riesgo}</span>
+                      {ev.tipo && <span style={{ fontSize: 12, background: '#f1f5f9', color: C.muted, borderRadius: 6, padding: '2px 8px' }}>{ev.tipo}</span>}
+                      <span style={{ fontSize: 12, color: C.subtle }}>{ev.fecha}</span>
+                    </div>
+                    <div style={{ fontSize: isMobile ? 13 : 15, fontWeight: 700, color: C.text, lineHeight: 1.3 }}>{ev.evento}</div>
+                  </div>
+                  {isAdmin && (
+                    <button onClick={() => handleDelete(ev.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.muted, fontSize: 16, padding: '2px 4px', flexShrink: 0, lineHeight: 1 }}
+                      title="Eliminar">🗑</button>
+                  )}
+                </div>
+                {ev.impacto && <div style={{ fontSize: 13, color: '#9a3412', background: '#fff7ed', padding: '5px 8px', borderRadius: 6, marginBottom: 4, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{ev.impacto}</div>}
+                {ev.accion && <div style={{ fontSize: 13, color: '#166534', background: '#f0fdf4', padding: '5px 8px', borderRadius: 6, marginBottom: 4, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Acción: </span>{ev.accion}</div>}
+                {ev.responsable && <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>👤 {ev.responsable}</div>}
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -205,6 +205,17 @@ export async function getCronogramaLegislativo() {
   return data
 }
 
+export async function addCronogramaLegislativo(entry) {
+  const { data, error } = await supabase.from('cronograma_legislativo').insert([entry]).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteCronogramaLegislativo(id) {
+  const { error } = await supabase.from('cronograma_legislativo').delete().eq('id', id)
+  if (error) throw error
+}
+
 // ── Delete functions ──────────────────────────────────────────────────────────
 
 export async function deleteReporteSemanal(id) {
