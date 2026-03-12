@@ -1901,7 +1901,7 @@ export default function App() {
             </div>
             </div>
 
-            <div style={{ position: 'sticky', top: 80 }}>
+            {!isMobile && <div style={{ position: 'sticky', top: 80 }}>
               <div style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
                 <div style={{ background: C.navy, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 16 }}>🔔</span>
@@ -1942,7 +1942,7 @@ export default function App() {
                   })()}
                 </div>
               </div>
-            </div>
+            </div>}
             </div>
           </div>
         )}
