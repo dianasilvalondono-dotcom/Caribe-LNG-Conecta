@@ -1675,7 +1675,7 @@ export default function App() {
   ]
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'hidden' }}>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         {isMobile ? (
@@ -1808,7 +1808,7 @@ export default function App() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
             <div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
                 <div style={{ width: 3, height: 18, background: C.navy, borderRadius: 2 }} />
                 <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapeo de Actores</span>
