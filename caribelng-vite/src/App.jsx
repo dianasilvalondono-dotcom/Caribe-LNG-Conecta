@@ -1817,10 +1817,10 @@ export default function App() {
         {view === 'dashboard' && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Caribe LNG Conecta | Estado del territorio</h1>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Resumen de relacionamiento →  Caribe LNG 2026 →  Tiempo real</p>
-                <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 17 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Caribe LNG Conecta | Estado del territorio</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 12 : 16, flex: 1, minWidth: 0 }}>Resumen de relacionamiento · Caribe LNG 2026 · Tiempo real</p>
+                {!isMobile && <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>}
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
@@ -1841,7 +1841,7 @@ export default function App() {
             </div>
             <div style={{ marginBottom: 24 }}>
               <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer', display: 'block', maxWidth: isMobile ? '100%' : 320 }}>
-                <StatCard label="Riesgos en acción inmediata" value={riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))).length} sub="Ver mapa completo →" color='#dc2626' icon="🗺️" />
+                <StatCard label="Riesgos en acción inmediata" value={riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))).length} sub="Ver mapa completo →" color='#dc2626' icon="🗺️" compact={isMobile} />
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -1900,8 +1900,8 @@ export default function App() {
               <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores en Gestión Prioritaria</span>
             </div>
-            <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-              <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
+            <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? '12px' : 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+              <h3 style={{ margin: isMobile ? '0 0 10px' : '0 0 14px', fontSize: isMobile ? 13 : 15, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
                 {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').slice(0, 8).map(a => (
                   <div key={a.id} onClick={() => { setSelectedActor(a); setView('actores') }}
