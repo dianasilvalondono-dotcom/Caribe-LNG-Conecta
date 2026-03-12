@@ -1645,8 +1645,12 @@ export default function App() {
   }), [actors, search, filterT, filterS, filterR])
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+  const [isPortrait, setIsPortrait] = useState(() => window.innerHeight > window.innerWidth)
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+      setIsPortrait(window.innerHeight > window.innerWidth)
+    }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -1673,6 +1677,19 @@ export default function App() {
     { id: 'riesgos', label: 'Riesgos', icon: '⚠️' },
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '📍' }] : []),
   ]
+
+  if (isMobile && isPortrait) return (
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      minHeight: '100vh', background: C.navy, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
+      <div style={{ fontSize: 64, marginBottom: 24, animation: 'spin90 1.5s ease-in-out infinite alternate' }}>📱</div>
+      <div style={{ fontSize: 22, fontWeight: 900, color: 'white', marginBottom: 12, letterSpacing: -0.5 }}>Rota el dispositivo</div>
+      <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, maxWidth: 260 }}>
+        Caribe LNG Conecta está optimizado para usarse en <strong style={{ color: 'rgba(255,255,255,0.85)' }}>modo horizontal</strong> en celular.
+      </div>
+      <style>{`@keyframes spin90 { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }`}</style>
+    </div>
+  )
 
   return (
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
