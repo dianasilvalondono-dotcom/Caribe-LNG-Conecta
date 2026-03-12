@@ -784,9 +784,9 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 // RiesgosView component
 function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   const [tab, setTab] = useState('mapa')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 768)
+    const h = () => setIsMobile(window.innerWidth < 1024)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -988,9 +988,9 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
 // KPIs Gestoras component
 function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
   const [terrFilter, setTerrFilter] = useState('Todos')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 768)
+    const h = () => setIsMobile(window.innerWidth < 1024)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -1227,9 +1227,9 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
 // InputSemanal component
 function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 768)
+    const h = () => setIsMobile(window.innerWidth < 1024)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -1643,9 +1643,9 @@ export default function App() {
     return true
   }), [actors, search, filterT, filterS, filterR])
 
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    const handleResize = () => setIsMobile(window.innerWidth < 1024)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -1674,7 +1674,7 @@ export default function App() {
   ]
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'hidden', width: '100%' }}>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         {isMobile ? (
