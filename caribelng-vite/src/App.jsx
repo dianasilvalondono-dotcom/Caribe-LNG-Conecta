@@ -1681,7 +1681,7 @@ export default function App() {
         {isMobile ? (
           <>
             {/* Mobile: top bar — hamburger + logo + user */}
-            <div style={{ padding: '0 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+            <div style={{ paddingTop: 'env(safe-area-inset-top)', paddingLeft: 14, paddingRight: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 56 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {/* Hamburger */}
                 <button onClick={() => setDrawerOpen(true)}
@@ -1714,7 +1714,8 @@ export default function App() {
                 {/* Drawer panel */}
                 <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 260,
                   background: C.navy, zIndex: 201, display: 'flex', flexDirection: 'column',
-                  boxShadow: '4px 0 24px rgba(0,0,0,0.4)' }}>
+                  boxShadow: '4px 0 24px rgba(0,0,0,0.4)',
+                  paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
                   {/* Drawer header */}
                   <div style={{ padding: '16px 16px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
