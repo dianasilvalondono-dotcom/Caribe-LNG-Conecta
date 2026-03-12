@@ -834,7 +834,7 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{riesgos.length} riesgos sociales, institucionales y legislativos</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 16, marginBottom: 18 }}>
         {[
           { label: 'Accion inmediata', key: 'Alto', count: rojos.length, color: C.red, bg: '#fee2e2' },
           { label: 'Vigilar', key: 'Medio', count: amarillos.length, color: C.yellow, bg: '#fef9c3' },
@@ -1089,7 +1089,8 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
         {kpis.map(cat => (
           <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>{cat.cat}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, marginBottom: 6, alignItems: 'center', minWidth: 420 }}>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700 }}>KPI</div>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q1</div>
               <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textAlign: 'center' }}>Q2</div>
@@ -1108,7 +1109,7 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
 
               return (
                 <div key={kpi.name} style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4, 1fr) 60px 50px', gap: 4, alignItems: 'center',
-                  padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
+                  padding: '6px 0', borderBottom: '1px solid #f1f5f9', minWidth: 420 }}>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{kpi.name}</div>
                     <div style={{ fontSize: 15, color: C.subtle }}>{kpi.base}</div>
@@ -1127,6 +1128,7 @@ function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements }) {
                 </div>
               )
             })}
+            </div>{/* close overflowX wrapper */}
           </div>
         ))}
 
@@ -1518,7 +1520,7 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: semaforo }} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 8 }}>
                   {[
                     { label: 'Acuerdos', value: r.acuerdos_firmados, color: C.accent },
                     { label: 'Eventos', value: totalEventos, color: C.tolu },
@@ -1672,7 +1674,7 @@ export default function App() {
   ]
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text, overflowX: 'hidden', width: '100%' }}>
       {/* Top nav */}
       <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
         {isMobile ? (
@@ -1922,9 +1924,7 @@ export default function App() {
               {/* Tolú */}
               <div style={{ background: C.tolu, borderRadius: 14, padding: '20px 22px', color: 'white',
                 cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => setFilterT(filterT === 'Tolú' ? 'Todos' : 'Tolú')}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                onClick={() => setFilterT('Tolú')}>
                 <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Tolú</div>
                 <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.tolu}</div>
                 <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Terminal marítima · Sucre</div>
@@ -1932,9 +1932,7 @@ export default function App() {
               {/* Barbosa */}
               <div style={{ background: C.barbosa, borderRadius: 14, padding: '20px 22px', color: 'white',
                 cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => setFilterT(filterT === 'Barbosa' ? 'Todos' : 'Barbosa')}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                onClick={() => setFilterT('Barbosa')}>
                 <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Barbosa</div>
                 <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.barbosa}</div>
                 <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Planta regasificación · Antioquia</div>
@@ -1942,9 +1940,7 @@ export default function App() {
               {/* Nacional */}
               <div style={{ background: C.blue, borderRadius: 14, padding: '20px 22px', color: 'white',
                 cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onClick={() => setFilterT(filterT === 'Nacional' ? 'Todos' : 'Nacional')}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                onClick={() => setFilterT('Nacional')}>
                 <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.7, marginBottom: 8 }}>Nacional</div>
                 <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1, letterSpacing: -2 }}>{stats.nacional}</div>
                 <div style={{ fontSize: 13, opacity: 0.65, marginTop: 6 }}>Legislativo · Regulatorio</div>
