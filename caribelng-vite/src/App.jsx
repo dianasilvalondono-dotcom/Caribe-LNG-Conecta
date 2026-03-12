@@ -1794,7 +1794,7 @@ export default function App() {
         )}
       </div>
 
-      <div style={{ padding: isMobile ? '16px 14px' : '24px 40px' }}>
+      <div style={{ padding: isMobile ? '16px 14px' : '24px 40px', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'clip' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
