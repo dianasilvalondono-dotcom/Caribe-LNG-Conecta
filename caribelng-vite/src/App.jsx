@@ -1808,7 +1808,7 @@ export default function App() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
             <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -8 }}>
                 <div style={{ width: 3, height: 18, background: C.navy, borderRadius: 2 }} />
                 <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapeo de Actores</span>
@@ -1823,7 +1823,7 @@ export default function App() {
               <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapa de Riesgos</span>
             </div>
             <div style={{ marginBottom: 24 }}>
-              <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer', display: 'inline-block', minWidth: 220 }}>
+              <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer', display: 'block', maxWidth: isMobile ? '100%' : 320 }}>
                 <StatCard label="Riesgos en acción inmediata" value={riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))).length} sub="Ver mapa completo →" color='#dc2626' icon="🗺️" />
               </div>
             </div>
