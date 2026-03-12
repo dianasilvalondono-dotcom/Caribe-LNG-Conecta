@@ -1925,75 +1925,72 @@ export default function App() {
                 })
               })()}
             </div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-              {['Todos', 'Tolú', 'Barbosa'].map(t => (
-                <button key={t} onClick={() => setCronoFilter(t)}
-                  style={{ background: cronoFilter === t ? C.navy : '#f1f5f9', color: cronoFilter === t ? 'white' : C.text,
-                    border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 16, cursor: 'pointer', fontWeight: 600 }}>
-                  {t}
-                </button>
-              ))}
-            </div>
-            {['Tolú', 'Barbosa'].filter(t => cronoFilter === 'Todos' || cronoFilter === t).map(territorio => {
-              const items = cronograma.filter(c => c.territorio === territorio)
-              const cumplidos = items.filter(c => c.estado === 'Cumplido').length
-              const pct = items.length ? Math.round((cumplidos / items.length) * 100) : 0
-              return (
-                <div key={territorio} style={{ marginBottom: 28 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                    <div style={{ width: 4, height: 24, background: territorio === 'Tolú' ? C.tolu : C.barbosa, borderRadius: 2 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{territorio}</div>
-                      <div style={{ fontSize: 15, color: C.subtle }}>{territorio === 'Tolú' ? 'Terminal marítima' : 'Planta de regasificación'} → {items.length} eventos</div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 18, fontWeight: 900, color: territorio === 'Tolú' ? C.tolu : C.barbosa }}>{pct}%</div>
-                      <div style={{ fontSize: 16, color: C.subtle }}>avance</div>
-                    </div>
-                  </div>
-                  <Bar value={pct} color={territorio === 'Tolú' ? C.tolu : C.barbosa} height={6} />
-                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {items.filter(ev => cronoEstadoFilter === 'Todos' || ev.estado === cronoEstadoFilter).map(ev => {
-                      const stColor = ev.estado === 'Cumplido' ? C.green : ev.estado === 'En proceso' ? C.orange : C.subtle
-                      const stBg = ev.estado === 'Cumplido' ? '#dcfce7' : ev.estado === 'En proceso' ? '#fff7ed' : '#f8fafc'
-                      return (
-                        <div key={ev.id} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
-                          boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${stColor}`, position: 'relative' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                              <span style={{ fontSize: 15, fontWeight: 800, color: territorio === 'Tolú' ? C.tolu : C.barbosa,
-                                background: territorio === 'Tolú' ? '#e0f2fe' : '#ede9fe', padding: '2px 8px', borderRadius: 10 }}>
-                                #{ev.numero}
-                              </span>
-                              <span style={{ fontSize: 15, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              {ev.periodo && <span style={{ fontSize: 16, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
-                              <select value={ev.estado}
-                                onChange={async e => { await updateCronogramaEstado(ev.id, e.target.value); loadData() }}
-                                style={{ border: `1.5px solid ${stColor}`, borderRadius: 20, padding: '3px 10px',
-                                  fontSize: 14, fontWeight: 700, color: stColor, background: stBg,
-                                  cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
-                                {['Pendiente', 'En proceso', 'Cumplido'].map(op => (
-                                  <option key={op} value={op}>{op}</option>
-                                ))}
-                              </select>
-                              {isAdmin && (
-                                <button onClick={async () => { if (confirm('¿Borrar este evento del cronograma?')) { await deleteCronogramaEvent(ev.id); loadData() } }}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}>🗑</button>
-                              )}
-                            </div>
-                          </div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.4 }}>{ev.evento}</div>
-                          {ev.producto && <div style={{ fontSize: 15, color: C.muted, marginBottom: 4, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Producto: </span>{ev.producto}</div>}
-                          {ev.resultado && <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Resultado: </span>{ev.resultado}</div>}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
+              {['Tolú', 'Barbosa'].map(territorio => {
+                const color = territorio === 'Tolú' ? C.tolu : C.barbosa
+                const items = cronograma.filter(c => c.territorio === territorio)
+                const cumplidos = items.filter(c => c.estado === 'Cumplido').length
+                const pct = items.length ? Math.round((cumplidos / items.length) * 100) : 0
+                const filtered = items.filter(ev => cronoEstadoFilter === 'Todos' || ev.estado === cronoEstadoFilter)
+                return (
+                  <div key={territorio}>
+                    <div style={{ borderTop: `5px solid ${color}`, borderRadius: 12, background: C.card,
+                      padding: '16px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)', marginBottom: 14 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <div>
+                          <div style={{ fontSize: 18, fontWeight: 900, color }}>{territorio}</div>
+                          <div style={{ fontSize: 13, color: C.subtle }}>{territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta de regasificación · Antioquia'} · {items.length} eventos</div>
                         </div>
-                      )
-                    })}
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 22, fontWeight: 900, color }}>{pct}%</div>
+                          <div style={{ fontSize: 12, color: C.subtle }}>avance</div>
+                        </div>
+                      </div>
+                      <Bar value={pct} color={color} height={6} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {filtered.map(ev => {
+                        const stColor = ev.estado === 'Cumplido' ? C.green : ev.estado === 'En proceso' ? C.orange : C.subtle
+                        const stBg = ev.estado === 'Cumplido' ? '#dcfce7' : ev.estado === 'En proceso' ? '#fff7ed' : '#f8fafc'
+                        return (
+                          <div key={ev.id} style={{ background: C.card, borderRadius: 12, padding: '14px 18px',
+                            boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${stColor}`, position: 'relative' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 13, fontWeight: 800, color,
+                                  background: territorio === 'Tolú' ? '#e0f2fe' : '#ede9fe', padding: '2px 8px', borderRadius: 10 }}>
+                                  #{ev.numero}
+                                </span>
+                                <span style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>{ev.mes}</span>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                {ev.periodo && <span style={{ fontSize: 12, color: C.subtle, whiteSpace: 'nowrap' }}>{ev.periodo}</span>}
+                                <select value={ev.estado}
+                                  onChange={async e => { await updateCronogramaEstado(ev.id, e.target.value); loadData() }}
+                                  style={{ border: `1.5px solid ${stColor}`, borderRadius: 20, padding: '2px 8px',
+                                    fontSize: 12, fontWeight: 700, color: stColor, background: stBg,
+                                    cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
+                                  {['Pendiente', 'En proceso', 'Cumplido'].map(op => (
+                                    <option key={op} value={op}>{op}</option>
+                                  ))}
+                                </select>
+                                {isAdmin && (
+                                  <button onClick={async () => { if (confirm('¿Borrar este evento del cronograma?')) { await deleteCronogramaEvent(ev.id); loadData() } }}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: C.red, padding: '0 2px' }}>🗑</button>
+                                )}
+                              </div>
+                            </div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4, lineHeight: 1.4 }}>{ev.evento}</div>
+                            {ev.producto && <div style={{ fontSize: 13, color: C.muted, marginBottom: 2, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Producto: </span>{ev.producto}</div>}
+                            {ev.resultado && <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.text }}>Resultado: </span>{ev.resultado}</div>}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         )}
 
