@@ -1883,7 +1883,7 @@ export default function App() {
     { id: 'cronograma', label: 'Cronograma', icon: '📅' },
     { id: 'kpis', label: 'KPIs', icon: '🎯' },
     { id: 'input', label: 'Input Semanal', icon: '✍️' },
-    ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '📍' }] : []),
+    { id: 'gestora', label: 'Mi territorio', icon: '📍' },
   ]
 
   if (isMobile && isPortrait) return (
@@ -2475,11 +2475,18 @@ export default function App() {
             isAdmin={isAdmin} onDeleted={loadData} />
         )}
 
-        {view === 'gestora' && isGestora && (
+        {view === 'gestora' && (
           <div>
             <div style={{ marginBottom: 18 }}>
               <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} →  {myTerritorio || 'Todos los territorios'}</p>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
+            </div>
+            {/* Explanation banner */}
+            <div style={{ background: `${C.accent}12`, border: `1px solid ${C.accent}33`, borderRadius: 12, padding: '12px 16px', marginBottom: 18, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <span style={{ fontSize: 20, flexShrink: 0 }}>💡</span>
+              <div style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>
+                <strong>Panel de campo.</strong> Aquí ves de un vistazo los actores que necesitan atención inmediata en tu territorio y los cumpleaños próximos — para que puedas priorizar tu gestión del día. Toca cualquier actor para registrar una novedad.
+              </div>
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
               <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
