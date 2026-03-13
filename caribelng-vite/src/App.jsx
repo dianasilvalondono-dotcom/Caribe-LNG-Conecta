@@ -2992,7 +2992,7 @@ export default function App() {
             }
           ]
           const HuellaCard = ({ pilar, data }) => (
-            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: '#fff', border: '1px solid #E0E4EA', borderRadius: 14, padding: '24px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: "'Montserrat', sans-serif" }}>
+            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: '#fff', border: '1px solid #E0E4EA', borderRadius: 14, padding: '24px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div style={{ width: 56, height: 56, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
                 <span style={{ color: 'white', fontSize: 15, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
               </div>
@@ -3008,7 +3008,7 @@ export default function App() {
             </div>
           )
           return (
-            <div style={{ background: '#fff', borderRadius: 16, padding: isMobile ? 16 : 32, fontFamily: "'Montserrat', sans-serif" }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: isMobile ? 16 : 32 }}>
               {/* Header with logos */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
