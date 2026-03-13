@@ -238,6 +238,19 @@ export async function deleteRiesgo(id) {
   if (error) throw error
 }
 
+// ── KPIs DAC Director ─────────────────────────────────────────────────────────
+
+export async function getKpisDac() {
+  const { data } = await supabase.from('kpis_dac').select('*')
+  return data || []
+}
+
+export async function upsertKpiDac(id, { valor, estado, notas }) {
+  const { error } = await supabase.from('kpis_dac')
+    .upsert({ id, valor, estado, notas, updated_at: new Date().toISOString() })
+  if (error) throw error
+}
+
 // ── Alertas ───────────────────────────────────────────────────────────────────
 
 export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
