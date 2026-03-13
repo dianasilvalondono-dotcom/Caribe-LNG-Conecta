@@ -1876,13 +1876,13 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'actores', label: 'Actores', icon: '👥' },
-    { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
-    { id: 'cronograma', label: 'Cronograma', icon: '📅' },
-    { id: 'huella', label: 'Huella Social', icon: '🌱' },
-    { id: 'input', label: 'Input Semanal', icon: '✍️' },
-    { id: 'kpis', label: 'KPIs', icon: '🎯' },
     { id: 'riesgos', label: 'Riesgos DAC', icon: '⚠️' },
+    { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
+    { id: 'huella', label: 'Huella Social', icon: '🌱' },
+    { id: 'actores', label: 'Actores', icon: '👥' },
+    { id: 'cronograma', label: 'Cronograma', icon: '📅' },
+    { id: 'kpis', label: 'KPIs', icon: '🎯' },
+    { id: 'input', label: 'Input Semanal', icon: '✍️' },
     ...(isGestora ? [{ id: 'gestora', label: 'Mi territorio', icon: '📍' }] : []),
   ]
 
