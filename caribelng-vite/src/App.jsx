@@ -11,21 +11,21 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
-  navy:    '#0f2744',
-  blue:    '#1e3a5f',
-  accent:  '#3b82f6',
-  tolu:    '#0ea5e9',
-  barbosa: '#8b5cf6',
+  navy:    '#0D47A1',  // Pantone 294 C — primary dark
+  blue:    '#1565C0',  // Pantone 2145 C — primary medium
+  accent:  '#1565C0',  // primary blue for links/accents
+  tolu:    '#007A87',  // Pantone 7716 C — secondary teal
+  barbosa: '#00BFB3',  // Pantone 3262 C — secondary cyan
   green:   '#22c55e',
   yellow:  '#eab308',
   orange:  '#f97316',
   red:     '#ef4444',
-  bg:      '#f8fafc',
-  card:    '#ffffff',
-  border:  '#f1f5f9',
-  text:    '#0f172a',
-  muted:   '#64748b',
-  subtle:  '#94a3b8',
+  bg:      '#FAFBFC',  // very light neutral
+  card:    '#FFFFFF',
+  border:  '#E8ECF0',
+  text:    '#2B2926',  // Pantone Black C
+  muted:   '#5C6370',
+  subtle:  '#8D95A0',
 }
 
 const SEMAFORO = {

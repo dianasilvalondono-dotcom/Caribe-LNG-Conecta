@@ -10,8 +10,8 @@ App web de gestión social territorial para Caribe LNG. Permite a la Dirección 
 - Autenticación: Microsoft 365 OAuth (tenant caribelng.com)
 
 ## Territorios
-- **Tolú** — Terminal marítima, departamento de Sucre. Color: #0ea5e9
-- **Barbosa** — Planta de regasificación, departamento de Antioquia. Color: #8b5cf6
+- **Tolú** — Terminal marítima, departamento de Sucre. Color: #007A87
+- **Barbosa** — Planta de regasificación, departamento de Antioquia. Color: #00BFB3
 - **Nacional** — Actores legislativos y regulatorios
 
 ## Estructura de la app
@@ -30,24 +30,24 @@ El archivo principal es `App.jsx`. Toda la UI vive ahí.
 | `riesgos` | Mapa de riesgos, bow-tie y cronograma legislativo |
 | `gestora` | Vista personal para gestoras de territorio |
 
-## Design tokens (objeto C en App.jsx)
+## Design tokens (objeto C en App.jsx) — Brandbook 2026
 ```js
 const C = {
-  navy:    '#0f2744',  // fondo nav, botones primarios
-  blue:    '#1e3a5f',
-  accent:  '#3b82f6',
-  tolu:    '#0ea5e9',  // color Tolú
-  barbosa: '#8b5cf6',  // color Barbosa
+  navy:    '#0D47A1',  // Pantone 294 C — primary dark
+  blue:    '#1565C0',  // Pantone 2145 C — primary medium
+  accent:  '#1565C0',  // primary blue for links/accents
+  tolu:    '#007A87',  // Pantone 7716 C — secondary teal (Tolú)
+  barbosa: '#00BFB3',  // Pantone 3262 C — secondary cyan (Barbosa)
   green:   '#22c55e',
   yellow:  '#eab308',
   orange:  '#f97316',
   red:     '#ef4444',
-  bg:      '#f8fafc',
-  card:    '#ffffff',
-  border:  '#f1f5f9',
-  text:    '#0f172a',
-  muted:   '#64748b',
-  subtle:  '#94a3b8',
+  bg:      '#FAFBFC',  // very light neutral
+  card:    '#FFFFFF',
+  border:  '#E8ECF0',
+  text:    '#2B2926',  // Pantone Black C
+  muted:   '#5C6370',
+  subtle:  '#8D95A0',
 }
 ```
 
