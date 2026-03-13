@@ -2208,14 +2208,19 @@ function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
 
   return (
     <>
-      {/* Floating label */}
+      {/* Floating label above button */}
       {!open && (
         <div onClick={() => setOpen(true)}
-          style={{ position: 'fixed', bottom: isMobile ? 78 : 86, right: isMobile ? 12 : 20,
-            background: 'white', borderRadius: 12, padding: '8px 14px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-            cursor: 'pointer', zIndex: 9999, maxWidth: 200, textAlign: 'center' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>¡Hola! Soy Conecta</div>
-          <div style={{ fontSize: 11, color: C.muted }}>Tu asistente personal</div>
+          style={{ position: 'fixed', bottom: isMobile ? 78 : 88, right: isMobile ? 4 : 8,
+            background: 'white', borderRadius: 14, padding: '10px 16px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            cursor: 'pointer', zIndex: 10000, textAlign: 'center', minWidth: 180,
+            border: `1.5px solid ${C.navy}22` }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: C.navy }}>¡Hola! Soy Conecta</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Tu asistente personal de Caribe LNG</div>
+          {/* Arrow pointing down */}
+          <div style={{ position: 'absolute', bottom: -8, right: 28, width: 16, height: 16,
+            background: 'white', transform: 'rotate(45deg)', boxShadow: '2px 2px 4px rgba(0,0,0,0.08)',
+            borderRight: `1.5px solid ${C.navy}22`, borderBottom: `1.5px solid ${C.navy}22` }} />
         </div>
       )}
       {/* Floating button */}
