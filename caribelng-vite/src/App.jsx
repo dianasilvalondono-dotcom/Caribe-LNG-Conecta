@@ -1909,6 +1909,158 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   )
 }
 
+// ━━ ChatBot ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ChatBot({ appData, session, isMobile }) {
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  function buildContext() {
+    const d = appData
+    const lines = []
+    lines.push(`== RESUMEN GENERAL ==`)
+    lines.push(`Total actores: ${d.actors?.length || 0}`)
+    const byTerr = (t) => d.actors?.filter(a => a.territorio === t) || []
+    lines.push(`Actores Tolú: ${byTerr('Tolú').length}, Barbosa: ${byTerr('Barbosa').length}, Nacional: ${byTerr('Nacional').length}`)
+    const sem = (color) => d.actors?.filter(a => a.semaforo === color).length || 0
+    lines.push(`Semáforo: ${sem('Verde')} verde, ${sem('Amarillo')} amarillo, ${sem('Rojo')} rojo`)
+    lines.push(`Total acuerdos: ${d.agreements?.length || 0}`)
+    d.agreements?.forEach(a => lines.push(`  - ${a.nombre}: ${a.estado} (${a.territorio})`))
+    lines.push(`Total riesgos sociales: ${d.riesgos?.length || 0}`)
+    d.riesgos?.forEach(r => lines.push(`  - [${r.nivel_riesgo}] ${r.riesgo} → Acción: ${r.accion_inmediata}`))
+    lines.push(`Total riesgos legislativos: ${d.riesgosLeg?.length || 0}`)
+    d.riesgosLeg?.forEach(r => lines.push(`  - [${r.nivel_riesgo}] ${r.riesgo} → ${r.accion_inmediata}`))
+    lines.push(`\n== HUELLA SOCIAL TERRITORIAL ==`)
+    lines.push(`TOLÚ: C3 Licencia C3 (formación, género, sustancias peligrosas) | HUB Muelle Astivik (hub operativo, deportes acuáticos, certificaciones marítimas) | ECO Ambiental Marino (impacto ambiental con pescadores, restauración arrecifes)`)
+    lines.push(`BARBOSA: C3 Licencia C3 (formación, género) | HUB Cancha El Machete (polideportivo, espacio comunitario) | ECO Cadena de Reciclaje (puntos ecológicos, siembra 150 árboles, genera ingreso)`)
+    lines.push(`\n== CRONOGRAMA LEGISLATIVO ==`)
+    d.cronoLeg?.forEach(c => lines.push(`  - ${c.fecha}: [${c.nivel_riesgo}] ${c.evento} (${c.tipo})`))
+    lines.push(`\n== ACTORES CLAVE (top 20 por relevancia) ==`)
+    const topActors = [...(d.actors || [])].sort((a, b) => (b.relevancia || 0) - (a.relevancia || 0)).slice(0, 20)
+    topActors.forEach(a => lines.push(`  - ${a.nombre} (${a.territorio}, ${a.sector}, semáforo: ${a.semaforo}, cargo: ${a.cargo || 'N/A'})`))
+    lines.push(`\n== KPIs DAC ==`)
+    d.kpisDac?.forEach(k => lines.push(`  - ${k.kpi_id}: valor=${k.valor || 'pendiente'}, estado=${k.estado || 'EN CURSO'}`))
+    lines.push(`\n== REPORTES SEMANALES ==`)
+    lines.push(`Total reportes: ${d.reportes?.length || 0}`)
+    const lastR = d.reportes?.[0]
+    if (lastR) lines.push(`Último reporte: Semana ${lastR.semana} (${lastR.territorio}) — Eventos AID: ${lastR.eventos_aid}, AII: ${lastR.eventos_aii}, PQRS: ${lastR.pqrs_recibidas}, Incidentes: ${lastR.incidentes}`)
+    return lines.join('\n')
+  }
+
+  async function handleSend() {
+    if (!input.trim() || loading) return
+    const q = input.trim()
+    setInput('')
+    setMessages(prev => [...prev, { role: 'user', text: q }])
+    setLoading(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, context: buildContext(), userId: session?.user?.id })
+      })
+      const data = await res.json()
+      if (data.error) {
+        setMessages(prev => [...prev, { role: 'assistant', text: data.error }])
+      } else {
+        setMessages(prev => [...prev, { role: 'assistant', text: data.answer, budget: data.budget }])
+      }
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'assistant', text: 'Error de conexión: ' + e.message }])
+    } finally { setLoading(false) }
+  }
+
+  const panelW = isMobile ? '92vw' : 400
+  const panelH = isMobile ? '70vh' : 500
+
+  return (
+    <>
+      {/* Floating button */}
+      <button onClick={() => setOpen(!open)}
+        style={{ position: 'fixed', bottom: isMobile ? 16 : 24, right: isMobile ? 16 : 24,
+          width: 56, height: 56, borderRadius: '50%', background: C.navy, color: 'white',
+          border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', cursor: 'pointer',
+          fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+        {open ? '✕' : '🤖'}
+      </button>
+
+      {/* Chat panel */}
+      {open && (
+        <div style={{ position: 'fixed', bottom: isMobile ? 80 : 90, right: isMobile ? '4vw' : 24,
+          width: panelW, height: panelH, background: 'white', borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)', zIndex: 9998, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* Header */}
+          <div style={{ background: C.navy, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 22 }}>🤖</span>
+            <div>
+              <div style={{ color: 'white', fontSize: 15, fontWeight: 800 }}>Asistente Caribe LNG</div>
+              <div style={{ color: '#94a3b8', fontSize: 11 }}>Pregúntame sobre la operación social</div>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {messages.length === 0 && (
+              <div style={{ textAlign: 'center', color: C.subtle, fontSize: 13, padding: '30px 10px', lineHeight: 1.7 }}>
+                Hola! Soy el asistente de Caribe LNG Conecta.<br />
+                Puedes preguntarme sobre actores, acuerdos, riesgos, huella social, KPIs o cualquier dato de la plataforma.
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', marginTop: 14 }}>
+                  {['¿Cuántos actores hay en Tolú?', '¿Cuál es la huella social de Barbosa?', '¿Qué riesgos legislativos tenemos?', '¿Cómo van los acuerdos?'].map(q => (
+                    <button key={q} onClick={() => { setInput(q); }}
+                      style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 10px',
+                        fontSize: 12, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {messages.map((m, i) => (
+              <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
+                <div style={{
+                  background: m.role === 'user' ? C.navy : '#f1f5f9',
+                  color: m.role === 'user' ? 'white' : C.text,
+                  padding: '10px 14px', borderRadius: 12, fontSize: 13, lineHeight: 1.6,
+                  borderBottomRightRadius: m.role === 'user' ? 4 : 12,
+                  borderBottomLeftRadius: m.role === 'user' ? 12 : 4,
+                  whiteSpace: 'pre-wrap'
+                }}>
+                  {m.text}
+                </div>
+                {m.budget && (
+                  <div style={{ fontSize: 10, color: C.subtle, marginTop: 2, textAlign: 'right' }}>
+                    ${m.budget.spent} / ${m.budget.limit} este mes
+                  </div>
+                )}
+              </div>
+            ))}
+            {loading && (
+              <div style={{ alignSelf: 'flex-start', background: '#f1f5f9', padding: '10px 14px', borderRadius: 12, fontSize: 13, color: C.muted }}>
+                Pensando...
+              </div>
+            )}
+          </div>
+
+          {/* Input */}
+          <div style={{ borderTop: '1px solid #e2e8f0', padding: '10px 12px', display: 'flex', gap: 8 }}>
+            <input value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSend()}
+              placeholder="Escribe tu pregunta..."
+              style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 14px',
+                fontSize: 14, outline: 'none', fontFamily: 'inherit', color: C.text }} />
+            <button onClick={handleSend} disabled={loading || !input.trim()}
+              style={{ background: loading ? '#94a3b8' : C.navy, color: 'white', border: 'none',
+                borderRadius: 10, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: loading ? 'wait' : 'pointer' }}>
+              →
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 // ━━ Main App ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function App() {
   const [session, setSession] = useState(null)
@@ -2771,6 +2923,12 @@ export default function App() {
         <ActorModal actor={selectedActor} session={session}
           onClose={() => setSelectedActor(null)} onUpdated={loadData} />
       )}
+
+      <ChatBot
+        appData={{ actors, agreements, riesgos, riesgosLeg, cronoLeg, kpisDac, reportes }}
+        session={session}
+        isMobile={isMobile}
+      />
     </div>
   )
 }
