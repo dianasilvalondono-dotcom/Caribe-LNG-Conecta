@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY
-const MONTHLY_BUDGET = parseFloat(process.env.CHAT_MONTHLY_BUDGET || '10')
+const MONTHLY_BUDGET = parseFloat(process.env.CHAT_MONTHLY_BUDGET || '5')
 
 // Haiku pricing per million tokens
 const INPUT_COST_PER_M = 0.80
