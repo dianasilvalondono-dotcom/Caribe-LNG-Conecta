@@ -259,7 +259,9 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
   const [hijos, setHijos] = useState(actor.hijos || '')
   const [hobbies, setHobbies] = useState(actor.hobbies || '')
   const [notasPer, setNotasPer] = useState(actor.notas_personales || '')
-  const [fechasImp, setFechasImp] = useState(actor.fechas_importantes || '')
+  const [fechasImp, setFechasImp] = useState(Array.isArray(actor.fechas_importantes) ? actor.fechas_importantes : [])
+  const [newFechaDate, setNewFechaDate] = useState('')
+  const [newFechaDesc, setNewFechaDesc] = useState('')
 
   useEffect(() => {
     getInteractions(actor.id).then(d => { setInteractions(d || []); setLoading(false) })
@@ -478,11 +480,36 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
               <Field label="🎯 Intereses y hobbies" value={hobbies} onChange={setHobbies} placeholder="Ej: fútbol, pesca, música vallenata..." />
             </div>
             <div style={{ marginBottom: 10 }}>
-              <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 4 }}>📅 Fechas importantes</label>
-              <textarea value={fechasImp} onChange={e => setFechasImp(e.target.value)}
-                placeholder="Ej: Aniversario 15 marzo, graduación hijo mayo..."
-                style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '8px 10px', fontSize: 13,
-                  resize: 'none', height: 60, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
+              <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 6 }}>📅 Fechas importantes</label>
+              {/* Existing dates list */}
+              {fechasImp.length > 0 && (
+                <div style={{ marginBottom: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {fechasImp.map((fi, i) => {
+                    const [mm, dd] = (fi.fecha || '').split('-')
+                    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+                    const label = mm && dd ? `${parseInt(dd)} ${meses[parseInt(mm)-1] || ''}` : fi.fecha
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f8fafc', borderRadius: 7, padding: '6px 10px' }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: C.accent, minWidth: 40 }}>{label}</span>
+                        <span style={{ fontSize: 13, color: C.text, flex: 1 }}>{fi.descripcion}</span>
+                        <button onClick={() => setFechasImp(f => f.filter((_, j) => j !== i))}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.muted, fontSize: 14, padding: '0 2px', lineHeight: 1 }}>✕</button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {/* Add new date */}
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input type="date" value={newFechaDate} onChange={e => setNewFechaDate(e.target.value)}
+                  style={{ border: '1px solid #e2e8f0', borderRadius: 7, padding: '6px 8px', fontSize: 13, outline: 'none', width: 140, boxSizing: 'border-box', fontFamily: 'inherit', color: C.text }} />
+                <input type="text" value={newFechaDesc} onChange={e => setNewFechaDesc(e.target.value)}
+                  placeholder="Ej: Hija se gradúa de la uni" onKeyDown={e => { if (e.key === 'Enter' && newFechaDate && newFechaDesc.trim()) { const [,mm,dd] = newFechaDate.split('-'); setFechasImp(f => [...f, { fecha: `${mm}-${dd}`, descripcion: newFechaDesc.trim() }]); setNewFechaDate(''); setNewFechaDesc('') } }}
+                  style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 7, padding: '6px 8px', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: C.text }} />
+                <button onClick={() => { if (!newFechaDate || !newFechaDesc.trim()) return; const [,mm,dd] = newFechaDate.split('-'); setFechasImp(f => [...f, { fecha: `${mm}-${dd}`, descripcion: newFechaDesc.trim() }]); setNewFechaDate(''); setNewFechaDesc('') }}
+                  style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 7, padding: '6px 10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Agregar</button>
+              </div>
+              <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>La fecha se usa para el recordatorio anual en "Mi Territorio"</div>
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 4 }}>🌟 Notas personales</label>
@@ -2504,25 +2531,59 @@ export default function App() {
               ))}
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>🎂 Próximos cumpleaños</h3>
+              <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>📅 Próximas fechas importantes</h3>
               {(() => {
                 const today = new Date()
-                const upcoming = actors.filter(a => a.cumpleanos).map(a => {
+                const todayMM = today.getMonth()
+                const todayDD = today.getDate()
+                const items = []
+
+                const filteredActors = actors.filter(a => myTerritorio ? a.territorio === myTerritorio : true)
+
+                // Birthdays
+                filteredActors.filter(a => a.cumpleanos).forEach(a => {
                   const d = new Date(a.cumpleanos)
                   const next = new Date(today.getFullYear(), d.getMonth(), d.getDate())
                   if (next < today) next.setFullYear(today.getFullYear() + 1)
                   const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
-                  return { ...a, diff, dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) }
-                }).filter(a => a.diff <= 30).sort((a, b) => a.diff - b.diff)
-                if (!upcoming.length) return <div style={{ fontSize: 16, color: C.subtle, fontStyle: 'italic' }}>Sin cumpleaños en los próximos 30 días.</div>
-                return upcoming.map(a => (
-                  <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
+                  if (diff <= 30) items.push({
+                    actorId: a.id, actor: a, diff,
+                    descripcion: '🎂 Cumpleaños',
+                    dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' })
+                  })
+                })
+
+                // Fechas importantes
+                filteredActors.forEach(a => {
+                  if (!Array.isArray(a.fechas_importantes)) return
+                  a.fechas_importantes.forEach((fi, idx) => {
+                    if (!fi.fecha) return
+                    const [mm, dd] = fi.fecha.split('-').map(Number)
+                    if (!mm || !dd) return
+                    const next = new Date(today.getFullYear(), mm - 1, dd)
+                    if (next < today) next.setFullYear(today.getFullYear() + 1)
+                    const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
+                    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+                    if (diff <= 30) items.push({
+                      actorId: a.id + '-' + idx, actor: a, diff,
+                      descripcion: fi.descripcion,
+                      dateStr: `${dd} de ${meses[mm - 1]}`
+                    })
+                  })
+                })
+
+                items.sort((a, b) => a.diff - b.diff)
+
+                if (!items.length) return <div style={{ fontSize: 14, color: C.subtle, fontStyle: 'italic' }}>Sin fechas en los próximos 30 días.</div>
+                return items.map(item => (
+                  <div key={item.actorId} onClick={() => setSelectedActor(item.actor)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${C.border}`, cursor: 'pointer' }}>
                     <div>
-                      <div style={{ fontSize: 16, fontWeight: 700 }}>{a.nombre}</div>
-                      <div style={{ fontSize: 15, color: C.subtle }}>{a.dateStr}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{item.actor.nombre}</div>
+                      <div style={{ fontSize: 13, color: C.accent, fontWeight: 600 }}>{item.descripcion}</div>
+                      <div style={{ fontSize: 12, color: C.subtle }}>{item.dateStr}</div>
                     </div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: a.diff <= 7 ? C.red : C.orange }}>
-                      {a.diff === 0 ? '¡Hoy! 🎉' : `En ${a.diff} días`}
+                    <div style={{ fontSize: 13, fontWeight: 700, color: item.diff <= 7 ? C.red : C.orange, textAlign: 'right', minWidth: 60 }}>
+                      {item.diff === 0 ? '¡Hoy! 🎉' : `En ${item.diff}d`}
                     </div>
                   </div>
                 ))
