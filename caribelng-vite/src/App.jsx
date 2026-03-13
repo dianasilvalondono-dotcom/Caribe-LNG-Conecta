@@ -2847,70 +2847,89 @@ export default function App() {
         )}
 
         {view === 'huella' && (() => {
-          const pilares = { c3: { label: 'C3', desc: 'Gente Capacitada', color: '#0ea5e9' }, hub: { label: 'HUB', desc: 'Infraestructura Funcionando', color: C.navy }, eco: { label: 'ECO', desc: 'Programa Ambiental', color: '#f97316' } }
+          const P = { c3: { label: 'C3', desc: 'Gente Capacitada', color: '#1565C0' }, hub: { label: 'HUB', desc: 'Infraestructura Funcionando', color: '#0D47A1' }, eco: { label: 'ECO', desc: 'Programa Ambiental', color: '#E53935' } }
           const territorios = [
-            { nombre: 'TOLÚ', sub: 'Sucre', color: C.tolu,
+            { nombre: 'TOLÚ', sub: 'Sucre', color: C.navy,
               c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Si no hay infraestructura, Cargovolco y Suragas proveen lo necesario', 'Certificación en manejo de sustancias peligrosas', 'En 3 años los contratamos'] },
               hub: { titulo: 'Muelle Astivik', items: ['Reformamos el muelle como hub operativo', 'Deportes acuáticos para jóvenes', 'Certificaciones marítimas y portuarias para adultos', 'Mercado de pescadores'] },
               eco: { titulo: 'Ambiental Marino', items: ['Mini estudio de impacto ambiental con pescadores', 'Programa ambiental costero co-construido con la comunidad', 'Restauración de arrecifes o protección de ecosistemas marinos', 'Nace del mar, se construye con la gente del mar'] },
               resumen: 'Tolú = Astivik + Licencia C3 + Programa Ambiental Marino con Pescadores'
             },
-            { nombre: 'BARBOSA', sub: 'Antioquia', color: C.barbosa,
+            { nombre: 'BARBOSA', sub: 'Antioquia', color: C.navy,
               c3: { titulo: 'Licencia C3', items: ['Mismo programa de formación', 'Enfoque de género', 'Certificación en sustancias peligrosas', 'En 3 años los contratamos'] },
               hub: { titulo: 'Cancha El Machete', items: ['Reforma con cubierta', 'Polideportivo: microfútbol, voleibol, básquetbol', 'Espacio comunitario de uso continuo'] },
               eco: { titulo: 'Cadena de Reciclaje', items: ['Puntos ecológicos en la comunidad', 'La comunidad recicla y vende el producto', 'Acuerdo con Alcaldía y EPM para manejo de basuras', 'Siembra de 150 árboles', 'Genera ingreso para la comunidad'] },
               resumen: 'Barbosa = El Machete + Licencia C3 + Cadena de Reciclaje que Genera Ingreso'
             }
           ]
-          const PilarCard = ({ pilar, data }) => (
-            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: C.card, borderRadius: 12, padding: '20px 16px', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 52, height: 52, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                <span style={{ color: 'white', fontSize: 14, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
+          const HuellaCard = ({ pilar, data }) => (
+            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: '#fff', border: '1px solid #E0E4EA', borderRadius: 14, padding: '24px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+                <span style={{ color: 'white', fontSize: 15, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
               </div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10, textAlign: 'center' }}>{data.titulo}</div>
-              <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: 13, color: C.muted, lineHeight: 1.7, textAlign: 'left', width: '100%' }}>
-                {data.items.map((it, i) => <li key={i} style={{ marginBottom: 3 }}>{it}</li>)}
-              </ul>
+              <div style={{ fontSize: 16, fontWeight: 800, color: C.text, marginBottom: 14, textAlign: 'center' }}>{data.titulo}</div>
+              <div style={{ width: '100%', textAlign: 'left' }}>
+                {data.items.map((it, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6, fontSize: 13, color: '#444', lineHeight: 1.6 }}>
+                    <span style={{ color: '#00BFB3', fontSize: 18, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>•</span>
+                    <span>{it}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )
           return (
-            <div>
-              <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 30, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>HUELLA SOCIAL TERRITORIAL</h1>
-                <div style={{ width: 60, height: 4, background: C.accent, borderRadius: 2, margin: '8px auto 10px' }} />
-                <p style={{ margin: 0, color: C.muted, fontSize: 15 }}>Lo que Caribe LNG deja en cada territorio</p>
+            <div style={{ background: '#fff', borderRadius: 16, padding: isMobile ? 16 : 32 }}>
+              {/* Header with logos */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <svg viewBox="0 0 863.64 794.92" width="36" height="36"><path fill="#1565C0" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#08306b" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>Caribe LNG</span>
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: C.accent }}>Caribe LNG <span style={{ color: '#00BFB3' }}>¡Conecta!</span></div>
               </div>
-              {/* Legend pills */}
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
-                {Object.values(pilares).map(p => (
-                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ background: p.color, color: 'white', fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 12 }}>{p.label}</span>
+              {/* Title */}
+              <div style={{ textAlign: 'center', marginBottom: 28 }}>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 24 : 34, fontWeight: 900, color: C.navy }}>HUELLA SOCIAL TERRITORIAL</h1>
+                <div style={{ width: 80, height: 4, background: C.accent, borderRadius: 2, margin: '10px auto 12px' }} />
+                <p style={{ margin: 0, color: '#5C6370', fontSize: 15, fontWeight: 500 }}>Lo que Caribe LNG deja en cada territorio</p>
+              </div>
+              {/* Legend bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 10 : 24, marginBottom: 32, flexWrap: 'wrap', background: '#F5F7FA', borderRadius: 10, padding: '12px 20px' }}>
+                {Object.values(P).map(p => (
+                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ background: p.color, color: 'white', fontSize: 11, fontWeight: 900, padding: '4px 12px', borderRadius: 14 }}>{p.label}</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{p.desc}</span>
                   </div>
                 ))}
               </div>
               {/* Territories */}
               {territorios.map(t => (
-                <div key={t.nombre} style={{ marginBottom: 32 }}>
-                  <div style={{ marginBottom: 14 }}>
-                    <h2 style={{ margin: 0, fontSize: isMobile ? 22 : 26, fontWeight: 900, color: C.text, letterSpacing: -0.3 }}>
-                      {t.nombre} <span style={{ fontSize: 16, fontWeight: 400, color: C.muted }}>{t.sub}</span>
+                <div key={t.nombre} style={{ marginBottom: 40 }}>
+                  <div style={{ marginBottom: 16, borderBottom: '2px solid #E0E4EA', paddingBottom: 8 }}>
+                    <h2 style={{ margin: 0, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: C.navy }}>
+                      {t.nombre} <span style={{ fontSize: 16, fontWeight: 400, color: '#8D95A0', marginLeft: 8 }}>{t.sub}</span>
                     </h2>
                   </div>
-                  <div style={{ display: 'flex', gap: 14, flexWrap: isMobile ? 'wrap' : 'nowrap', marginBottom: 14 }}>
-                    <PilarCard pilar={pilares.c3} data={t.c3} />
-                    <PilarCard pilar={pilares.hub} data={t.hub} />
-                    <PilarCard pilar={pilares.eco} data={t.eco} />
+                  <div style={{ display: 'flex', gap: 16, flexWrap: isMobile ? 'wrap' : 'nowrap', marginBottom: 16 }}>
+                    <HuellaCard pilar={P.c3} data={t.c3} />
+                    <HuellaCard pilar={P.hub} data={t.hub} />
+                    <HuellaCard pilar={P.eco} data={t.eco} />
                   </div>
-                  <div style={{ background: `linear-gradient(90deg, ${t.color}15, ${t.color}08)`, border: `1px solid ${t.color}30`, borderRadius: 10, padding: '12px 18px', textAlign: 'center' }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{t.resumen}</span>
+                  {/* Golden summary banner */}
+                  <div style={{ background: 'linear-gradient(90deg, #F59E0B, #FBBF24)', borderRadius: 10, padding: '14px 24px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{t.resumen}</span>
                   </div>
                 </div>
               ))}
-              {/* Final CTA */}
-              <div style={{ background: C.navy, borderRadius: 12, padding: '24px 20px', textAlign: 'center', marginTop: 8 }}>
-                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>En 3 años, esa gente trabaja con nosotros.</div>
-                <div style={{ fontSize: 14, color: '#94a3b8' }}>Eso es la huella social territorial de Caribe LNG.</div>
+              {/* Final banner */}
+              <div style={{ background: C.navy, borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: isMobile ? 17 : 22, fontWeight: 900, color: 'white', marginBottom: 6, fontStyle: 'italic' }}>En 3 años, esa gente trabaja con nosotros.</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Eso es la huella social territorial de Caribe LNG.</div>
+              </div>
+              {/* Footer */}
+              <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: '#8D95A0' }}>
+                Caribe LNG | Huella Social Territorial | 2026
               </div>
             </div>
           )
