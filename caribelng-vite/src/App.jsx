@@ -2976,7 +2976,7 @@ export default function App() {
         )}
 
         {view === 'huella' && (() => {
-          const P = { c3: { label: 'C3', desc: 'Gente Capacitada', color: '#1565C0' }, hub: { label: 'HUB', desc: 'Infraestructura Funcionando', color: '#0D47A1' }, eco: { label: 'ECO', desc: 'Programa Ambiental', color: '#E53935' } }
+          const P = { c3: { label: 'C3', desc: 'Gente Capacitada', color: '#1565C0' }, hub: { label: 'HUB', desc: 'Infraestructura Funcionando', color: '#007A87' }, eco: { label: 'ECO', desc: 'Programa Ambiental', color: '#00BFB3' } }
           const territorios = [
             { nombre: 'TOLÚ', sub: 'Sucre', color: C.navy,
               c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Si no hay infraestructura, Cargovolco y Suragas proveen lo necesario', 'Certificación en manejo de sustancias peligrosas', 'En 3 años los contratamos'] },
@@ -3045,9 +3045,9 @@ export default function App() {
                     <HuellaCard pilar={P.hub} data={t.hub} />
                     <HuellaCard pilar={P.eco} data={t.eco} />
                   </div>
-                  {/* Golden summary banner */}
-                  <div style={{ background: 'linear-gradient(90deg, #F59E0B, #FBBF24)', borderRadius: 10, padding: '14px 24px', textAlign: 'center' }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{t.resumen}</span>
+                  {/* Summary banner */}
+                  <div style={{ background: '#0D2137', borderRadius: 10, padding: '14px 24px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t.resumen}</span>
                   </div>
                 </div>
               ))}
