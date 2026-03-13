@@ -2573,66 +2573,75 @@ export default function App() {
           </div>
         )}
 
-        {view === 'huella' && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Huella Social Territorial</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Lo que Caribe LNG deja instalado en el territorio</p>
+        {view === 'huella' && (() => {
+          const pilares = { c3: { label: 'C3', desc: 'Gente Capacitada', color: '#0ea5e9' }, hub: { label: 'HUB', desc: 'Infraestructura Funcionando', color: C.navy }, eco: { label: 'ECO', desc: 'Programa Ambiental', color: '#f97316' } }
+          const territorios = [
+            { nombre: 'TOLÚ', sub: 'Sucre', color: C.tolu,
+              c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Si no hay infraestructura, Cargovolco y Suragas proveen lo necesario', 'Certificación en manejo de sustancias peligrosas', 'En 3 años los contratamos'] },
+              hub: { titulo: 'Muelle Astivik', items: ['Reformamos el muelle como hub operativo', 'Deportes acuáticos para jóvenes', 'Certificaciones marítimas y portuarias para adultos', 'Mercado de pescadores'] },
+              eco: { titulo: 'Ambiental Marino', items: ['Mini estudio de impacto ambiental con pescadores', 'Programa ambiental costero co-construido con la comunidad', 'Restauración de arrecifes o protección de ecosistemas marinos', 'Nace del mar, se construye con la gente del mar'] },
+              resumen: 'Tolú = Astivik + Licencia C3 + Programa Ambiental Marino con Pescadores'
+            },
+            { nombre: 'BARBOSA', sub: 'Antioquia', color: C.barbosa,
+              c3: { titulo: 'Licencia C3', items: ['Mismo programa de formación', 'Enfoque de género', 'Certificación en sustancias peligrosas', 'En 3 años los contratamos'] },
+              hub: { titulo: 'Cancha El Machete', items: ['Reforma con cubierta', 'Polideportivo: microfútbol, voleibol, básquetbol', 'Espacio comunitario de uso continuo'] },
+              eco: { titulo: 'Cadena de Reciclaje', items: ['Puntos ecológicos en la comunidad', 'La comunidad recicla y vende el producto', 'Acuerdo con Alcaldía y EPM para manejo de basuras', 'Siembra de 150 árboles', 'Genera ingreso para la comunidad'] },
+              resumen: 'Barbosa = El Machete + Licencia C3 + Cadena de Reciclaje que Genera Ingreso'
+            }
+          ]
+          const PilarCard = ({ pilar, data }) => (
+            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: C.card, borderRadius: 12, padding: '20px 16px', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                <span style={{ color: 'white', fontSize: 14, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10, textAlign: 'center' }}>{data.titulo}</div>
+              <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: 13, color: C.muted, lineHeight: 1.7, textAlign: 'left', width: '100%' }}>
+                {data.items.map((it, i) => <li key={i} style={{ marginBottom: 3 }}>{it}</li>)}
+              </ul>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 24, alignItems: 'start' }}>
-              {['Tolú', 'Barbosa'].map(territorio => {
-                const items = huellaSocial.filter(h => h.territorio === territorio)
-                const color = territorio === 'Tolú' ? C.tolu : C.barbosa
-                return (
-                  <div key={territorio}>
-                    <div style={{ borderTop: `5px solid ${color}`, borderRadius: 12, background: C.card,
-                      padding: '20px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)', marginBottom: 16 }}>
-                      <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 900, color, letterSpacing: -0.3, textTransform: 'uppercase' }}>
-                        {territorio}
-                      </h2>
-                      <p style={{ margin: 0, fontSize: 14, color: C.muted }}>
-                        {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta de regasificación · Antioquia'}
-                      </p>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
-                      {items.map(h => (
-                        <div key={h.id} style={{ background: C.card, borderRadius: 12, padding: '18px 16px',
-                          boxShadow: '0 1px 6px rgba(0,0,0,0.07)', borderTop: `3px solid ${color}`,
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 8 }}>
-                          <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${color}18`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
-                            {h.icono || ({
-                              'Ambiental-Marítimo': '⚓', 'Ambiental': '⚓', 'Marítimo': '⚓',
-                              'Formación Marítima': '🎓', 'Formación Local': '💡', 'Formación': '💡',
-                              'Seguridad y Convivencia': '🛡️', 'Seguridad': '🛡️', 'Convivencia': '🛡️',
-                              'Presencia Territorial': '🗺️', 'Presencia permanente': '🗺️', 'Presencia': '🗺️',
-                              'Prevención Conflictos': '⚠️', 'Prevención': '⚠️',
-                              'Vida comunitaria': '👥', 'Vida Comunitaria': '👥',
-                              'Cuidado del entorno': '🌳', 'Cuidado del Entorno': '🌳',
-                              'Deporte e infraestructura': '🏆', 'Deporte': '🏆',
-                              'Datos para decidir': '📊', 'Datos': '📊',
-                              'Roles claros': '🤝', 'Roles Claros': '🤝',
-                              'Economía Costera': '🎣', 'Economía costera': '🎣',
-                            }[h.eje] || '🌱')}
-                          </div>
-                          <div style={{ fontSize: 13, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            {h.eje}
-                          </div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>
-                            {h.intervencion}
-                          </div>
-                          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5 }}>
-                            {h.huella}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+          )
+          return (
+            <div>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 30, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>HUELLA SOCIAL TERRITORIAL</h1>
+                <div style={{ width: 60, height: 4, background: C.accent, borderRadius: 2, margin: '8px auto 10px' }} />
+                <p style={{ margin: 0, color: C.muted, fontSize: 15 }}>Lo que Caribe LNG deja en cada territorio</p>
+              </div>
+              {/* Legend pills */}
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
+                {Object.values(pilares).map(p => (
+                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ background: p.color, color: 'white', fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 12 }}>{p.label}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{p.desc}</span>
                   </div>
-                )
-              })}
+                ))}
+              </div>
+              {/* Territories */}
+              {territorios.map(t => (
+                <div key={t.nombre} style={{ marginBottom: 32 }}>
+                  <div style={{ marginBottom: 14 }}>
+                    <h2 style={{ margin: 0, fontSize: isMobile ? 22 : 26, fontWeight: 900, color: C.text, letterSpacing: -0.3 }}>
+                      {t.nombre} <span style={{ fontSize: 16, fontWeight: 400, color: C.muted }}>{t.sub}</span>
+                    </h2>
+                  </div>
+                  <div style={{ display: 'flex', gap: 14, flexWrap: isMobile ? 'wrap' : 'nowrap', marginBottom: 14 }}>
+                    <PilarCard pilar={pilares.c3} data={t.c3} />
+                    <PilarCard pilar={pilares.hub} data={t.hub} />
+                    <PilarCard pilar={pilares.eco} data={t.eco} />
+                  </div>
+                  <div style={{ background: `linear-gradient(90deg, ${t.color}15, ${t.color}08)`, border: `1px solid ${t.color}30`, borderRadius: 10, padding: '12px 18px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{t.resumen}</span>
+                  </div>
+                </div>
+              ))}
+              {/* Final CTA */}
+              <div style={{ background: C.navy, borderRadius: 12, padding: '24px 20px', textAlign: 'center', marginTop: 8 }}>
+                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>En 3 años, esa gente trabaja con nosotros.</div>
+                <div style={{ fontSize: 14, color: '#94a3b8' }}>Eso es la huella social territorial de Caribe LNG.</div>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {view === 'input' && (
           <InputSemanal session={session} profile={profile} territorio={myTerritorio}
