@@ -1,4 +1,4 @@
-const CACHE_NAME = 'caribe-lng-v17';
+const CACHE_NAME = 'caribe-lng-v18';
 
 // Assets to cache on install (app shell)
 const PRECACHE_ASSETS = [

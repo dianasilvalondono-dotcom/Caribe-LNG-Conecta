@@ -251,6 +251,29 @@ export async function upsertKpiDac(id, { valor, estado, notas }) {
   if (error) throw error
 }
 
+// ── Knowledge Base (Base de Conocimiento) ────────────────────────────────────
+
+export async function getKnowledgeBase() {
+  const { data } = await supabase.from('knowledge_base').select('*').order('categoria').order('titulo')
+  return data || []
+}
+
+export async function addKnowledgeDoc({ titulo, categoria, contenido }) {
+  const { data, error } = await supabase.from('knowledge_base').insert({ titulo, categoria, contenido }).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function updateKnowledgeDoc(id, { titulo, categoria, contenido }) {
+  const { error } = await supabase.from('knowledge_base').update({ titulo, categoria, contenido, updated_at: new Date().toISOString() }).eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteKnowledgeDoc(id) {
+  const { error } = await supabase.from('knowledge_base').delete().eq('id', id)
+  if (error) throw error
+}
+
 // ── Alertas ───────────────────────────────────────────────────────────────────
 
 export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {

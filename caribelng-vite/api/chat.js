@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
+        max_tokens: 2048,
         system: `Eres el asistente de inteligencia artificial de Caribe LNG Conecta, la plataforma de gestión social territorial. Respondes preguntas sobre la operación social del proyecto usando los datos que te proporcionan como contexto.
 
 Reglas:

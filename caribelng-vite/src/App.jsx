@@ -6,7 +6,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
          getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
-         getKpisDac, upsertKpiDac, sendAlerta } from './lib/supabase'
+         getKpisDac, upsertKpiDac, sendAlerta,
+         getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -1909,8 +1910,117 @@ function InputSemanal({ session, profile, territorio, reportes, seguimiento, onS
   )
 }
 
+// ━━ KnowledgeBaseView ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function KnowledgeBaseView({ docs, onReload, isMobile }) {
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ titulo: '', categoria: 'General', contenido: '' })
+  const [saving, setSaving] = useState(false)
+  const categorias = ['General', 'Políticas DAC', 'Procedimientos', 'Marco Regulatorio', 'Acuerdos Marco', 'Comunicaciones', 'ESG', 'Otro']
+
+  async function handleSave() {
+    if (!form.titulo.trim() || !form.contenido.trim()) return
+    setSaving(true)
+    try {
+      if (editing) {
+        await updateKnowledgeDoc(editing, form)
+      } else {
+        await addKnowledgeDoc(form)
+      }
+      setForm({ titulo: '', categoria: 'General', contenido: '' })
+      setEditing(null)
+      onReload()
+    } catch(e) { alert('Error: ' + e.message) }
+    finally { setSaving(false) }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm('¿Eliminar este documento?')) return
+    await deleteKnowledgeDoc(id)
+    onReload()
+  }
+
+  const grouped = {}
+  docs.forEach(d => { if (!grouped[d.categoria]) grouped[d.categoria] = []; grouped[d.categoria].push(d) })
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>🧠 Base de Conocimiento</h1>
+        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 14 }}>Documentos y contexto que el asistente IA usa para responder preguntas. Total: {docs.length} docs · ~{Math.round(docs.reduce((s,d) => s + (d.contenido?.length || 0), 0) / 1000)}K caracteres</p>
+      </div>
+
+      {/* Add/Edit form */}
+      <div style={{ background: C.card, borderRadius: 12, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 20, borderLeft: `4px solid ${C.accent}` }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: C.accent, marginBottom: 12 }}>{editing ? '✏️ Editar documento' : '+ Agregar documento'}</div>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+          <input value={form.titulo} onChange={e => setForm({...form, titulo: e.target.value})} placeholder="Título del documento"
+            style={{ flex: 2, minWidth: 200, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+          <select value={form.categoria} onChange={e => setForm({...form, categoria: e.target.value})}
+            style={{ flex: 1, minWidth: 150, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: 'white' }}>
+            {categorias.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <textarea value={form.contenido} onChange={e => setForm({...form, contenido: e.target.value})}
+          placeholder="Pega aquí el contenido del documento, política, procedimiento, etc. El asistente IA usará este texto para responder preguntas."
+          style={{ width: '100%', minHeight: 140, border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 12px', fontSize: 14,
+            fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6 }} />
+        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+          <button onClick={handleSave} disabled={saving || !form.titulo.trim() || !form.contenido.trim()}
+            style={{ background: saving ? '#94a3b8' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '9px 20px',
+              fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
+            {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Guardar documento'}
+          </button>
+          {editing && (
+            <button onClick={() => { setEditing(null); setForm({ titulo: '', categoria: 'General', contenido: '' }) }}
+              style={{ background: '#f1f5f9', color: C.text, border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              Cancelar
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Documents list by category */}
+      {Object.keys(grouped).length === 0 && (
+        <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>🧠</div>
+          <div style={{ fontSize: 15, fontWeight: 600 }}>No hay documentos aún</div>
+          <div style={{ fontSize: 13, marginTop: 4 }}>Agrega documentos, políticas o procedimientos para que el asistente IA pueda responder preguntas sobre ellos.</div>
+        </div>
+      )}
+      {Object.entries(grouped).map(([cat, catDocs]) => (
+        <div key={cat} style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{cat} ({catDocs.length})</div>
+          {catDocs.map(d => (
+            <div key={d.id} style={{ background: C.card, borderRadius: 10, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', marginBottom: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{d.titulo}</div>
+                  <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>{(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}</div>
+                  <div style={{ fontSize: 13, color: C.muted, marginTop: 6, lineHeight: 1.5, maxHeight: 60, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {d.contenido?.slice(0, 200)}{d.contenido?.length > 200 ? '...' : ''}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button onClick={() => { setEditing(d.id); setForm({ titulo: d.titulo, categoria: d.categoria, contenido: d.contenido }) }}
+                    style={{ background: '#f1f5f9', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 600, color: C.accent }}>
+                    Editar
+                  </button>
+                  <button onClick={() => handleDelete(d.id)}
+                    style={{ background: '#fef2f2', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 600, color: C.red }}>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ━━ ChatBot ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function ChatBot({ appData, session, isMobile }) {
+function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -1945,6 +2055,14 @@ function ChatBot({ appData, session, isMobile }) {
     lines.push(`Total reportes: ${d.reportes?.length || 0}`)
     const lastR = d.reportes?.[0]
     if (lastR) lines.push(`Último reporte: Semana ${lastR.semana} (${lastR.territorio}) — Eventos AID: ${lastR.eventos_aid}, AII: ${lastR.eventos_aii}, PQRS: ${lastR.pqrs_recibidas}, Incidentes: ${lastR.incidentes}`)
+    // Knowledge base documents
+    if (knowledgeDocs?.length) {
+      lines.push(`\n== BASE DE CONOCIMIENTO (${knowledgeDocs.length} documentos) ==`)
+      knowledgeDocs.forEach(d => {
+        lines.push(`\n--- ${d.titulo} [${d.categoria}] ---`)
+        lines.push(d.contenido)
+      })
+    }
     return lines.join('\n')
   }
 
@@ -2087,6 +2205,7 @@ export default function App() {
   const [reportes, setReportes] = useState([])
   const [seguimiento, setSeguimiento] = useState([])
   const [kpisDac, setKpisDac] = useState([])
+  const [knowledgeBase, setKnowledgeBase] = useState([])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -2108,7 +2227,7 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac()])
+      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd, kb] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac(), getKnowledgeBase()])
       setActors(a || [])
       setAgreements(ag || [])
       setCronograma(cr || [])
@@ -2119,6 +2238,7 @@ export default function App() {
       setRiesgosLeg(rl || [])
       setCronoLeg(cleg || [])
       setKpisDac(kd || [])
+      setKnowledgeBase(kb || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -2210,6 +2330,7 @@ export default function App() {
     { id: 'kpis', label: 'KPIs', icon: '🎯' },
     { id: 'input', label: 'Input Semanal', icon: '✍️' },
     { id: 'gestora', label: 'Mi territorio', icon: '📍' },
+    ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: '🧠' }] : []),
   ]
 
   if (isMobile && isPortrait) return (
@@ -2811,6 +2932,10 @@ export default function App() {
             isAdmin={isAdmin} onDeleted={loadData} />
         )}
 
+        {view === 'knowledge' && isAdmin && (
+          <KnowledgeBaseView docs={knowledgeBase} onReload={loadData} isMobile={isMobile} />
+        )}
+
         {view === 'gestora' && (
           <div>
             <div style={{ marginBottom: 18 }}>
@@ -2926,6 +3051,7 @@ export default function App() {
 
       <ChatBot
         appData={{ actors, agreements, riesgos, riesgosLeg, cronoLeg, kpisDac, reportes }}
+        knowledgeDocs={knowledgeBase}
         session={session}
         isMobile={isMobile}
       />
