@@ -856,9 +856,9 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
         </div>
         {/* Dual mini status bars */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: isMobile ? '100%' : 200 }}>
-          {/* Social risks bar */}
-          {total > 0 && <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Sociales y Comunitarios</div>
+          {/* Social risks bar — clickable → switches to mapa sub-tab */}
+          {total > 0 && <div onClick={() => setTab('mapa')} style={{ cursor: 'pointer' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Sociales y Comunitarios ↗</div>
             <div style={{ display: 'flex', height: 7, borderRadius: 4, overflow: 'hidden', gap: 1, marginBottom: 3 }}>
               {rojos.length > 0 && <div style={{ background: C.red, flex: rojos.length }} title={`${rojos.length} acción inmediata`} />}
               {amarillos.length > 0 && <div style={{ background: C.yellow, flex: amarillos.length }} title={`${amarillos.length} vigilar`} />}
@@ -872,9 +872,9 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
               <span style={{ color: C.accent, fontWeight: 700 }}>🔵 {azules.length}</span>
             </div>
           </div>}
-          {/* Legislative risks bar */}
-          {totalLeg > 0 && <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Legislativos y Regulatorios</div>
+          {/* Legislative risks bar — clickable → switches to legislativo sub-tab */}
+          {totalLeg > 0 && <div onClick={() => setTab('legislativo')} style={{ cursor: 'pointer' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Legislativos y Regulatorios ↗</div>
             <div style={{ display: 'flex', height: 7, borderRadius: 4, overflow: 'hidden', gap: 1, marginBottom: 3 }}>
               {legAlto.length > 0 && <div style={{ background: C.red, flex: legAlto.length }} title={`${legAlto.length} alto`} />}
               {legMedio.length > 0 && <div style={{ background: C.orange, flex: legMedio.length }} title={`${legMedio.length} medio`} />}
