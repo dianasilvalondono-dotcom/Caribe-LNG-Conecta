@@ -258,8 +258,10 @@ export async function getKnowledgeBase() {
   return data || []
 }
 
-export async function addKnowledgeDoc({ titulo, categoria, contenido }) {
-  const { data, error } = await supabase.from('knowledge_base').insert({ titulo, categoria, contenido }).select().single()
+export async function addKnowledgeDoc({ titulo, categoria, contenido, file_url }) {
+  const row = { titulo, categoria, contenido }
+  if (file_url) row.file_url = file_url
+  const { data, error } = await supabase.from('knowledge_base').insert(row).select().single()
   if (error) throw error
   return data
 }
@@ -272,6 +274,18 @@ export async function updateKnowledgeDoc(id, { titulo, categoria, contenido }) {
 export async function deleteKnowledgeDoc(id) {
   const { error } = await supabase.from('knowledge_base').delete().eq('id', id)
   if (error) throw error
+}
+
+// ── File Storage (Knowledge Base) ────────────────────────────────────────────
+
+export async function uploadKnowledgeFile(file) {
+  const timestamp = Date.now()
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+  const path = `knowledge/${timestamp}_${safeName}`
+  const { error } = await supabase.storage.from('archivos').upload(path, file)
+  if (error) throw error
+  const { data } = supabase.storage.from('archivos').getPublicUrl(path)
+  return data.publicUrl
 }
 
 // ── Alertas ───────────────────────────────────────────────────────────────────

@@ -15,7 +15,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
          getKpisDac, upsertKpiDac, sendAlerta,
-         getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc } from './lib/supabase'
+         getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -2009,6 +2009,10 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
     const name = file.name.replace(/\.(md|txt|text|pdf|docx|xlsx|xls|pptx)$/i, '')
     setUploading(true)
     try {
+      // Upload original file to storage
+      let fileUrl = null
+      try { fileUrl = await uploadKnowledgeFile(file) } catch(err) { console.warn('File upload skipped:', err.message) }
+
       const text = await extractText(file)
       if (!text || !text.trim()) { alert('No se pudo extraer texto del archivo.'); return }
       const chunks = splitIntoChunks(text, name)
@@ -2016,8 +2020,8 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
         setForm({ ...form, titulo: chunks[0].titulo, contenido: chunks[0].contenido })
       } else {
         if (!confirm(`El archivo tiene ${text.length.toLocaleString()} caracteres y se dividirá en ~${chunks.length} documentos (categoría: ${form.categoria}). ¿Continuar?`)) return
-        for (const chunk of chunks) {
-          await addKnowledgeDoc({ titulo: chunk.titulo, categoria: form.categoria, contenido: chunk.contenido })
+        for (let i = 0; i < chunks.length; i++) {
+          await addKnowledgeDoc({ titulo: chunks[i].titulo, categoria: form.categoria, contenido: chunks[i].contenido, file_url: i === 0 ? fileUrl : null })
         }
         alert(`${chunks.length} documentos creados desde "${file.name}"`)
         onReload()
@@ -2110,7 +2114,10 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{d.titulo}</div>
-                  <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>{(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}</div>
+                  <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>
+                    {(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}
+                    {d.file_url && <> · <a href={d.file_url} target="_blank" rel="noopener" style={{ color: C.accent, fontWeight: 600 }}>Descargar archivo</a></>}
+                  </div>
                   <div style={{ fontSize: 13, color: C.muted, marginTop: 6, lineHeight: 1.5, maxHeight: 60, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {d.contenido?.slice(0, 200)}{d.contenido?.length > 200 ? '...' : ''}
                   </div>
