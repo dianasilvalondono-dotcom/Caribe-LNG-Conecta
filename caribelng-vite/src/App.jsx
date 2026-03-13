@@ -3052,9 +3052,9 @@ export default function App() {
                 </div>
               ))}
               {/* Final banner */}
-              <div style={{ background: C.navy, borderRadius: 12, padding: '28px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: isMobile ? 17 : 22, fontWeight: 900, color: 'white', marginBottom: 6, fontStyle: 'italic' }}>En 3 años, esa gente trabaja con nosotros.</div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Eso es la huella social territorial de Caribe LNG.</div>
+              <div style={{ background: 'linear-gradient(135deg, #0D47A1, #007A87)', borderRadius: 12, padding: '32px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: isMobile ? 18 : 24, fontWeight: 900, color: 'white', marginBottom: 8 }}>Nace del territorio. Se construye con su gente.</div>
+                <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Eso es la huella social de Caribe LNG.</div>
               </div>
               {/* Footer */}
               <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: '#8D95A0' }}>
