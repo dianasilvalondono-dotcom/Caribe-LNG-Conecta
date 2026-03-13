@@ -2208,6 +2208,16 @@ function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
 
   return (
     <>
+      {/* Floating label */}
+      {!open && (
+        <div onClick={() => setOpen(true)}
+          style={{ position: 'fixed', bottom: isMobile ? 78 : 86, right: isMobile ? 12 : 20,
+            background: 'white', borderRadius: 12, padding: '8px 14px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+            cursor: 'pointer', zIndex: 9999, maxWidth: 200, textAlign: 'center' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>¡Hola! Soy Conecta</div>
+          <div style={{ fontSize: 11, color: C.muted }}>Tu asistente personal</div>
+        </div>
+      )}
       {/* Floating button */}
       <button onClick={() => setOpen(!open)}
         style={{ position: 'fixed', bottom: isMobile ? 16 : 24, right: isMobile ? 16 : 24,
