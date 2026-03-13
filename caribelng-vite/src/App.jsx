@@ -1,4 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import * as pdfjsLib from 'pdfjs-dist'
+import mammoth from 'mammoth'
+import * as XLSX from 'xlsx'
+import JSZip from 'jszip'
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
          getCronograma, getHuellaSocial, updateCronogramaEstado,
@@ -1915,7 +1922,108 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ titulo: '', categoria: 'General', contenido: '' })
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const categorias = ['General', 'Políticas DAC', 'Procedimientos', 'Marco Regulatorio', 'Acuerdos Marco', 'Comunicaciones', 'ESG', 'Otro']
+  const fileInputRef = useRef(null)
+
+  async function extractText(file) {
+    const ext = file.name.split('.').pop().toLowerCase()
+    const buf = await file.arrayBuffer()
+
+    if (ext === 'pdf') {
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise
+      const pages = []
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const content = await page.getTextContent()
+        pages.push(content.items.map(item => item.str).join(' '))
+      }
+      return pages.join('\n\n')
+    }
+
+    if (ext === 'docx') {
+      const result = await mammoth.extractRawText({ arrayBuffer: buf })
+      return result.value
+    }
+
+    if (ext === 'xlsx' || ext === 'xls') {
+      const wb = XLSX.read(buf, { type: 'array' })
+      const lines = []
+      for (const name of wb.SheetNames) {
+        lines.push(`--- ${name} ---`)
+        const csv = XLSX.utils.sheet_to_csv(wb.Sheets[name])
+        lines.push(csv)
+      }
+      return lines.join('\n\n')
+    }
+
+    if (ext === 'pptx') {
+      const zip = await JSZip.loadAsync(buf)
+      const slides = []
+      const slideFiles = Object.keys(zip.files)
+        .filter(f => /^ppt\/slides\/slide\d+\.xml$/i.test(f))
+        .sort((a, b) => {
+          const na = parseInt(a.match(/slide(\d+)/)[1])
+          const nb = parseInt(b.match(/slide(\d+)/)[1])
+          return na - nb
+        })
+      for (const sf of slideFiles) {
+        const xml = await zip.files[sf].async('text')
+        const text = xml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        if (text) slides.push(text)
+      }
+      return slides.join('\n\n')
+    }
+
+    // Fallback: read as text (md, txt)
+    return new TextDecoder().decode(buf)
+  }
+
+  function splitIntoChunks(text, name) {
+    if (text.length <= 1900) return [{ titulo: name, contenido: text.trim() }]
+    const sections = text.split(/(?=^## |\n\n---\s*\n)/m).filter(s => s.trim())
+    const chunks = []
+    let current = ''
+    let currentTitle = name
+    for (const section of sections) {
+      const headingMatch = section.match(/^## (.+)/)
+      const sectionTitle = headingMatch ? headingMatch[1].replace(/[#*_]/g, '').trim() : null
+      if ((current + section).length > 1900 && current.length > 0) {
+        chunks.push({ titulo: currentTitle, contenido: current.trim() })
+        current = section
+        currentTitle = sectionTitle ? `${name} - ${sectionTitle}` : `${name} (cont.)`
+      } else {
+        if (sectionTitle && !current) currentTitle = `${name} - ${sectionTitle}`
+        current += section
+      }
+    }
+    if (current.trim()) chunks.push({ titulo: currentTitle, contenido: current.trim() })
+    return chunks
+  }
+
+  async function handleFileUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    const name = file.name.replace(/\.(md|txt|text|pdf|docx|xlsx|xls|pptx)$/i, '')
+    setUploading(true)
+    try {
+      const text = await extractText(file)
+      if (!text || !text.trim()) { alert('No se pudo extraer texto del archivo.'); return }
+      const chunks = splitIntoChunks(text, name)
+      if (chunks.length === 1 && chunks[0].contenido.length <= 1900) {
+        setForm({ ...form, titulo: chunks[0].titulo, contenido: chunks[0].contenido })
+      } else {
+        if (!confirm(`El archivo tiene ${text.length.toLocaleString()} caracteres y se dividirá en ~${chunks.length} documentos (categoría: ${form.categoria}). ¿Continuar?`)) return
+        for (const chunk of chunks) {
+          await addKnowledgeDoc({ titulo: chunk.titulo, categoria: form.categoria, contenido: chunk.contenido })
+        }
+        alert(`${chunks.length} documentos creados desde "${file.name}"`)
+        onReload()
+      }
+    } catch(err) { alert('Error al procesar archivo: ' + err.message) }
+    finally { setUploading(false) }
+  }
 
   async function handleSave() {
     if (!form.titulo.trim() || !form.contenido.trim()) return
@@ -1970,6 +2078,12 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
               fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
             {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Guardar documento'}
           </button>
+          <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
+            style={{ background: uploading ? '#94a3b8' : '#f1f5f9', color: uploading ? 'white' : C.accent, border: `1px solid ${C.accent}33`, borderRadius: 8, padding: '9px 20px',
+              fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+            {uploading ? 'Subiendo...' : '📄 Subir archivo'}
+          </button>
+          <input ref={fileInputRef} type="file" accept=".md,.txt,.text,.pdf,.docx,.xlsx,.xls,.pptx" onChange={handleFileUpload} style={{ display: 'none' }} />
           {editing && (
             <button onClick={() => { setEditing(null); setForm({ titulo: '', categoria: 'General', contenido: '' }) }}
               style={{ background: '#f1f5f9', color: C.text, border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
