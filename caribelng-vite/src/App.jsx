@@ -2993,10 +2993,10 @@ export default function App() {
           ]
           const HuellaCard = ({ pilar, data }) => (
             <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: '#fff', border: '1px solid #E0E4EA', borderRadius: 14, padding: '24px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-                <span style={{ color: 'white', fontSize: 15, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
+              <div style={{ width: 66, height: 66, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+                <span style={{ color: 'white', fontSize: 18, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
               </div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: C.text, marginBottom: 14, textAlign: 'center' }}>{data.titulo}</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 14, textAlign: 'center' }}>{data.titulo}</div>
               <div style={{ width: '100%', textAlign: 'left' }}>
                 {data.items.map((it, i) => (
                   <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 8, fontSize: 18, color: '#444', lineHeight: 1.6 }}>
@@ -3021,14 +3021,14 @@ export default function App() {
               <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <h1 style={{ margin: 0, fontSize: isMobile ? 24 : 34, fontWeight: 900, color: C.navy }}>HUELLA SOCIAL TERRITORIAL</h1>
                 <div style={{ width: 80, height: 4, background: C.accent, borderRadius: 2, margin: '10px auto 12px' }} />
-                <p style={{ margin: 0, color: '#5C6370', fontSize: 15, fontWeight: 500 }}>Lo que Caribe LNG deja en cada territorio</p>
+                <p style={{ margin: 0, color: '#5C6370', fontSize: 18, fontWeight: 500 }}>Lo que Caribe LNG deja en cada territorio</p>
               </div>
               {/* Legend bar */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 10 : 24, marginBottom: 32, flexWrap: 'wrap', background: '#F5F7FA', borderRadius: 10, padding: '12px 20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 10 : 28, marginBottom: 32, flexWrap: 'wrap', background: '#F5F7FA', borderRadius: 10, padding: '14px 24px' }}>
                 {Object.values(P).map(p => (
-                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ background: p.color, color: 'white', fontSize: 11, fontWeight: 900, padding: '4px 12px', borderRadius: 14 }}>{p.label}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{p.desc}</span>
+                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ background: p.color, color: 'white', fontSize: 14, fontWeight: 900, padding: '5px 14px', borderRadius: 14 }}>{p.label}</span>
+                    <span style={{ fontSize: 16, fontWeight: 600, color: C.text }}>{p.desc}</span>
                   </div>
                 ))}
               </div>
@@ -3037,7 +3037,7 @@ export default function App() {
                 <div key={t.nombre} style={{ marginBottom: 40 }}>
                   <div style={{ marginBottom: 16, borderBottom: '2px solid #E0E4EA', paddingBottom: 8 }}>
                     <h2 style={{ margin: 0, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: C.navy }}>
-                      {t.nombre} <span style={{ fontSize: 16, fontWeight: 400, color: '#8D95A0', marginLeft: 8 }}>{t.sub}</span>
+                      {t.nombre} <span style={{ fontSize: 18, fontWeight: 400, color: '#8D95A0', marginLeft: 8 }}>{t.sub}</span>
                     </h2>
                   </div>
                   <div style={{ display: 'flex', gap: 16, flexWrap: isMobile ? 'wrap' : 'nowrap', marginBottom: 16 }}>
@@ -3046,8 +3046,8 @@ export default function App() {
                     <HuellaCard pilar={P.eco} data={t.eco} />
                   </div>
                   {/* Summary banner */}
-                  <div style={{ background: '#0D2137', borderRadius: 10, padding: '14px 24px', textAlign: 'center' }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t.resumen}</span>
+                  <div style={{ background: '#0D2137', borderRadius: 10, padding: '16px 24px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{t.resumen}</span>
                   </div>
                 </div>
               ))}
