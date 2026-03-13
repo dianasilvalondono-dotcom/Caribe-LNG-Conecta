@@ -2999,7 +2999,7 @@ export default function App() {
               <div style={{ fontSize: 16, fontWeight: 800, color: C.text, marginBottom: 14, textAlign: 'center' }}>{data.titulo}</div>
               <div style={{ width: '100%', textAlign: 'left' }}>
                 {data.items.map((it, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6, fontSize: 13, color: '#444', lineHeight: 1.6 }}>
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 8, fontSize: 15, color: '#444', lineHeight: 1.6 }}>
                     <span style={{ color: '#00BFB3', fontSize: 18, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>•</span>
                     <span>{it}</span>
                   </div>
