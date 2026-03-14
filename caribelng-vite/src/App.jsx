@@ -2011,7 +2011,13 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
     try {
       // Upload original file to storage
       let fileUrl = null
-      try { fileUrl = await uploadKnowledgeFile(file) } catch(err) { console.warn('File storage skipped:', err.message) }
+      try {
+        fileUrl = await uploadKnowledgeFile(file)
+        console.log('File uploaded:', fileUrl)
+      } catch(err) {
+        console.error('File storage error:', err)
+        alert('Nota: el archivo no se pudo guardar en Storage (' + err.message + '), pero el texto se extraerá igual.')
+      }
 
       // Extract text for AI knowledge base
       const text = await extractText(file)
@@ -2111,21 +2117,24 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{d.titulo}</div>
-                  <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>
-                    {(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}
-                    {d.file_url && <> · <a href={d.file_url} target="_blank" rel="noopener" style={{ color: C.accent, fontWeight: 600 }}>Descargar archivo</a></>}
-                  </div>
+                  <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>{(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}</div>
                   <div style={{ fontSize: 13, color: C.muted, marginTop: 6, lineHeight: 1.5, maxHeight: 60, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {d.contenido?.slice(0, 200)}{d.contenido?.length > 200 ? '...' : ''}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <button onClick={() => { setEditing(d.id); setForm({ titulo: d.titulo, categoria: d.categoria, contenido: d.contenido }) }}
-                    style={{ background: '#f1f5f9', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 600, color: C.accent }}>
+                <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  {d.file_url && (
+                    <a href={d.file_url} target="_blank" rel="noopener"
+                      style={{ background: '#f0fdf4', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: C.green, textDecoration: 'none', display: 'inline-block' }}>
+                      Archivo
+                    </a>
+                  )}
+                  <button onClick={() => { setEditing(d.id); setForm({ titulo: d.titulo, categoria: d.categoria, contenido: d.contenido }); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    style={{ background: '#f1f5f9', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: C.accent }}>
                     Editar
                   </button>
                   <button onClick={() => handleDelete(d.id)}
-                    style={{ background: '#fef2f2', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 600, color: C.red }}>
+                    style={{ background: '#fef2f2', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: C.red }}>
                     Eliminar
                   </button>
                 </div>
