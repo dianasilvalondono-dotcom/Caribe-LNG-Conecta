@@ -2011,21 +2011,18 @@ function KnowledgeBaseView({ docs, onReload, isMobile }) {
     try {
       // Upload original file to storage
       let fileUrl = null
-      try { fileUrl = await uploadKnowledgeFile(file) } catch(err) { console.warn('File upload skipped:', err.message) }
+      try { fileUrl = await uploadKnowledgeFile(file) } catch(err) { console.warn('File storage skipped:', err.message) }
 
+      // Extract text for AI knowledge base
       const text = await extractText(file)
       if (!text || !text.trim()) { alert('No se pudo extraer texto del archivo.'); return }
       const chunks = splitIntoChunks(text, name)
-      if (chunks.length === 1 && chunks[0].contenido.length <= 1900) {
-        setForm({ ...form, titulo: chunks[0].titulo, contenido: chunks[0].contenido })
-      } else {
-        if (!confirm(`El archivo tiene ${text.length.toLocaleString()} caracteres y se dividirá en ~${chunks.length} documentos (categoría: ${form.categoria}). ¿Continuar?`)) return
-        for (let i = 0; i < chunks.length; i++) {
-          await addKnowledgeDoc({ titulo: chunks[i].titulo, categoria: form.categoria, contenido: chunks[i].contenido, file_url: i === 0 ? fileUrl : null })
-        }
-        alert(`${chunks.length} documentos creados desde "${file.name}"`)
-        onReload()
+      if (!confirm(`Se subirá "${file.name}" y se creará${chunks.length > 1 ? `n ~${chunks.length} documentos` : ' 1 documento'} en la base de conocimiento (categoría: ${form.categoria}). ¿Continuar?`)) return
+      for (let i = 0; i < chunks.length; i++) {
+        await addKnowledgeDoc({ titulo: chunks[i].titulo, categoria: form.categoria, contenido: chunks[i].contenido, file_url: i === 0 ? fileUrl : null })
       }
+      alert(`${fileUrl ? 'Archivo guardado. ' : ''}${chunks.length} documento${chunks.length > 1 ? 's' : ''} creado${chunks.length > 1 ? 's' : ''} desde "${file.name}"`)
+      onReload()
     } catch(err) { alert('Error al procesar archivo: ' + err.message) }
     finally { setUploading(false) }
   }
