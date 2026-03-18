@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /Users/dianasilvalondono/Documents/caribe-lng -type f \\\\\\(-name *.sql -o -name *schema* -o -name *migration* \\\\\\))"
+      "Bash(find /Users/dianasilvalondono/Documents/caribe-lng -type f \\\\\\(-name *.sql -o -name *schema* -o -name *migration* \\\\\\))",
+      "Bash(ls -lh /Users/dianasilvalondono/Documents/caribe-lng/caribelng-vite/public/*.svg)"
     ]
   }
 }
