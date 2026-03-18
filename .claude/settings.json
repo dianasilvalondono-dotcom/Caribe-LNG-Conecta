@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/dianasilvalondono/Documents/caribe-lng -type f \\\\\\(-name *.sql -o -name *schema* -o -name *migration* \\\\\\))"
+    ]
+  }
+}

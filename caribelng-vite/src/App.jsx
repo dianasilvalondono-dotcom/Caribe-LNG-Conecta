@@ -977,92 +977,121 @@ function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
 
       {tab === 'mapa' && (
         <div>
-          {riesgos.filter(r => {
-            if (riesgoFilter === 'Todos') return true
-            if (riesgoFilter === 'Alto') return r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))
-            if (riesgoFilter === 'Medio') return r.semaforo && (r.semaforo.includes('Medio') || r.semaforo.includes('Vigilar'))
-            if (riesgoFilter === 'Bajo') return r.semaforo && (r.semaforo.includes('Bajo') || r.semaforo.includes('control'))
-            if (riesgoFilter === 'Revision') return r.semaforo && r.semaforo.includes('Revision')
-            return true
-          }).map(r => {
-            const semColor = getSemaforoColor(r.semaforo)
-            const isExp = expandedRisk === r.id
-            const bt = bowTieData[r.id] || []
-            return (
-              <div key={r.id} style={{ background: C.card, borderRadius: 12, marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${semColor}`, overflow: 'hidden' }}>
-                <div onClick={() => toggleRisk(r.id)} style={{ padding: '14px 16px', cursor: 'pointer' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 15, fontWeight: 800, color: 'white', background: semColor, padding: '2px 8px', borderRadius: 10 }}>{r.id}</span>
-                      <span style={{ fontSize: 16, color: C.muted }}>{r.zona}</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                      <Tag color={C.muted}>P: {r.probabilidad}</Tag>
-                      <Tag color={semColor}>I: {r.impacto}</Tag>
-                      {isAdmin && (
-                        <button onClick={async (e) => { e.stopPropagation(); if (confirm('¿Borrar este riesgo?')) { await deleteRiesgo(r.id); onDeleted() } }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
-                          title="Borrar">🗑</button>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
-                  {!isExp && r.que_hacemos && <div style={{ fontSize: 15, color: C.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
-                </div>
-                {isExp && (
-                  <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
-                    <div style={{ paddingTop: 12 }}>
-                      {r.descripcion && <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
-                      {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Actores clave a gestionar: </span>{r.quien_detona}</div>}
-                      {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien nos ayuda a controlarlo: </span>{r.quien_mitiga}</div>}
-                      {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo hoy: </span>{r.que_hacemos}</div>}
-                      {bt.length > 0 && (
-                        <div style={{ marginTop: 10 }}>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Causa y efecto</div>
-                          {bt.map((b, idx) => (
-                            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, marginBottom: 8, fontSize: 16, lineHeight: 1.4 }}>
-                              <div>
-                                {b.causa && <div style={{ background: '#fee2e2', padding: '6px 8px', borderRadius: 6, color: '#991b1b', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Causa: </span>{b.causa}</div>}
-                                {b.control_preventivo && <div style={{ background: '#dbeafe', padding: '6px 8px', borderRadius: 6, color: '#1e40af' }}><span style={{ fontWeight: 700 }}>Que hacemos para evitarlo: </span>{b.control_preventivo}</div>}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', color: C.subtle, fontSize: 16, padding: '0 4px' }}>&rarr;</div>
-                              <div>
-                                {b.control_detectivo && <div style={{ background: '#fef9c3', padding: '6px 8px', borderRadius: 6, color: '#854d0e', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Como nos enteramos: </span>{b.control_detectivo}</div>}
-                                {b.consecuencia && <div style={{ background: '#fce7f3', padding: '6px 8px', borderRadius: 6, color: '#9d174d' }}><span style={{ fontWeight: 700 }}>Si no actuamos: </span>{b.consecuencia}</div>}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+          {[
+            { label: 'Acción inmediata', color: C.red, items: rojos },
+            { label: 'Vigilar', color: C.yellow, items: amarillos },
+            { label: 'Bajo control', color: C.green, items: verdes },
+            { label: 'En revisión', color: C.accent, items: azules },
+          ].filter(g => riesgoFilter === 'Todos' ? g.items.length > 0 : (
+            (riesgoFilter === 'Alto' && (g.color === C.red)) ||
+            (riesgoFilter === 'Medio' && (g.color === C.yellow)) ||
+            (riesgoFilter === 'Bajo' && (g.color === C.green)) ||
+            (riesgoFilter === 'Revision' && (g.color === C.accent))
+          )).map(group => (
+            <div key={group.label} style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${group.color}` }}>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: group.color, display: 'inline-block' }} />
+                <span style={{ fontSize: 14, fontWeight: 800, color: group.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{group.label}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.muted }}>({group.items.length})</span>
               </div>
-            )
-          })}
+              {group.items.sort((a, b) => {
+                const numA = parseInt((a.id || '').replace(/\D/g, ''), 10) || 0
+                const numB = parseInt((b.id || '').replace(/\D/g, ''), 10) || 0
+                return numA - numB
+              }).map(r => {
+                const semColor = getSemaforoColor(r.semaforo)
+                const isExp = expandedRisk === r.id
+                const bt = bowTieData[r.id] || []
+                return (
+                  <div key={r.id} style={{ background: C.card, borderRadius: 12, marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${semColor}`, overflow: 'hidden' }}>
+                    <div onClick={() => toggleRisk(r.id)} style={{ padding: '14px 16px', cursor: 'pointer' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: 'white', background: semColor, padding: '2px 8px', borderRadius: 10 }}>{r.id}</span>
+                          <span style={{ fontSize: 16, color: C.muted }}>{r.zona}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <Tag color={C.muted}>P: {r.probabilidad}</Tag>
+                          <Tag color={semColor}>I: {r.impacto}</Tag>
+                          {isAdmin && (
+                            <button onClick={async (e) => { e.stopPropagation(); if (confirm('¿Borrar este riesgo?')) { await deleteRiesgo(r.id); onDeleted() } }}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
+                              title="Borrar">🗑</button>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
+                      {!isExp && r.que_hacemos && <div style={{ fontSize: 15, color: C.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
+                    </div>
+                    {isExp && (
+                      <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
+                        <div style={{ paddingTop: 12 }}>
+                          {r.descripcion && <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
+                          {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Actores clave a gestionar: </span>{r.quien_detona}</div>}
+                          {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien nos ayuda a controlarlo: </span>{r.quien_mitiga}</div>}
+                          {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo hoy: </span>{r.que_hacemos}</div>}
+                          {bt.length > 0 && (
+                            <div style={{ marginTop: 10 }}>
+                              <div style={{ fontSize: 16, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Causa y efecto</div>
+                              {bt.map((b, idx) => (
+                                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, marginBottom: 8, fontSize: 16, lineHeight: 1.4 }}>
+                                  <div>
+                                    {b.causa && <div style={{ background: '#fee2e2', padding: '6px 8px', borderRadius: 6, color: '#991b1b', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Causa: </span>{b.causa}</div>}
+                                    {b.control_preventivo && <div style={{ background: '#dbeafe', padding: '6px 8px', borderRadius: 6, color: '#1e40af' }}><span style={{ fontWeight: 700 }}>Que hacemos para evitarlo: </span>{b.control_preventivo}</div>}
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', color: C.subtle, fontSize: 16, padding: '0 4px' }}>&rarr;</div>
+                                  <div>
+                                    {b.control_detectivo && <div style={{ background: '#fef9c3', padding: '6px 8px', borderRadius: 6, color: '#854d0e', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Como nos enteramos: </span>{b.control_detectivo}</div>}
+                                    {b.consecuencia && <div style={{ background: '#fce7f3', padding: '6px 8px', borderRadius: 6, color: '#9d174d' }}><span style={{ fontWeight: 700 }}>Si no actuamos: </span>{b.consecuencia}</div>}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
       )}
 
       {tab === 'legislativo' && (
         <div>
-          {riesgosLeg.map(r => {
-            const nivelColor = getNivelColor(r.nivel_riesgo)
-            return (
-              <div key={r.id} style={{ background: C.card, borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.3, flex: 1 }}>{r.tema}</div>
-                  <Tag color={nivelColor}>{r.nivel_riesgo}</Tag>
-                </div>
-                <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5, marginBottom: 6 }}>{r.descripcion}</div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-                  <Tag color={C.muted}>Prob: {r.probabilidad}</Tag>
-                  <Tag color={C.accent}>{r.comision}</Tag>
-                </div>
-                {r.impacto && <div style={{ fontSize: 15, color: '#9a3412', background: '#fff7ed', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5, marginBottom: 6 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{r.impacto}</div>}
-                {r.acciones_preventivas && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Acciones: </span>{r.acciones_preventivas}</div>}
+          {[
+            { label: 'Riesgo Alto / Muy Alto', color: C.red, items: legAlto },
+            { label: 'Riesgo Medio', color: C.yellow, items: legMedio },
+            { label: 'Riesgo Bajo', color: C.green, items: legBajo },
+          ].filter(g => g.items.length > 0).map(group => (
+            <div key={group.label} style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${group.color}` }}>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: group.color, display: 'inline-block' }} />
+                <span style={{ fontSize: 14, fontWeight: 800, color: group.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{group.label}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.muted }}>({group.items.length})</span>
               </div>
-            )
-          })}
+              {group.items.map(r => {
+                const nivelColor = getNivelColor(r.nivel_riesgo)
+                return (
+                  <div key={r.id} style={{ background: C.card, borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${nivelColor}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.3, flex: 1 }}>{r.tema}</div>
+                      <Tag color={nivelColor}>{r.nivel_riesgo}</Tag>
+                    </div>
+                    <div style={{ fontSize: 15, color: C.muted, lineHeight: 1.5, marginBottom: 6 }}>{r.descripcion}</div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+                      <Tag color={C.muted}>Prob: {r.probabilidad}</Tag>
+                      <Tag color={C.accent}>{r.comision}</Tag>
+                    </div>
+                    {r.impacto && <div style={{ fontSize: 15, color: '#9a3412', background: '#fff7ed', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5, marginBottom: 6 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{r.impacto}</div>}
+                    {r.acciones_preventivas && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '6px 8px', borderRadius: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Acciones: </span>{r.acciones_preventivas}</div>}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
       )}
 
