@@ -155,16 +155,9 @@ function LoginScreen() {
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div style={{ background: 'white', borderRadius: 20, padding: 40, maxWidth: 380, width: '100%',
         textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
-        <div style={{ width: 72, height: 72, background: C.navy,
-          borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 16px', boxShadow: '0 4px 20px rgba(13,71,161,0.35)' }}>
-          <img src="/logo-simbolo-white.svg" alt="Caribe LNG" style={{ width: 40, height: 40 }} />
-        </div>
-        <h1 style={{ margin: '0 0 6px', fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>
-          Caribe LNG
-        </h1>
-        <p style={{ margin: '0 0 8px', color: C.muted, fontSize: 15 }}>
-          Conecta! | Plan de Gestion Social 2026
+        <img src="/logo-conecta.svg" alt="Caribe LNG Conecta" style={{ width: '100%', maxWidth: 300, margin: '0 auto 8px', display: 'block' }} />
+        <p style={{ margin: '0 0 6px', color: C.muted, fontSize: 15 }}>
+          Plan de Gestion Social 2026
         </p>
         <p style={{ margin: '0 0 32px', color: C.subtle, fontSize: 16 }}>
           Tolú →  Barbosa →  Nacional
@@ -2555,10 +2548,9 @@ export default function App() {
             gap: 2, scrollbarWidth: 'none',
           }}>
             {/* Logo — click to go to dashboard */}
-            <div onClick={() => setView('dashboard')} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
+            <div onClick={() => setView('dashboard')} style={{ flexShrink: 0, display: 'flex', alignItems: 'center',
               paddingRight: 10, marginRight: 4, borderRight: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer' }}>
-              <img src="/logo-simbolo-white.svg" alt="Caribe LNG" style={{ width: 20, height: 20 }} />
-              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: -0.2, whiteSpace: 'nowrap' }}>Caribe LNG</span>
+              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 30 }} />
             </div>
             {/* Nav tabs */}
             {NAV.map(n => (
@@ -2627,9 +2619,10 @@ export default function App() {
         {view === 'dashboard' && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img src="/logo-simbolo.svg" alt="Caribe LNG" style={{ width: isMobile ? 34 : 44, height: isMobile ? 34 : 44 }} />
-                <h1 style={{ margin: 0, fontSize: isMobile ? 17 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Caribe LNG Conecta | Estado del territorio</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <img src="/logo-conecta.svg" alt="Caribe LNG Conecta" style={{ height: isMobile ? 32 : 44 }} />
+                <span style={{ fontSize: isMobile ? 15 : 22, fontWeight: 800, color: C.muted }}>|</span>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 17 : 24, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Estado del territorio</h1>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                 <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 12 : 16, flex: 1, minWidth: 0 }}>Resumen de relacionamiento · Caribe LNG 2026 · Tiempo real</p>
