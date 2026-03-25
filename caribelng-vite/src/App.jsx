@@ -2353,6 +2353,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true)
 
   const [view, setView] = useState('dashboard')
+  const [navOpen, setNavOpen] = useState(null) // which dropdown is open
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [actors, setActors] = useState([])
   const [agreements, setAgreements] = useState([])
@@ -2489,16 +2490,22 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'riesgos', label: 'Riesgos DAC', icon: '⚠️' },
-    { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
-    { id: 'huella', label: 'Huella Social', icon: '🌱' },
     { id: 'actores', label: 'Actores', icon: '👥' },
-    { id: 'cronograma', label: 'Cronograma', icon: '📅' },
-    { id: 'kpis', label: 'KPIs', icon: '🎯' },
-    { id: 'input', label: 'Input Semanal', icon: '✍️' },
+    { id: 'territorio', label: 'Territorio', icon: '🌎', children: [
+      { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
+      { id: 'huella', label: 'Huella Social', icon: '🌱' },
+      { id: 'cronograma', label: 'Cronograma', icon: '📅' },
+    ]},
+    { id: 'riesgos', label: 'Riesgos DAC', icon: '⚠️' },
+    { id: 'gestion', label: 'Gestión', icon: '📋', children: [
+      { id: 'kpis', label: 'KPIs', icon: '🎯' },
+      { id: 'input', label: 'Input Semanal', icon: '✍️' },
+    ]},
     { id: 'gestora', label: 'Mi territorio', icon: '📍' },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: '🧠' }] : []),
   ]
+  // helper: check if a view belongs to a dropdown group
+  const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
 
   if (isMobile && isPortrait) return (
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
@@ -2514,7 +2521,8 @@ export default function App() {
   )
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+    <div onClick={(e) => { if (!e.target.closest('[data-nav-dropdown]')) setNavOpen(null) }}
+      style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       <style>{`
         /* CSS responsive — bypasses JS isMobile detection */
         .clng-mobile-nav { display: none; }
@@ -2553,8 +2561,37 @@ export default function App() {
               <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 30 }} />
             </div>
             {/* Nav tabs */}
-            {NAV.map(n => (
-              <button key={n.id} onClick={() => setView(n.id)}
+            {NAV.map(n => n.children ? (
+              <div key={n.id} data-nav-dropdown style={{ position: 'relative', flexShrink: 0 }}>
+                <button onClick={() => setNavOpen(navOpen === n.id ? null : n.id)}
+                  style={{ flexShrink: 0,
+                    background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                    color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.6)',
+                    border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer',
+                    fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
+                    whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: 13 }}>{n.icon}</span>
+                  <span>{n.label}</span>
+                  <span style={{ fontSize: 9, marginLeft: 2 }}>▼</span>
+                </button>
+                {navOpen === n.id && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#1a2744',
+                    borderRadius: 8, padding: 4, zIndex: 200, minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                    {n.children.map(c => (
+                      <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+                          background: view === c.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                          color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
+                          border: 'none', borderRadius: 6, padding: '7px 10px', cursor: 'pointer',
+                          fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: 13 }}>{c.icon}</span><span>{c.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button key={n.id} onClick={() => { setView(n.id); setNavOpen(null) }}
                 style={{ flexShrink: 0,
                   background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
                   color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.6)',
@@ -2585,8 +2622,34 @@ export default function App() {
               <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 34 }} />
             </div>
             <div style={{ display: 'flex', gap: 2 }}>
-              {NAV.map(n => (
-                <button key={n.id} onClick={() => setView(n.id)}
+              {NAV.map(n => n.children ? (
+                <div key={n.id} data-nav-dropdown style={{ position: 'relative' }}>
+                  <button onClick={() => setNavOpen(navOpen === n.id ? null : n.id)}
+                    style={{ background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                      color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
+                      border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
+                      fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span>{n.icon}</span><span>{n.label}</span>
+                    <span style={{ fontSize: 10, marginLeft: 2 }}>▼</span>
+                  </button>
+                  {navOpen === n.id && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#1a2744',
+                      borderRadius: 8, padding: 4, zIndex: 200, minWidth: 180, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                      {n.children.map(c => (
+                        <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+                            background: view === c.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                            color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
+                            border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer',
+                            fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          <span>{c.icon}</span><span>{c.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button key={n.id} onClick={() => { setView(n.id); setNavOpen(null) }}
                   style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
                     color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                     border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
