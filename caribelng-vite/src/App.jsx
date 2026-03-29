@@ -2552,7 +2552,7 @@ export default function App() {
             paddingRight: 'max(12px, env(safe-area-inset-right))',
             paddingTop: 'env(safe-area-inset-top)',
             height: 'calc(46px + env(safe-area-inset-top))',
-            overflowX: 'auto', overflowY: 'hidden',
+            overflowX: 'auto', overflowY: 'visible',
             gap: 2, scrollbarWidth: 'none',
           }}>
             {/* Logo — click to go to dashboard */}
@@ -2617,7 +2617,7 @@ export default function App() {
             </div>
           </div>
         </div>
-          <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, overflow: 'hidden', maxWidth: '100vw' }} className="clng-desktop-nav">
+          <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, maxWidth: '100vw' }} className="clng-desktop-nav">
             <div onClick={() => setView('dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
               <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 34 }} />
             </div>
