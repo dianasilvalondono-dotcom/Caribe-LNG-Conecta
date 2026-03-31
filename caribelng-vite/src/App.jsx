@@ -8,7 +8,7 @@ import JSZip from 'jszip'
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
-         getActors, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
+         getActors, addActor, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
          getCronograma, getHuellaSocial, updateCronogramaEstado,
          getReportesSemanales, addReporteSemanal, deleteReporteSemanal, deleteKpiEntry, deleteCronogramaEvent, deleteRiesgo,
          getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
@@ -2359,6 +2359,8 @@ export default function App() {
   const [agreements, setAgreements] = useState([])
   const [dataLoading, setDataLoading] = useState(true)
   const [selectedActor, setSelectedActor] = useState(null)
+  const [showNewActor, setShowNewActor] = useState(false)
+  const [newActor, setNewActor] = useState({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', que_hacemos: '' })
   const [search, setSearch] = useState('')
   const [filterT, setFilterT] = useState('Todos')
   const [filterS, setFilterS] = useState('Todos')
@@ -2833,10 +2835,172 @@ export default function App() {
         {view === 'actores' && (
           <div>
             {/* Header */}
-            <div style={{ marginBottom: 20 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{filtered.length} de {actors.length} actores</p>
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+              <div>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
+                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{filtered.length} de {actors.length} actores</p>
+              </div>
+              {(isAdmin || profile?.role === 'gestora') && (
+                <button onClick={() => setShowNewActor(!showNewActor)}
+                  style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
+                    padding: '8px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 18 }}>+</span> Nuevo Actor
+                </button>
+              )}
             </div>
+
+            {/* ── Formulario nuevo actor ── */}
+            {showNewActor && (
+              <div style={{ background: C.card, borderRadius: 12, padding: 20, marginBottom: 16,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.1)', border: `2px solid ${C.navy}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>Crear nuevo actor</h3>
+                  <button onClick={() => setShowNewActor(false)}
+                    style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: C.muted }}>✕</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12 }}>
+                  {/* Nombre */}
+                  <div style={{ gridColumn: isMobile ? '1' : '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Nombre *</label>
+                    <input value={newActor.nombre} onChange={e => setNewActor({ ...newActor, nombre: e.target.value })}
+                      placeholder="Nombre completo del actor"
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  {/* Tipo */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Tipo *</label>
+                    <select value={newActor.tipo} onChange={e => setNewActor({ ...newActor, tipo: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Comunitario', 'Político', 'Institucional', 'Empresarial', 'Mediático', 'Social', 'Educativo'].map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Territorio */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Territorio *</label>
+                    <select value={newActor.territorio} onChange={e => setNewActor({ ...newActor, territorio: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Tolú', 'Barbosa', 'Nacional'].map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Semáforo */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Semáforo</label>
+                    <select value={newActor.semaforo} onChange={e => setNewActor({ ...newActor, semaforo: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['verde', 'amarillo', 'naranja', 'rojo'].map(s => (
+                        <option key={s} value={s}>{SEMAFORO[s].dot} {SEMAFORO[s].label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Posición */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Posición</label>
+                    <select value={newActor.posicion} onChange={e => setNewActor({ ...newActor, posicion: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Aliado', 'Neutro', 'Opositor'].map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Riesgo */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Riesgo</label>
+                    <select value={newActor.riesgo} onChange={e => setNewActor({ ...newActor, riesgo: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Bajo', 'Medio', 'Alto', 'Muy Alto'].map(r => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Poder */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Poder (1-5)</label>
+                    <select value={newActor.poder} onChange={e => setNewActor({ ...newActor, poder: +e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  {/* Interés */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Interés (1-5)</label>
+                    <select value={newActor.interes} onChange={e => setNewActor({ ...newActor, interes: +e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  {/* Prioridad */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Prioridad</label>
+                    <select value={newActor.prioridad} onChange={e => setNewActor({ ...newActor, prioridad: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      <option value="">Sin prioridad</option>
+                      <option value="A">A (máxima)</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                    </select>
+                  </div>
+                  {/* Owner */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Responsable</label>
+                    <input value={newActor.owner} onChange={e => setNewActor({ ...newActor, owner: e.target.value })}
+                      placeholder="Quién gestiona"
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  {/* Contacto */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Contacto</label>
+                    <input value={newActor.contacto} onChange={e => setNewActor({ ...newActor, contacto: e.target.value })}
+                      placeholder="Email, teléfono, etc."
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  {/* Qué hacemos */}
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Estrategia / Qué hacemos</label>
+                    <textarea value={newActor.que_hacemos} onChange={e => setNewActor({ ...newActor, que_hacemos: e.target.value })}
+                      placeholder="Estrategia de relacionamiento con este actor"
+                      rows={2}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                  </div>
+                </div>
+                {/* Botones */}
+                <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'flex-end' }}>
+                  <button onClick={() => setShowNewActor(false)}
+                    style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8,
+                      padding: '8px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                    Cancelar
+                  </button>
+                  <button onClick={async () => {
+                    if (!newActor.nombre.trim()) return alert('El nombre es obligatorio')
+                    try {
+                      await addActor(newActor)
+                      await loadData()
+                      setShowNewActor(false)
+                      setNewActor({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', que_hacemos: '' })
+                    } catch (err) { alert('Error creando actor: ' + err.message) }
+                  }}
+                    style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
+                      padding: '8px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    Guardar actor
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* ── Banner territorial ── */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>

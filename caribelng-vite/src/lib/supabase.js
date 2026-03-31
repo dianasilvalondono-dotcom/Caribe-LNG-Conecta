@@ -45,6 +45,16 @@ export async function getActors() {
   return data
 }
 
+export async function addActor(fields) {
+  const { data, error } = await supabase
+    .from('actors')
+    .insert({ ...fields, updated_at: new Date().toISOString() })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function updateActorSemaforo(id, semaforo) {
   const { error } = await supabase
     .from('actors')
