@@ -2,7 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 360" width="1120" height="360">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&amp;display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Courgette&amp;display=swap');
     </style>
   </defs>
   <g transform="translate(0,260) scale(0.1,-0.1)" fill="#fff" stroke="none">
@@ -81,10 +81,9 @@ c-1 201 -86 422 -240 621 -88 114 -134 196 -170 304 -39 116 -49 242 -28 344
 -34 -59 -162 -104 -230 -55 -82 -167 -197 -254 -261 -34 -24 -60 -45 -59 -47
 2 -1 32 4 67 12 300 63 559 251 719 523 35 59 37 58 -69 36z"/>
   </g>
-  <text x="1100" y="340"
-        font-family="'Montserrat', sans-serif"
-        font-weight="900"
-        font-size="85"
+  <text x="1100" y="348"
+        font-family="'Courgette', cursive"
+        font-size="90"
         fill="rgba(255,255,255,0.9)"
         text-anchor="end"
         letter-spacing="1">¡Conecta!</text>
