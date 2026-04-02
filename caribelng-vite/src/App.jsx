@@ -552,7 +552,7 @@ export default function App() {
             {/* Nav tabs */}
             {NAV.map(n => n.children ? (
               <div key={n.id} data-nav-dropdown style={{ position: 'relative', flexShrink: 0 }}>
-                <button onClick={() => setNavOpen(navOpen === n.id ? null : n.id)}
+                <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
                   style={{ flexShrink: 0,
                     background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
                     color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.6)',
@@ -613,7 +613,7 @@ export default function App() {
             <div style={{ display: 'flex', gap: 2 }}>
               {NAV.map(n => n.children ? (
                 <div key={n.id} data-nav-dropdown style={{ position: 'relative' }}>
-                  <button onClick={() => setNavOpen(navOpen === n.id ? null : n.id)}
+                  <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
                     style={{ background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
                       color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                       border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
