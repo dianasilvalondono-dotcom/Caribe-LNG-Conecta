@@ -68,40 +68,51 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
 
   const MODAL_TABS = [
-    { id: 'perfil', label: '📋 Perfil' },
-    { id: 'relacionamiento', label: '💬 Relacionamiento' },
-    { id: 'personal', label: '🌟 Datos personales' },
-    { id: 'editar', label: '✏️ Editar' },
+    { id: 'perfil', label: 'Perfil' },
+    { id: 'relacionamiento', label: 'Actividad' },
+    { id: 'personal', label: 'Personal' },
+    { id: 'editar', label: 'Editar' },
   ]
 
+  const tc = getTipoColor(actor.tipo)
+
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', zIndex: 1000,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 580,
-        maxHeight: '90vh', overflowY: 'auto', padding: 24 }}>
+      <div style={{ background: 'white', borderRadius: 20, width: '100%', maxWidth: 580,
+        maxHeight: '90vh', overflowY: 'auto', overflow: 'hidden' }}>
 
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Avatar name={actor.nombre} size={48} color={getTipoColor(actor.tipo)} />
+        {/* Header con gradiente */}
+        <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, #1a3d7a 60%, #1565C0 100%)`, padding: '20px 24px 16px', position: 'relative' }}>
+          <button onClick={onClose} style={{ position: 'absolute', top: 12, right: 16, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 16, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+            <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.25)', color: 'white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, flexShrink: 0 }}>
+              {actor.nombre?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
+            </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>{actor.nombre}</h2>
-              <div style={{ fontSize: 14, color: C.muted, marginTop: 2 }}>{actor.tipo} → {actor.nivel}</div>
-              <div style={{ fontSize: 13, color: C.subtle, marginTop: 1 }}>{actor.territorio} → {actor.area}</div>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'white', lineHeight: 1.3 }}>{actor.nombre}</h2>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>{actor.tipo} · {actor.territorio}{actor.nivel ? ` · ${actor.nivel}` : ''}</div>
+              <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 100, background: sc.color + '30', color: 'white' }}>{sc.label}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 100, background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)' }}>{actor.posicion}</span>
+                {actor.prioridad === 'A' && <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 100, background: '#fbbf24', color: '#78350f' }}>Prioridad A</span>}
+              </div>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: C.subtle, padding: 0 }}>✕</button>
         </div>
 
+        <div style={{ padding: '0 24px 24px' }}>
+
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 20, marginTop: -1, background: '#f8fafc', borderRadius: 12, padding: 4, border: '1px solid #e8ecf0' }}>
           {MODAL_TABS.map(t => (
             <button key={t.id} onClick={() => setModalTab(t.id)}
               style={{ flex: 1, background: modalTab === t.id ? 'white' : 'transparent',
-                border: 'none', borderRadius: 7, padding: '7px 4px', fontSize: 13, fontWeight: 700,
-                color: modalTab === t.id ? C.navy : C.muted, cursor: 'pointer',
-                boxShadow: modalTab === t.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none' }}>
+                border: 'none', borderRadius: 8, padding: '8px 4px', fontSize: 12, fontWeight: 700,
+                color: modalTab === t.id ? C.navy : '#94a3b8', cursor: 'pointer', letterSpacing: '0.3px',
+                boxShadow: modalTab === t.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s' }}>
               {t.label}
             </button>
           ))}
@@ -111,34 +122,26 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
         {modalTab === 'perfil' && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
-              <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                <div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Estado relación</div>
-                <div style={{ fontSize: 14, color: sc.color, fontWeight: 700 }}>{sc.dot} {sc.label}</div>
-                <div style={{ fontSize: 12, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
-                  {actor.semaforo === 'rojo' && 'No se ha iniciado acercamiento — prioritaria'}
-                  {actor.semaforo === 'naranja' && 'Relación en construcción — seguimiento cercano'}
-                  {actor.semaforo === 'amarillo' && 'Acercamiento en curso — avanzar'}
-                  {actor.semaforo === 'verde' && 'Relacion activa con comunicacion regular'}
+              {[
+                { label: 'Estado relación', value: sc.label, color: sc.color,
+                  desc: actor.semaforo === 'rojo' ? 'Sin acercamiento' : actor.semaforo === 'naranja' ? 'En construcción' : actor.semaforo === 'amarillo' ? 'Avanzando' : 'Relación activa',
+                  bg: sc.bg },
+                { label: 'Posición', value: actor.posicion, color: (actor.posicion || '').includes('Aliado') ? '#10b981' : (actor.posicion || '').includes('Opositor') ? '#ef4444' : '#64748b',
+                  desc: (actor.posicion || '').includes('Aliado') ? 'Apoya el proyecto' : (actor.posicion || '').includes('Opositor') ? 'Se opone activamente' : 'Sin posición definida',
+                  bg: (actor.posicion || '').includes('Aliado') ? '#ecfdf5' : (actor.posicion || '').includes('Opositor') ? '#fff1f2' : '#f8fafc' },
+                { label: 'Riesgo', value: actor.riesgo || 'N/A', color: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? '#ef4444' : actor.riesgo === 'Medio' ? '#f59e0b' : '#10b981',
+                  desc: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? 'Gestión prioritaria' : actor.riesgo === 'Medio' ? 'Seguimiento regular' : 'Monitoreo rutina',
+                  bg: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? '#fff1f2' : actor.riesgo === 'Medio' ? '#fffbeb' : '#ecfdf5' },
+              ].map(item => (
+                <div key={item.label} style={{ background: item.bg, borderRadius: 12, padding: '12px 12px', border: `1px solid ${item.color}20` }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>{item.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}60` }} />
+                    <span style={{ fontSize: 14, fontWeight: 800, color: item.color }}>{item.value}</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: '#64748b' }}>{item.desc}</div>
                 </div>
-              </div>
-              <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                <div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Posición</div>
-                <div style={{ fontSize: 14 }}>{actor.posicion}</div>
-                <div style={{ fontSize: 12, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
-                  {(actor.posicion || '').includes('Aliado') && 'Apoya el proyecto activamente'}
-                  {(actor.posicion || '').includes('Neutro') && 'Sin posición definida'}
-                  {(actor.posicion || '').includes('Opositor') && 'Se opone activamente'}
-                </div>
-              </div>
-              <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                <div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Riesgo</div>
-                <div style={{ fontSize: 14, color: actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto' ? C.red : actor.riesgo === 'Medio' ? C.orange : C.green, fontWeight: 700 }}>{actor.riesgo}</div>
-                <div style={{ fontSize: 12, color: C.muted, marginTop: 4, lineHeight: 1.4 }}>
-                  {(actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') && 'Gestión proactiva prioritaria'}
-                  {actor.riesgo === 'Medio' && 'Seguimiento regular'}
-                  {actor.riesgo === 'Bajo' && 'Monitoreo de rutina'}
-                </div>
-              </div>
+              ))}
             </div>
             <div style={{ display: 'flex', gap: 16, marginBottom: 14, background: '#f8fafc', borderRadius: 8, padding: '10px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <div><div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>PODER</div><Pill value={actor.poder} color={C.accent} /></div>
@@ -207,7 +210,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
             <button onClick={handleSave} disabled={saving || !resumen.trim()}
               style={{ marginTop: 8, width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white',
                 border: 'none', borderRadius: 10, padding: '11px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
-              {saving ? '💾 Guardando...' : '💾 Guardar novedad'}
+              {saving ? 'Guardando...' : 'Guardar novedad'}
             </button>
             {interactions.length > 0 && (
               <div style={{ marginTop: 16, borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
@@ -224,7 +227,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                       <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}>{i.resumen}</div>
                       {i.accion_tomada && (
                         <div style={{ fontSize: 12, color: C.accent, marginTop: 3, fontStyle: 'italic' }}>
-                          ✅ {i.accion_tomada}{i.fecha_accion ? ` — ${new Date(i.fecha_accion).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}` : ''}
+                          → {i.accion_tomada}{i.fecha_accion ? ` — ${new Date(i.fecha_accion).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}` : ''}
                         </div>
                       )}
                     </div>
@@ -293,7 +296,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
             <button onClick={handleSavePersonal} disabled={savingPersonal}
               style={{ width: '100%', background: savingPersonal ? '#94a3b8' : C.green, color: 'white',
                 border: 'none', borderRadius: 10, padding: '11px', fontSize: 14, fontWeight: 700, cursor: savingPersonal ? 'wait' : 'pointer' }}>
-              {savingPersonal ? '💾 Guardando...' : '💾 Guardar datos personales'}
+              {savingPersonal ? 'Guardando...' : 'Guardar datos personales'}
             </button>
           </div>
         )}
@@ -303,7 +306,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
           <div>
             {editSent ? (
               <div style={{ textAlign: 'center', padding: '24px 0' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: '#dcfce7', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: '#10b981' }}>✓</div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: C.green }}>Cambios enviados para aprobación</div>
                 <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>La directora DAC revisará y aprobará los cambios.</div>
               </div>
@@ -420,13 +423,14 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                   style={{ width: '100%', marginTop: 8, background: editSaving ? '#94a3b8' : isAdmin ? C.green : C.navy,
                     color: 'white', border: 'none', borderRadius: 10, padding: '11px', fontSize: 14, fontWeight: 700,
                     cursor: editSaving ? 'wait' : 'pointer' }}>
-                  {editSaving ? '⏳ Guardando...' : isAdmin ? '✅ Aplicar cambios' : '📤 Enviar para aprobación'}
+                  {editSaving ? 'Guardando...' : isAdmin ? 'Aplicar cambios' : 'Enviar para aprobación'}
                 </button>
               </>
             )}
           </div>
         )}
 
+      </div>
       </div>
     </div>
   )
