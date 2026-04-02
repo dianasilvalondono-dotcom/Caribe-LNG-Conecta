@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { C } from '../lib/constants'
 import { Field } from './ui'
 import { supabase, addReporteSemanal, deleteReporteSemanal, sendAlerta, sendPushNotification, uploadReporteToOneDrive } from '../lib/supabase'
 
 export default function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+    const h = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -169,7 +169,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
         {[
           { id: 'reporte', label: 'Reporte Semanal' },
-          { id: 'alerta', label: '🚨 Escalar alerta' },
+          { id: 'alerta', label: 'Escalar alerta' },
           { id: 'historico', label: 'Histórico' },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
@@ -301,7 +301,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       {tab === 'alerta' && (
         <div>
           <div style={{ background: '#fff1f2', border: '1.5px solid #fecdd3', borderRadius: 12, padding: 20, marginBottom: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>🚨 Escalar alerta a Diana Silva</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Escalar alerta a Diana Silva</div>
             <div style={{ fontSize: 14, color: C.muted, marginBottom: 16 }}>El mensaje llega directamente al correo de la Directora de Asuntos Corporativos.</div>
 
             <div style={{ marginBottom: 12 }}>
@@ -330,7 +330,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
             {alertaEnviada && (
               <div style={{ background: '#dcfce7', borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 14, color: '#166534', fontWeight: 600 }}>
-                ✅ Alerta enviada a diana.silva@caribelng.com
+                Alerta enviada a diana.silva@caribelng.com
               </div>
             )}
 
@@ -339,7 +339,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
                 color: saving || !alertaMensaje.trim() ? C.muted : 'white',
                 border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
                 cursor: saving || !alertaMensaje.trim() ? 'not-allowed' : 'pointer' }}>
-              {saving ? 'Enviando...' : '🚨 Enviar alerta'}
+              {saving ? 'Enviando...' : 'Enviar alerta'}
             </button>
           </div>
         </div>

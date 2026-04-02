@@ -658,7 +658,7 @@ export default function App() {
               <div style={{ position: 'relative' }}>
                 <input value={globalSearch} onChange={e => { setGlobalSearch(e.target.value); setShowGlobalSearch(!!e.target.value) }}
                   onFocus={() => { if (globalSearch) setShowGlobalSearch(true) }}
-                  placeholder="🔍 Buscar todo..."
+                  placeholder="Buscar todo..."
                   style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
                     padding: '5px 12px', fontSize: 13, color: 'white', width: 180, outline: 'none', fontFamily: 'inherit' }} />
                 {showGlobalSearch && globalSearch.length >= 2 && (() => {
@@ -1004,7 +1004,7 @@ export default function App() {
             {/* Filtros */}
             <div style={{ background: C.card, borderRadius: 12, padding: '12px 14px', marginBottom: 14,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Buscar por nombre, tipo..."
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nombre, tipo..."
                 style={{ flex: 1, minWidth: 180, border: '1px solid #e2e8f0', borderRadius: 8,
                   padding: isMobile ? '11px 14px' : '7px 11px',
                   fontSize: isMobile ? 16 : 15, outline: 'none', color: C.text, fontFamily: 'inherit' }} />
@@ -1408,7 +1408,7 @@ export default function App() {
                           <button onClick={() => fileRef.current?.click()}
                             style={{ background: `${C.accent}10`, border: `1.5px dashed ${C.accent}`, borderRadius: 10,
                               padding: '12px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-                            <span style={{ fontSize: 20 }}>📷</span>
+                            <span style={{ fontSize: 20 }}></span>
                             <div style={{ textAlign: 'left' }}>
                               <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
                               <div style={{ fontSize: 11, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
@@ -1418,7 +1418,7 @@ export default function App() {
                           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 1 }}>
                             <img src={preview} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} />
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              {geo && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>📍 {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              {geo && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
                               {geoLugar && <div style={{ fontSize: 12, color: C.muted }}>{geoLugar}</div>}
                             </div>
                             <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setGeoLugar(null) }}
@@ -1430,7 +1430,7 @@ export default function App() {
                         style={{ width: '100%', background: saving || !descripcion.trim() ? '#cbd5e1' : C.navy,
                           color: 'white', border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
                           cursor: saving || !descripcion.trim() ? 'not-allowed' : 'pointer' }}>
-                        {saving ? '⏳ Guardando...' : '📤 Guardar registro'}
+                        {saving ? 'Guardando...' : 'Guardar registro'}
                       </button>
                     </div>
 
@@ -1453,8 +1453,8 @@ export default function App() {
                               <div style={{ fontSize: 13, color: C.text, marginBottom: 3, lineHeight: 1.4 }}>{r.descripcion}</div>
                               <div style={{ fontSize: 11, color: C.subtle }}>
                                 📅 {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
-                                {r.lugar && <span> · 📌 {r.lugar}</span>}
-                                {r.geo_lugar && !r.lugar && <span> · 📌 {r.geo_lugar}</span>}
+                                {r.lugar && <span> · · {r.lugar}</span>}
+                                {r.geo_lugar && !r.lugar && <span> · · {r.geo_lugar}</span>}
                               </div>
                             </div>
                           </div>
@@ -1517,7 +1517,7 @@ export default function App() {
                       {!preview ? (
                         <div onClick={() => fileRef.current?.click()}
                           style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
-                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}></div>
                           <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
                           <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>GPS + hora + lugar automáticos</div>
                         </div>
@@ -1526,9 +1526,9 @@ export default function App() {
                           <img src={preview} alt="" style={{ width: '100%', borderRadius: 10, maxHeight: 180, objectFit: 'cover', marginBottom: 10 }} />
                           {captureTime && (
                             <div style={{ background: '#f8fafc', borderRadius: 8, padding: 10, marginBottom: 10, fontSize: 13 }}>
-                              <div>🕐 {new Date(captureTime).toLocaleString('es-CO')}</div>
-                              {geo && <div>📍 {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
-                              {lugar && <div>📌 {lugar}</div>}
+                              <div>— {new Date(captureTime).toLocaleString('es-CO')}</div>
+                              {geo && <div>GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              {lugar && <div>· {lugar}</div>}
                             </div>
                           )}
                           <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Descripción de la evidencia *" rows={2}
@@ -1549,7 +1549,7 @@ export default function App() {
                             }}
                               disabled={uploading || !desc.trim() || !geo}
                               style={{ flex: 2, background: uploading || !desc.trim() || !geo ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
-                              {uploading ? '⏳ Subiendo...' : '📤 Guardar'}
+                              {uploading ? 'Subiendo...' : 'Guardar'}
                             </button>
                           </div>
                         </div>
@@ -1565,11 +1565,11 @@ export default function App() {
                               <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
                               <div style={{ padding: '10px 12px' }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
-                                <div style={{ fontSize: 11, color: C.subtle }}>🕐 {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
-                                {ev.lugar && <div style={{ fontSize: 11, color: C.accent }}>📌 {ev.lugar}</div>}
-                                <div style={{ fontSize: 10, color: C.subtle }}>📍 {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
+                                <div style={{ fontSize: 11, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
+                                {ev.lugar && <div style={{ fontSize: 11, color: C.accent }}>· {ev.lugar}</div>}
+                                <div style={{ fontSize: 10, color: C.subtle }}>GPS {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
                                 {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
-                                  style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>🗑 Eliminar</button>}
+                                  style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
                               </div>
                             </div>
                           ))}
@@ -1603,7 +1603,7 @@ export default function App() {
           <div>
             <div style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div>
-                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
+                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>Mi Territorio</h1>
                 <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
               </div>
               <button onClick={() => setShowGuia(true)}
@@ -1633,7 +1633,7 @@ export default function App() {
                 <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 520,
                   maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.navy }}>📖 Guía de la Gestora</h2>
+                    <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.navy }}>Guía de la Gestora</h2>
                     <button onClick={() => setShowGuia(false)}
                       style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
                   </div>
@@ -1724,7 +1724,7 @@ export default function App() {
               </div>
             )}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
+              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>Actores que necesitan atención hoy</h3>
               {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => (
                 <div key={a.id} onClick={() => setSelectedActor(a)}
                   style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '9px 0',
@@ -1739,7 +1739,7 @@ export default function App() {
               ))}
             </div>
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>📅 Próximas fechas importantes</h3>
+              <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>Próximas fechas importantes</h3>
               {(() => {
                 const today = new Date()
                 const todayMM = today.getMonth()
@@ -1756,7 +1756,7 @@ export default function App() {
                   const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
                   if (diff <= 30) items.push({
                     actorId: a.id, actor: a, diff,
-                    descripcion: '🎂 Cumpleaños',
+                    descripcion: 'Cumpleaños',
                     dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' })
                   })
                 })
@@ -1882,7 +1882,7 @@ export default function App() {
                     <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480,
                       maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>📸 Capturar Evidencia</h3>
+                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>Capturar Evidencia</h3>
                         <button onClick={() => setShowEvidenciaCapture(false)}
                           style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
                       </div>
@@ -1894,7 +1894,7 @@ export default function App() {
                         <div onClick={() => fileRef.current?.click()}
                           style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '32px 16px',
                             textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: `${C.accent}08` }}>
-                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}></div>
                           <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
                           <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Se capturará ubicación GPS y hora automáticamente</div>
                         </div>
@@ -1913,13 +1913,13 @@ export default function App() {
                       {captureTime && (
                         <div style={{ background: '#f8fafc', borderRadius: 10, padding: 12, marginBottom: 16, fontSize: 13 }}>
                           <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
-                            <span style={{ fontWeight: 700, color: C.text }}>🕐 Hora:</span>
+                            <span style={{ fontWeight: 700, color: C.text }}>— Hora:</span>
                             <span style={{ color: C.muted }}>{new Date(captureTime).toLocaleString('es-CO')}</span>
                           </div>
                           {geo ? (
                             <>
                               <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
-                                <span style={{ fontWeight: 700, color: C.text }}>📍 GPS:</span>
+                                <span style={{ fontWeight: 700, color: C.text }}>GPS GPS:</span>
                                 <span style={{ color: C.muted }}>{geo.lat.toFixed(6)}, {geo.lng.toFixed(6)}</span>
                               </div>
                               <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
@@ -1929,7 +1929,7 @@ export default function App() {
                                 </span>
                               </div>
                               <div style={{ display: 'flex', gap: 8 }}>
-                                <span style={{ fontWeight: 700, color: C.text }}>📌 Lugar:</span>
+                                <span style={{ fontWeight: 700, color: C.text }}>· Lugar:</span>
                                 <span style={{ color: C.muted }}>{lugar || '⏳ Resolviendo...'}</span>
                               </div>
                             </>
@@ -1962,7 +1962,7 @@ export default function App() {
                         style={{ width: '100%', background: (!file || !desc.trim() || !geo || uploading) ? '#cbd5e1' : C.navy,
                           color: 'white', border: 'none', borderRadius: 10, padding: '12px 20px',
                           fontSize: 15, fontWeight: 700, cursor: (!file || !desc.trim() || !geo || uploading) ? 'not-allowed' : 'pointer' }}>
-                        {uploading ? '⏳ Subiendo...' : '📤 Guardar evidencia'}
+                        {uploading ? 'Subiendo...' : 'Guardar evidencia'}
                       </button>
                     </div>
                   </div>
@@ -1974,22 +1974,22 @@ export default function App() {
             {/* ── Galería de evidencias recientes ── */}
             {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).length > 0 && (
               <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-                <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>📸 Evidencias recientes</h3>
+                <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>Evidencias recientes</h3>
                 {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).slice(0, 10).map(ev => (
                   <div key={ev.id} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start' }}>
                     <img src={ev.foto_url} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 2 }}>{ev.descripcion}</div>
                       <div style={{ fontSize: 12, color: C.subtle }}>
-                        🕐 {new Date(ev.capturada_at).toLocaleString('es-CO')}
+                        — {new Date(ev.capturada_at).toLocaleString('es-CO')}
                       </div>
                       {ev.lugar && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>
-                        📌 {ev.lugar}
+                        · {ev.lugar}
                       </div>}
                       {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
-                        style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>🗑 Eliminar</button>}
+                        style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
                       <div style={{ fontSize: 11, color: C.subtle }}>
-                        📍 {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
+                        GPS {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
                         {ev.precision_m && <span> · ±{Math.round(ev.precision_m)}m</span>}
                       </div>
                     </div>

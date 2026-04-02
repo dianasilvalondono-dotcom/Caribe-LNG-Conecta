@@ -85,10 +85,11 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
               {azules.length > 0 && <div style={{ background: C.accent, flex: azules.length }} title={`${azules.length} en revisión`} />}
             </div>
             <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
-              <span style={{ color: C.red, fontWeight: 700 }}>🔴 {rojos.length}</span>
-              <span style={{ color: C.yellow, fontWeight: 700 }}>🟡 {amarillos.length}</span>
-              <span style={{ color: C.green, fontWeight: 700 }}>🟢 {verdes.length}</span>
-              <span style={{ color: C.accent, fontWeight: 700 }}>🔵 {azules.length}</span>
+              {[[C.red, rojos.length], [C.yellow, amarillos.length], [C.green, verdes.length], [C.accent, azules.length]].map(([c, n], i) => (
+                <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: c, fontWeight: 700 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: c, display: 'inline-block' }} />{n}
+                </span>
+              ))}
             </div>
           </div>}
           {/* Legislative risks bar — clickable → switches to legislativo sub-tab */}
@@ -100,9 +101,9 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
               {legBajo.length > 0 && <div style={{ background: C.green, flex: legBajo.length }} title={`${legBajo.length} bajo`} />}
             </div>
             <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
-              <span style={{ color: C.red, fontWeight: 700 }}>🔴 {legAlto.length}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: C.red, fontWeight: 700 }}><span style={{ width: 7, height: 7, borderRadius: '50%', background: C.red, display: 'inline-block' }} />{legAlto.length}</span>
               <span style={{ color: C.orange, fontWeight: 700 }}>🟠 {legMedio.length}</span>
-              <span style={{ color: C.green, fontWeight: 700 }}>🟢 {legBajo.length}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: C.green, fontWeight: 700 }}><span style={{ width: 7, height: 7, borderRadius: '50%', background: C.green, display: 'inline-block' }} />{legBajo.length}</span>
             </div>
           </div>}
         </div>
@@ -112,10 +113,10 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
       <div style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Riesgos Sociales y Comunitarios</div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
-          { label: 'Acción inmediata', key: 'Alto', count: rojos.length, pct: pct(rojos.length), color: C.red, bg: '#fee2e2', icon: '🔴' },
-          { label: 'Vigilar', key: 'Medio', count: amarillos.length, pct: pct(amarillos.length), color: C.yellow, bg: '#fef9c3', icon: '🟡' },
-          { label: 'Bajo control', key: 'Bajo', count: verdes.length, pct: pct(verdes.length), color: C.green, bg: '#dcfce7', icon: '🟢' },
-          { label: 'En revisión', key: 'Revision', count: azules.length, pct: pct(azules.length), color: C.accent, bg: '#dbeafe', icon: '🔵' },
+          { label: 'Acción inmediata', key: 'Alto', count: rojos.length, pct: pct(rojos.length), color: C.red, bg: '#fee2e2' },
+          { label: 'Vigilar', key: 'Medio', count: amarillos.length, pct: pct(amarillos.length), color: C.yellow, bg: '#fef9c3' },
+          { label: 'Bajo control', key: 'Bajo', count: verdes.length, pct: pct(verdes.length), color: C.green, bg: '#dcfce7' },
+          { label: 'En revisión', key: 'Revision', count: azules.length, pct: pct(azules.length), color: C.accent, bg: '#dbeafe' },
         ].map(s => {
           const isActive = riesgoFilter === s.key
           return (
@@ -141,9 +142,9 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
       {/* Sub-tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
         {[
-          { id: 'mapa', label: '🗺 Riesgos Sociales', count: riesgos.length },
-          { id: 'legislativo', label: '⚖️ Riesgos Legislativos', count: riesgosLeg.length },
-          { id: 'cronograma', label: '🏛 Agenda Government Affairs', count: cronoLeg.length },
+          { id: 'mapa', label: 'Riesgos Sociales', count: riesgos.length },
+          { id: 'legislativo', label: 'Riesgos Legislativos', count: riesgosLeg.length },
+          { id: 'cronograma', label: 'Agenda Gubernamental', count: cronoLeg.length },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9',
@@ -321,7 +322,7 @@ function AgendaGubernamental({ cronoLeg, isAdmin, onReloaded, getNivelColor, isM
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: C.text }}>
-          🏛 Agenda Government Affairs
+          Agenda Gubernamental
         </div>
         {isAdmin && (
           <button

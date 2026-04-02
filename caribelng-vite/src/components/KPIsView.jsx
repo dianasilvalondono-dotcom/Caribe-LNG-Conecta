@@ -270,7 +270,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
       {/* Main tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
-        {[{ id: 'dac', label: '🎯 Director DAC' }, { id: 'gestoras', label: '🌍 Gestoras Territoriales' }].map(t => (
+        {[{ id: 'dac', label: 'Director DAC' }, { id: 'gestoras', label: 'Gestoras Territoriales' }].map(t => (
           <button key={t.id} onClick={() => setMainTab(t.id)}
             style={{ flex: 1, background: mainTab === t.id ? C.navy : 'transparent', color: mainTab === t.id ? 'white' : C.muted,
               border: 'none', borderRadius: 7, padding: '9px 8px', fontSize: isMobile ? 12 : 14, fontWeight: 700, cursor: 'pointer' }}>
