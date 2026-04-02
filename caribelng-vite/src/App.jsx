@@ -16,7 +16,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
          getKpisDac, upsertKpiDac, sendAlerta,
          getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
-         uploadEvidenciaPhoto, addEvidencia, getEvidencias } from './lib/supabase'
+         uploadEvidenciaPhoto, addEvidencia, getEvidencias,
+         submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -247,7 +248,7 @@ function ActorCard({ actor, onClick }) {
 }
 
 // ━━ Actor Modal ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function ActorModal({ actor, session, onClose, onUpdated }) {
+function ActorModal({ actor, session, onClose, onUpdated, isAdmin, profile }) {
   const [interactions, setInteractions] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalTab, setModalTab] = useState('perfil')
@@ -268,6 +269,15 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
   const [fechasImp, setFechasImp] = useState(Array.isArray(actor.fechas_importantes) ? actor.fechas_importantes : [])
   const [newFechaDate, setNewFechaDate] = useState('')
   const [newFechaDesc, setNewFechaDesc] = useState('')
+  // Edit fields
+  const [editFields, setEditFields] = useState({
+    nombre: actor.nombre || '', tipo: actor.tipo || '', territorio: actor.territorio || '',
+    posicion: actor.posicion || '', riesgo: actor.riesgo || '', poder: actor.poder || 3,
+    interes: actor.interes || 3, owner: actor.owner || '', contacto: actor.contacto || '',
+    que_hacemos: actor.que_hacemos || '', prioridad: actor.prioridad || ''
+  })
+  const [editSaving, setEditSaving] = useState(false)
+  const [editSent, setEditSent] = useState(false)
 
   useEffect(() => {
     getInteractions(actor.id).then(d => { setInteractions(d || []); setLoading(false) })
@@ -306,6 +316,7 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
     { id: 'perfil', label: '📋 Perfil' },
     { id: 'relacionamiento', label: '💬 Relacionamiento' },
     { id: 'personal', label: '🌟 Datos personales' },
+    { id: 'editar', label: '✏️ Editar' },
   ]
 
   return (
@@ -529,6 +540,135 @@ function ActorModal({ actor, session, onClose, onUpdated }) {
                 border: 'none', borderRadius: 10, padding: '11px', fontSize: 14, fontWeight: 700, cursor: savingPersonal ? 'wait' : 'pointer' }}>
               {savingPersonal ? '💾 Guardando...' : '💾 Guardar datos personales'}
             </button>
+          </div>
+        )}
+
+        {/* ── TAB: EDITAR ── */}
+        {modalTab === 'editar' && (
+          <div>
+            {editSent ? (
+              <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.green }}>Cambios enviados para aprobación</div>
+                <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>La directora DAC revisará y aprobará los cambios.</div>
+              </div>
+            ) : (
+              <>
+                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#92400e' }}>
+                  {isAdmin
+                    ? '⚡ Como admin, tus cambios se aplican directamente.'
+                    : '📋 Tus cambios quedarán pendientes hasta que la directora DAC los apruebe.'}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Nombre</label>
+                    <input value={editFields.nombre} onChange={e => setEditFields({ ...editFields, nombre: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Tipo</label>
+                    <select value={editFields.tipo} onChange={e => setEditFields({ ...editFields, tipo: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Comunitario', 'Político', 'Institucional', 'Empresarial', 'Mediático', 'Social', 'Educativo'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Territorio</label>
+                    <select value={editFields.territorio} onChange={e => setEditFields({ ...editFields, territorio: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Tolú', 'Barbosa', 'Nacional'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Posición</label>
+                    <select value={editFields.posicion} onChange={e => setEditFields({ ...editFields, posicion: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Aliado', 'Neutro', 'Opositor'].map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Riesgo</label>
+                    <select value={editFields.riesgo} onChange={e => setEditFields({ ...editFields, riesgo: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {['Bajo', 'Medio', 'Alto', 'Muy Alto'].map(r => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Poder (1-5)</label>
+                    <select value={editFields.poder} onChange={e => setEditFields({ ...editFields, poder: +e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Interés (1-5)</label>
+                    <select value={editFields.interes} onChange={e => setEditFields({ ...editFields, interes: +e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Prioridad</label>
+                    <select value={editFields.prioridad} onChange={e => setEditFields({ ...editFields, prioridad: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                      <option value="">Sin prioridad</option>
+                      <option value="A">A (máxima)</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Responsable</label>
+                    <input value={editFields.owner} onChange={e => setEditFields({ ...editFields, owner: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Contacto</label>
+                    <input value={editFields.contacto} onChange={e => setEditFields({ ...editFields, contacto: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Qué hacemos (estrategia)</label>
+                    <textarea value={editFields.que_hacemos} onChange={e => setEditFields({ ...editFields, que_hacemos: e.target.value })}
+                      rows={2}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                  </div>
+                </div>
+                <button onClick={async () => {
+                  setEditSaving(true)
+                  try {
+                    // Detectar qué campos cambiaron
+                    const changed = {}
+                    Object.keys(editFields).forEach(k => {
+                      if (editFields[k] !== (actor[k] || '')) changed[k] = editFields[k]
+                    })
+                    if (!Object.keys(changed).length) { alert('No hay cambios'); setEditSaving(false); return }
+                    if (isAdmin) {
+                      // Admin: aplicar directo
+                      await updateActor(actor.id, changed)
+                      onUpdated()
+                      onClose()
+                    } else {
+                      // Gestora: enviar para aprobación
+                      await submitActorEdit({
+                        actor_id: actor.id,
+                        user_id: session.user.id,
+                        user_name: profile?.full_name || session.user.email,
+                        campos: changed
+                      })
+                      setEditSent(true)
+                    }
+                  } catch (err) { alert('Error: ' + err.message) }
+                  finally { setEditSaving(false) }
+                }}
+                  disabled={editSaving}
+                  style={{ width: '100%', marginTop: 8, background: editSaving ? '#94a3b8' : isAdmin ? C.green : C.navy,
+                    color: 'white', border: 'none', borderRadius: 10, padding: '11px', fontSize: 14, fontWeight: 700,
+                    cursor: editSaving ? 'wait' : 'pointer' }}>
+                  {editSaving ? '⏳ Guardando...' : isAdmin ? '✅ Aplicar cambios' : '📤 Enviar para aprobación'}
+                </button>
+              </>
+            )}
           </div>
         )}
 
@@ -2379,6 +2519,8 @@ export default function App() {
   const [knowledgeBase, setKnowledgeBase] = useState([])
   const [evidencias, setEvidencias] = useState([])
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
+  const [actorEdits, setActorEdits] = useState([])
+  const [editingActor, setEditingActor] = useState(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -2400,7 +2542,7 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd, kb, ev] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac(), getKnowledgeBase(), getEvidencias()])
+      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd, kb, ev, ae] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac(), getKnowledgeBase(), getEvidencias(), getActorEdits()])
       setActors(a || [])
       setAgreements(ag || [])
       setCronograma(cr || [])
@@ -2413,6 +2555,7 @@ export default function App() {
       setKpisDac(kd || [])
       setKnowledgeBase(kb || [])
       setEvidencias(ev || [])
+      setActorEdits(ae || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -2830,6 +2973,54 @@ export default function App() {
                   })()}
                 </div>
               </div>
+              {/* ── Ediciones pendientes (admin only) ── */}
+              {isAdmin && actorEdits.length > 0 && (
+                <div style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden', marginTop: 12 }}>
+                  <div style={{ background: '#f59e0b', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>✏️</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: 'white', letterSpacing: '0.04em' }}>EDICIONES PENDIENTES</span>
+                    <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.3)', borderRadius: 10, padding: '2px 8px', fontSize: 12, fontWeight: 800, color: 'white' }}>{actorEdits.length}</span>
+                  </div>
+                  <div style={{ padding: 12 }}>
+                    {actorEdits.map(edit => {
+                      const actorName = actors.find(a => a.id === edit.actor_id)?.nombre || `Actor #${edit.actor_id}`
+                      const changedKeys = Object.keys(edit.campos || {})
+                      return (
+                        <div key={edit.id} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 2 }}>{actorName}</div>
+                          <div style={{ fontSize: 12, color: C.subtle, marginBottom: 4 }}>
+                            Por: {edit.user_name} · {new Date(edit.created_at).toLocaleDateString('es-CO')}
+                          </div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}>
+                            {changedKeys.map(k => (
+                              <div key={k} style={{ display: 'flex', gap: 4, marginBottom: 2 }}>
+                                <span style={{ fontWeight: 700, color: C.muted }}>{k}:</span>
+                                <span style={{ color: C.accent, fontWeight: 600 }}>{String(edit.campos[k])}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button onClick={async () => {
+                              await approveActorEdit(edit.id, edit.actor_id, edit.campos, session.user.id)
+                              await loadData()
+                            }}
+                              style={{ flex: 1, background: C.green, color: 'white', border: 'none', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                              ✅ Aprobar
+                            </button>
+                            <button onClick={async () => {
+                              await rejectActorEdit(edit.id, session.user.id)
+                              await loadData()
+                            }}
+                              style={{ flex: 1, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                              ❌ Rechazar
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>}
             </div>
           </div>
@@ -3658,7 +3849,7 @@ export default function App() {
       </div>
 
       {selectedActor && (
-        <ActorModal actor={selectedActor} session={session}
+        <ActorModal actor={selectedActor} session={session} isAdmin={isAdmin} profile={profile}
           onClose={() => setSelectedActor(null)} onUpdated={loadData} />
       )}
 

@@ -298,6 +298,50 @@ export async function uploadKnowledgeFile(file) {
   return data.publicUrl
 }
 
+// ── Actor Edits (pending approval) ──────────────────────────────────────────
+
+export async function submitActorEdit({ actor_id, user_id, user_name, campos }) {
+  const { data, error } = await supabase
+    .from('actor_edits')
+    .insert({ actor_id, user_id, user_name, campos, estado: 'pendiente' })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getActorEdits() {
+  const { data } = await supabase
+    .from('actor_edits')
+    .select('*')
+    .eq('estado', 'pendiente')
+    .order('created_at', { ascending: false })
+  return data || []
+}
+
+export async function approveActorEdit(editId, actorId, campos, adminId) {
+  // Apply changes to actor
+  const { error: updateErr } = await supabase
+    .from('actors')
+    .update({ ...campos, updated_at: new Date().toISOString() })
+    .eq('id', actorId)
+  if (updateErr) throw updateErr
+  // Mark edit as approved
+  const { error } = await supabase
+    .from('actor_edits')
+    .update({ estado: 'aprobado', revisado_at: new Date().toISOString(), revisado_por: adminId })
+    .eq('id', editId)
+  if (error) throw error
+}
+
+export async function rejectActorEdit(editId, adminId) {
+  const { error } = await supabase
+    .from('actor_edits')
+    .update({ estado: 'rechazado', revisado_at: new Date().toISOString(), revisado_por: adminId })
+    .eq('id', editId)
+  if (error) throw error
+}
+
 // ── Evidencias ───────────────────────────────────────────────────────────────
 
 export async function uploadEvidenciaPhoto(file) {
