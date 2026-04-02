@@ -455,12 +455,12 @@ export default function App() {
     return true
   }), [actors, search, filterT, filterS, filterR])
 
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || navigator.maxTouchPoints > 0)
-  const [isPortrait, setIsPortrait] = useState(() => window.innerHeight > window.innerWidth)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
+  const [isPortrait, setIsPortrait] = useState(() => window.innerHeight > window.innerWidth && window.innerWidth < 960)
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 960 || navigator.maxTouchPoints > 0)
-      setIsPortrait(window.innerHeight > window.innerWidth)
+      setIsMobile(window.innerWidth < 960)
+      setIsPortrait(window.innerHeight > window.innerWidth && window.innerWidth < 960)
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -831,8 +831,8 @@ export default function App() {
             </div>
 
             {/* ── Gráficos ── */}
-            {!isMobile && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+            {(
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 24 }}>
                 {/* Chart 1: Progreso de Acuerdos */}
                 <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
                   <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Progreso de Acuerdos</div>
