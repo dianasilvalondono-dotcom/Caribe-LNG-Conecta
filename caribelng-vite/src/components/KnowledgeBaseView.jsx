@@ -151,18 +151,19 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Conocimiento</h1>
-        <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 14 }}>Documentos y contexto que el asistente IA usa para responder preguntas. Total: {docs.length} docs · ~{Math.round(docs.reduce((s,d) => s + (d.contenido?.length || 0), 0) / 1000)}K caracteres</p>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Base de Conocimiento</h1>
+        <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Documentos para el asistente IA · {docs.length} docs · ~{Math.round(docs.reduce((s,d) => s + (d.contenido?.length || 0), 0) / 1000)}K caracteres</p>
       </div>
 
       {/* Add/Edit form */}
-      <div style={{ background: C.card, borderRadius: 12, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 20, borderLeft: `4px solid ${C.accent}` }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: C.accent, marginBottom: 12 }}>{editing ? 'Editar documento' : '+ Agregar documento'}</div>
+      <div style={{ background: 'white', borderRadius: 16, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: C.accent }} />
+        <div style={{ fontSize: 12, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 14 }}>{editing ? 'Editar documento' : 'Agregar documento'}</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
           <input value={form.titulo} onChange={e => setForm({...form, titulo: e.target.value})} placeholder="Título del documento"
-            style={{ flex: 2, minWidth: 200, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+            style={{ flex: 2, minWidth: 200, border: '1px solid #e8ecf0', borderRadius: 10, padding: '9px 14px', fontSize: 13, fontFamily: 'inherit', outline: 'none' }} />
           <select value={form.categoria} onChange={e => setForm({...form, categoria: e.target.value})}
-            style={{ flex: 1, minWidth: 150, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none', background: 'white' }}>
+            style={{ flex: 1, minWidth: 150, border: '1px solid #e8ecf0', borderRadius: 10, padding: '9px 14px', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: 'white' }}>
             {categorias.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
@@ -172,13 +173,13 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
             fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6 }} />
         <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
           <button onClick={handleSave} disabled={saving || !form.titulo.trim() || !form.contenido.trim()}
-            style={{ background: saving ? '#94a3b8' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '9px 20px',
-              fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
-            {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Guardar documento'}
+            style={{ background: saving ? '#94a3b8' : C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '9px 20px',
+              fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', transition: 'all 0.15s' }}>
+            {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Guardar'}
           </button>
           <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
-            style={{ background: uploading ? '#94a3b8' : '#f1f5f9', color: uploading ? 'white' : C.accent, border: `1px solid ${C.accent}33`, borderRadius: 8, padding: '9px 20px',
-              fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+            style={{ background: uploading ? '#94a3b8' : 'white', color: uploading ? 'white' : '#64748b', border: '1px solid #e8ecf0', borderRadius: 10, padding: '9px 20px',
+              fontSize: 13, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer', transition: 'all 0.15s' }}>
             {uploading ? 'Subiendo...' : 'Subir archivo'}
           </button>
           <input ref={fileInputRef} type="file" accept=".md,.txt,.text,.pdf,.docx,.xlsx,.xls,.pptx" onChange={handleFileUpload} style={{ display: 'none' }} />
@@ -200,31 +201,35 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
         </div>
       )}
       {Object.entries(grouped).map(([cat, catDocs]) => (
-        <div key={cat} style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{cat} ({catDocs.length})</div>
+        <div key={cat} style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div style={{ width: 3, height: 14, background: C.accent, borderRadius: 2 }} />
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{cat}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', background: '#f1f5f9', padding: '2px 8px', borderRadius: 100 }}>{catDocs.length}</span>
+          </div>
           {catDocs.map(d => (
-            <div key={d.id} style={{ background: C.card, borderRadius: 10, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{d.titulo}</div>
-                  <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>{(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}</div>
-                  <div style={{ fontSize: 13, color: C.muted, marginTop: 6, lineHeight: 1.5, maxHeight: 60, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {d.contenido?.slice(0, 200)}{d.contenido?.length > 200 ? '...' : ''}
+            <div key={d.id} style={{ background: 'white', borderRadius: 14, padding: '16px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#2B2926' }}>{d.titulo}</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 3 }}>{(d.contenido?.length || 0).toLocaleString()} caracteres · {d.updated_at ? new Date(d.updated_at).toLocaleDateString('es-CO') : 'recién creado'}</div>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 8, lineHeight: 1.5, maxHeight: 50, overflow: 'hidden' }}>
+                    {d.contenido?.slice(0, 180)}{d.contenido?.length > 180 ? '...' : ''}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                   {d.file_url && (
                     <a href={d.file_url} target="_blank" rel="noopener"
-                      style={{ background: '#f0fdf4', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: C.green, textDecoration: 'none', display: 'inline-block' }}>
+                      style={{ background: '#ecfdf5', border: '1px solid #a7f3d020', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 600, color: '#059669', textDecoration: 'none' }}>
                       Archivo
                     </a>
                   )}
                   <button onClick={() => { setEditing(d.id); setForm({ titulo: d.titulo, categoria: d.categoria, contenido: d.contenido }); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                    style={{ background: '#f1f5f9', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: C.accent }}>
+                    style={{ background: 'white', border: '1px solid #e8ecf0', borderRadius: 8, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 600, color: '#1565C0', transition: 'all 0.15s' }}>
                     Editar
                   </button>
                   <button onClick={() => handleDelete(d.id)}
-                    style={{ background: '#fef2f2', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: C.red }}>
+                    style={{ background: '#fff1f2', border: '1px solid #fecaca20', borderRadius: 8, padding: '7px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 600, color: '#dc2626', transition: 'all 0.15s' }}>
                     Eliminar
                   </button>
                 </div>
