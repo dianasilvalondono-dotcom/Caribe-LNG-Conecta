@@ -178,13 +178,13 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       ) : (
         <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
           {localNotas
-            ? <div style={{ fontSize: 14, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>⚠️ {localNotas}</div>
+            ? <div style={{ fontSize: 14, color: C.orange, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{localNotas}</div>
             : isAdmin && <div style={{ fontSize: 13, color: C.subtle, fontStyle: 'italic', flex: 1 }}>Sin nota de seguimiento</div>
           }
           {isAdmin && (
             <button onClick={() => setEditingNotas(true)}
               style={{ background: 'none', border: 'none', color: C.muted, fontSize: 13, cursor: 'pointer', padding: '2px 6px', borderRadius: 6, flexShrink: 0 }}>
-              ✏️
+              
             </button>
           )}
         </div>
@@ -220,7 +220,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
                 </div>
                 <button onClick={() => handleBorrar(h)}
                   style={{ background: 'none', border: 'none', color: C.red, fontSize: 16, cursor: 'pointer', padding: '0 4px', flexShrink: 0, visibility: isAdmin ? 'visible' : 'hidden' }}
-                  title="Borrar esta actividad">🗑</button>
+                  title="Borrar esta actividad">✕</button>
               </div>
             ))
           }
@@ -669,17 +669,17 @@ export default function App() {
                     .forEach(a => results.push({ icon: '👤', label: a.nombre, sub: `${a.tipo} · ${a.territorio}`, action: () => { setSelectedActor(a); setView('actores') } }))
                   // Registros diarios
                   registrosDiarios.filter(r => r.descripcion?.toLowerCase().includes(q) || r.lugar?.toLowerCase().includes(q) || r.tipo_reunion?.toLowerCase().includes(q)).slice(0, 3)
-                    .forEach(r => results.push({ icon: '📝', label: r.descripcion?.substring(0, 50), sub: `${r.tipo_reunion} · ${r.fecha}`, action: () => { setView('input'); setInputSubTab('diario') } }))
+                    .forEach(r => results.push({ icon: '', label: r.descripcion?.substring(0, 50), sub: `${r.tipo_reunion} · ${r.fecha}`, action: () => { setView('input'); setInputSubTab('diario') } }))
                   // Acuerdos
                   agreements.filter(a => a.nombre?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(a => results.push({ icon: '🤝', label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('acuerdos') }))
+                    .forEach(a => results.push({ icon: '', label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('acuerdos') }))
                   // Riesgos
                   riesgos.filter(r => r.riesgo?.toLowerCase().includes(q) || r.accion_inmediata?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(r => results.push({ icon: '⚠️', label: r.riesgo?.substring(0, 50), sub: r.semaforo, action: () => setView('riesgos') }))
+                    .forEach(r => results.push({ icon: '', label: r.riesgo?.substring(0, 50), sub: r.semaforo, action: () => setView('riesgos') }))
                   // Seguimiento
                   seguimiento.filter(s => s.compromiso?.toLowerCase().includes(q) || s.actividad?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(s => results.push({ icon: '📋', label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('acuerdos') }))
-                  if (!results.length) results.push({ icon: '🔍', label: 'Sin resultados', sub: '', action: () => {} })
+                    .forEach(s => results.push({ icon: '', label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('acuerdos') }))
+                  if (!results.length) results.push({ icon: '', label: 'Sin resultados', sub: '', action: () => {} })
                   return (
                     <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#1a2744',
                       borderRadius: 10, padding: 6, zIndex: 300, minWidth: 300, maxHeight: 350, overflowY: 'auto',
@@ -1147,7 +1147,7 @@ export default function App() {
                                 </select>
                                 {isAdmin && (
                                   <button onClick={async () => { if (confirm('¿Borrar este evento del cronograma?')) { await deleteCronogramaEvent(ev.id); loadData() } }}
-                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: C.red, padding: '0 2px' }}>🗑</button>
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: C.red, padding: '0 2px' }}>✕</button>
                                 )}
                               </div>
                             </div>
@@ -1339,7 +1339,7 @@ export default function App() {
                     const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
                     if (admins?.length) {
                       sendPushNotification({
-                        title: `📝 Registro — ${territorio}`,
+                        title: `Registro — ${territorio}`,
                         body: `${tipoReunion}: ${descripcion.trim().substring(0, 80)}`,
                         user_ids: admins.map(a => a.id)
                       }).catch(() => {})
@@ -1354,7 +1354,7 @@ export default function App() {
 
                 if (saved) return (
                   <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: "#dcfce7", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#10b981" }}>✓</div>
                     <div style={{ fontSize: 18, fontWeight: 800, color: C.green }}>Registro guardado</div>
                     <div style={{ fontSize: 14, color: C.muted, marginTop: 6 }}>Con trazabilidad completa</div>
                   </div>
@@ -1452,7 +1452,7 @@ export default function App() {
                               </div>
                               <div style={{ fontSize: 13, color: C.text, marginBottom: 3, lineHeight: 1.4 }}>{r.descripcion}</div>
                               <div style={{ fontSize: 11, color: C.subtle }}>
-                                📅 {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
                                 {r.lugar && <span> · · {r.lugar}</span>}
                                 {r.geo_lugar && !r.lugar && <span> · · {r.geo_lugar}</span>}
                               </div>
@@ -1791,7 +1791,7 @@ export default function App() {
                       <div style={{ fontSize: 12, color: C.subtle }}>{item.dateStr}</div>
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: item.diff <= 7 ? C.red : C.orange, textAlign: 'right', minWidth: 60 }}>
-                      {item.diff === 0 ? '¡Hoy! 🎉' : `En ${item.diff}d`}
+                      {item.diff === 0 ? '¡Hoy! ' : `En ${item.diff}d`}
                     </div>
                   </div>
                 ))
@@ -1801,7 +1801,7 @@ export default function App() {
             <div onClick={() => setShowEvidenciaCapture(true)}
               style={{ background: C.navy, borderRadius: 12, padding: '16px 20px', marginBottom: 12,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-              <span style={{ fontSize: 28 }}>📸</span>
+              <span style={{ fontSize: 28 }}></span>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: 'white' }}>Capturar Evidencia</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Foto con geolocalización y hora exacta</div>
@@ -1923,18 +1923,18 @@ export default function App() {
                                 <span style={{ color: C.muted }}>{geo.lat.toFixed(6)}, {geo.lng.toFixed(6)}</span>
                               </div>
                               <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
-                                <span style={{ fontWeight: 700, color: C.text }}>🎯 Precisión:</span>
+                                <span style={{ fontWeight: 700, color: C.text }}>Precisión:</span>
                                 <span style={{ color: geo.accuracy > 50 ? C.orange : C.green, fontWeight: 600 }}>
                                   ±{Math.round(geo.accuracy)}m {geo.accuracy > 50 ? '(baja)' : '(buena)'}
                                 </span>
                               </div>
                               <div style={{ display: 'flex', gap: 8 }}>
                                 <span style={{ fontWeight: 700, color: C.text }}>· Lugar:</span>
-                                <span style={{ color: C.muted }}>{lugar || '⏳ Resolviendo...'}</span>
+                                <span style={{ color: C.muted }}>{lugar || 'Resolviendo...'}</span>
                               </div>
                             </>
                           ) : geoError ? (
-                            <div style={{ color: C.red, fontWeight: 600 }}>⚠️ {geoError}</div>
+                            <div style={{ color: C.red, fontWeight: 600 }}>{geoError}</div>
                           ) : (
                             <div style={{ color: C.accent }}>📡 Obteniendo ubicación...</div>
                           )}
@@ -2044,7 +2044,7 @@ export default function App() {
                 <div key={log.id} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: log.accion === 'insert' ? C.green : log.accion === 'delete' ? C.red : C.accent }}>
-                      {log.accion === 'insert' ? '➕ Creado' : log.accion === 'delete' ? '🗑️ Eliminado' : '✏️ Editado'}
+                      {log.accion === 'insert' ? '➕ Creado' : log.accion === 'delete' ? '🗑️ Eliminado' : ' Editado'}
                     </span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{actorName}</span>
                     <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>

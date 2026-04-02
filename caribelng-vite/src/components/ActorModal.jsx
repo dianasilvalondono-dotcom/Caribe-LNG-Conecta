@@ -245,17 +245,17 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
               Detalles que fortalecen la relación
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-              <Field label="🎂 Fecha de cumpleaños" value={cumple} onChange={setCumple} type="date" />
-              <Field label="💍 Cónyuge / pareja" value={conyuge} onChange={setConyuge} placeholder="Nombre" />
+              <Field label="Fecha de cumpleaños" value={cumple} onChange={setCumple} type="date" />
+              <Field label="Cónyuge / pareja" value={conyuge} onChange={setConyuge} placeholder="Nombre" />
             </div>
             <div style={{ marginBottom: 10 }}>
-              <Field label="👨‍👩‍👧 Hijos" value={hijos} onChange={setHijos} placeholder="Ej: Ana (12), Pedro (8)" />
+              <Field label="Hijos" value={hijos} onChange={setHijos} placeholder="Ej: Ana (12), Pedro (8)" />
             </div>
             <div style={{ marginBottom: 10 }}>
-              <Field label="🎯 Intereses y hobbies" value={hobbies} onChange={setHobbies} placeholder="Ej: fútbol, pesca, música vallenata..." />
+              <Field label="Intereses y hobbies" value={hobbies} onChange={setHobbies} placeholder="Ej: fútbol, pesca, música vallenata..." />
             </div>
             <div style={{ marginBottom: 10 }}>
-              <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 6 }}>📅 Fechas importantes</label>
+              <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 6 }}>Fechas importantes</label>
               {/* Existing dates list */}
               {fechasImp.length > 0 && (
                 <div style={{ marginBottom: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -287,7 +287,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
               <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>La fecha se usa para el recordatorio anual en "Mi Territorio"</div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 4 }}>🌟 Notas personales</label>
+              <label style={{ fontSize: 13, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 4 }}>Notas personales</label>
               <textarea value={notasPer} onChange={e => setNotasPer(e.target.value)}
                 placeholder="Lo que hay que recordar: gustos, tensiones, contexto familiar, temas sensibles..."
                 style={{ width: '100%', border: `1px solid #e2e8f0`, borderRadius: 8, padding: '8px 10px', fontSize: 13,
@@ -315,7 +315,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                 <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#92400e' }}>
                   {isAdmin
                     ? '⚡ Como admin, tus cambios se aplican directamente.'
-                    : '📋 Tus cambios quedarán pendientes hasta que la directora DAC los apruebe.'}
+                    : 'Tus cambios quedarán pendientes hasta que la directora DAC los apruebe.'}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                   <div style={{ gridColumn: '1 / -1' }}>

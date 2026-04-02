@@ -151,13 +151,13 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>🧠 Base de Conocimiento</h1>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Conocimiento</h1>
         <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 14 }}>Documentos y contexto que el asistente IA usa para responder preguntas. Total: {docs.length} docs · ~{Math.round(docs.reduce((s,d) => s + (d.contenido?.length || 0), 0) / 1000)}K caracteres</p>
       </div>
 
       {/* Add/Edit form */}
       <div style={{ background: C.card, borderRadius: 12, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 20, borderLeft: `4px solid ${C.accent}` }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: C.accent, marginBottom: 12 }}>{editing ? '✏️ Editar documento' : '+ Agregar documento'}</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: C.accent, marginBottom: 12 }}>{editing ? 'Editar documento' : '+ Agregar documento'}</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
           <input value={form.titulo} onChange={e => setForm({...form, titulo: e.target.value})} placeholder="Título del documento"
             style={{ flex: 2, minWidth: 200, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
@@ -179,7 +179,7 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
           <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
             style={{ background: uploading ? '#94a3b8' : '#f1f5f9', color: uploading ? 'white' : C.accent, border: `1px solid ${C.accent}33`, borderRadius: 8, padding: '9px 20px',
               fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-            {uploading ? 'Subiendo...' : '📄 Subir archivo'}
+            {uploading ? 'Subiendo...' : 'Subir archivo'}
           </button>
           <input ref={fileInputRef} type="file" accept=".md,.txt,.text,.pdf,.docx,.xlsx,.xls,.pptx" onChange={handleFileUpload} style={{ display: 'none' }} />
           {editing && (
@@ -194,7 +194,7 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
       {/* Documents list by category */}
       {Object.keys(grouped).length === 0 && (
         <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>
-          <div style={{ fontSize: 40, marginBottom: 10 }}>🧠</div>
+          <div style={{ width: 48, height: 48, borderRadius: 14, background: "#e0e7ff", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: "#4f46e5" }}>K</div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>No hay documentos aún</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Agrega documentos, políticas o procedimientos para que el asistente IA pueda responder preguntas sobre ellos.</div>
         </div>

@@ -114,7 +114,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
       if (admins?.length) {
         sendPushNotification({
-          title: `🚨 Alerta ${alertaUrgencia} — ${myTerr}`,
+          title: `Alerta ${alertaUrgencia} — ${myTerr}`,
           body: `${profile?.full_name || 'Gestora'}: ${alertaMensaje.substring(0, 100)}`,
           user_ids: admins.map(a => a.id)
         }).catch(() => {})
@@ -314,7 +314,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
                       background: alertaUrgencia === u ? (u === 'Alta' ? '#fee2e2' : u === 'Media' ? '#fff7ed' : '#fefce8') : 'white',
                       color: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : C.muted,
                       fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                    {u === 'Alta' ? '🔴' : u === 'Media' ? '🟠' : '🟡'} {u}
+                    {u === 'Alta' ? '●' : u === 'Media' ? '●' : '●'} {u}
                   </button>
                 ))}
               </div>
@@ -368,7 +368,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
                     {(isAdmin || profile?.role === 'gestora') && (
                       <button onClick={async () => { if (confirm('¿Borrar este reporte?')) { await deleteReporteSemanal(r.id); onSaved() } }}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
-                        title="Borrar">🗑</button>
+                        title="Borrar">✕</button>
                     )}
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: semaforo }} />
                   </div>

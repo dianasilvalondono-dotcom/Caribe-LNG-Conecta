@@ -102,7 +102,7 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
             </div>
             <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: C.red, fontWeight: 700 }}><span style={{ width: 7, height: 7, borderRadius: '50%', background: C.red, display: 'inline-block' }} />{legAlto.length}</span>
-              <span style={{ color: C.orange, fontWeight: 700 }}>🟠 {legMedio.length}</span>
+              <span style={{ color: C.orange, fontWeight: 700 }}>{legMedio.length}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: C.green, fontWeight: 700 }}><span style={{ width: 7, height: 7, borderRadius: '50%', background: C.green, display: 'inline-block' }} />{legBajo.length}</span>
             </div>
           </div>}
@@ -199,7 +199,7 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
                           {isAdmin && (
                             <button onClick={async (e) => { e.stopPropagation(); if (confirm('¿Borrar este riesgo?')) { await deleteRiesgo(r.id); onDeleted() } }}
                               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
-                              title="Borrar">🗑</button>
+                              title="Borrar">✕</button>
                           )}
                         </div>
                       </div>
@@ -412,7 +412,7 @@ function AgendaGubernamental({ cronoLeg, isAdmin, onReloaded, getNivelColor, isM
                   {isAdmin && (
                     <button onClick={() => handleDelete(ev.id)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.muted, fontSize: 16, padding: '2px 4px', flexShrink: 0, lineHeight: 1 }}
-                      title="Eliminar">🗑</button>
+                      title="Eliminar">✕</button>
                   )}
                 </div>
                 {ev.impacto && <div style={{ fontSize: 13, color: '#9a3412', background: '#fff7ed', padding: '5px 8px', borderRadius: 6, marginBottom: 4, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>Impacto: </span>{ev.impacto}</div>}

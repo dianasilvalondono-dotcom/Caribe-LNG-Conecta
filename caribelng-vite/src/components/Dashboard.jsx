@@ -106,8 +106,8 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
   const compromisosProximos = compromisosPendientes.filter(s => { const d = new Date(s.fecha_pactada); const diff = (d - today) / 86400000; return diff >= 0 && diff <= 7 }).sort((a, b) => new Date(a.fecha_pactada) - new Date(b.fecha_pactada))
 
   const recentActivity = [
-    ...seguimiento.slice().sort((a, b) => new Date(b.created_at || b.fecha_pactada) - new Date(a.created_at || a.fecha_pactada)).slice(0, 3).map(s => ({ icon: '📋', text: `Acuerdo <span style="color:#1565C0;font-weight:700">${s.acuerdo || ''}</span> — ${(s.compromiso || '').substring(0, 45)}`, time: s.fecha_pactada || '' })),
-    ...reportes.slice().sort((a, b) => (b.semana || '').localeCompare(a.semana || '')).slice(0, 2).map(r => ({ icon: '📊', text: `Reporte semanal <span style="color:#1565C0;font-weight:700">${r.territorio}</span> — Sem. ${r.semana}`, time: r.semana || '' })),
+    ...seguimiento.slice().sort((a, b) => new Date(b.created_at || b.fecha_pactada) - new Date(a.created_at || a.fecha_pactada)).slice(0, 3).map(s => ({ icon: '', text: `Acuerdo <span style="color:#1565C0;font-weight:700">${s.acuerdo || ''}</span> — ${(s.compromiso || '').substring(0, 45)}`, time: s.fecha_pactada || '' })),
+    ...reportes.slice().sort((a, b) => (b.semana || '').localeCompare(a.semana || '')).slice(0, 2).map(r => ({ icon: '', text: `Reporte semanal <span style="color:#1565C0;font-weight:700">${r.territorio}</span> — Sem. ${r.semana}`, time: r.semana || '' })),
   ].slice(0, 5)
 
   const ownerMap = {}
@@ -162,8 +162,8 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <button onClick={() => window.print()} style={{ background: C_navy, color: 'white', border: 'none', borderRadius: 10, padding: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>📄 PDF</button>
-        <button onClick={() => exportToExcel(actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo })), 'Actores_CaribeLNG', 'Actores')} style={{ background: '#f1f5f9', color: C_navy, border: '1px solid #e2e8f0', borderRadius: 10, padding: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>📥 Excel</button>
+        <button onClick={() => window.print()} style={{ background: C_navy, color: 'white', border: 'none', borderRadius: 10, padding: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>PDF</button>
+        <button onClick={() => exportToExcel(actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo })), 'Actores_CaribeLNG', 'Actores')} style={{ background: '#f1f5f9', color: C_navy, border: '1px solid #e2e8f0', borderRadius: 10, padding: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Excel</button>
       </div>
     </div>
   )
@@ -188,8 +188,8 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
             <button onClick={() => { setFilterT && setFilterT('Barbosa'); setView('actores') }} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)', padding: '7px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>🏭 Barbosa</button>
             <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)' }} />
             <button onClick={() => window.print()} style={{ background: 'linear-gradient(135deg,#00b4d8,#0096c7)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,180,216,0.4)' }}>⬇️ Exportar PDF</button>
-            <button onClick={() => exportToExcel(actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Riesgo: a.riesgo })), 'Actores_CaribeLNG', 'Actores')} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>📥 Excel</button>
-            <button onClick={async () => { if (!('Notification' in window)) return; const p = await Notification.requestPermission(); if (p === 'granted') { await subscribeToPush(session.user.id); new Notification('Caribe LNG Conecta', { body: '¡Notificaciones activadas!' }) } }} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', padding: '8px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>🔔</button>
+            <button onClick={() => exportToExcel(actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Riesgo: a.riesgo })), 'Actores_CaribeLNG', 'Actores')} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Excel</button>
+            <button onClick={async () => { if (!('Notification' in window)) return; const p = await Notification.requestPermission(); if (p === 'granted') { await subscribeToPush(session.user.id); new Notification('Caribe LNG Conecta', { body: '¡Notificaciones activadas!' }) } }} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', padding: '8px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}></button>
           </div>
         </div>
       </div>
@@ -225,7 +225,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           <section style={card}>
             <STitle label="Riesgos en acción inmediata" color="#ef4444" action={() => setView('riesgos')} actionLabel="Ver mapa completo →" />
             {riesgos.slice(0, 6).map((r, i) => <RiesgoRow key={r.id || i} riesgo={r} onClick={() => setView('riesgos')} />)}
-            {riesgos.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>✅ Sin riesgos activos registrados</div>}
+            {riesgos.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>Sin riesgos activos registrados</div>}
           </section>
 
           {/* Charts */}
@@ -276,7 +276,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   </div>
                 </div>
               ))}
-              {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').length === 0 && <div style={{ padding: 16, color: '#94a3b8', fontSize: 13 }}>✅ Sin actores prioritarios en semáforo rojo</div>}
+              {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').length === 0 && <div style={{ padding: 16, color: '#94a3b8', fontSize: 13 }}>Sin actores prioritarios en semáforo rojo</div>}
             </div>
           </section>
 
@@ -308,7 +308,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
             <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <TerritoryBar label="Tolú" icon="⚓" count={stats.tolu} total={stats.total} color={`linear-gradient(90deg,${C_tolu},#00b4d8)`} desc="Terminal marítima + Sucre" onClick={() => { setView('actores'); setFilterT('Tolú') }} />
               <TerritoryBar label="Barbosa" icon="🏭" count={stats.barbosa} total={stats.total} color="linear-gradient(90deg,#7c3aed,#a855f7)" desc="Planta regasificadora" onClick={() => { setView('actores'); setFilterT('Barbosa') }} />
-              <TerritoryBar label="Nacional" icon="🏛️" count={stats.nacional} total={stats.total} color={`linear-gradient(90deg,${C_muted},#94a3b8)`} desc="Legislativo + Regulatorio" onClick={() => { setView('actores'); setFilterT('Nacional') }} />
+              <TerritoryBar label="Nacional" icon="" count={stats.nacional} total={stats.total} color={`linear-gradient(90deg,${C_muted},#94a3b8)`} desc="Legislativo + Regulatorio" onClick={() => { setView('actores'); setFilterT('Nacional') }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: C_navy }}>{stats.total}</div>
@@ -403,7 +403,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           {/* Novedades */}
           <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
             <div style={{ background: C_navy, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 15 }}>🔔</span>
+              <span style={{ fontSize: 15 }}></span>
               <span style={{ fontSize: 12, fontWeight: 800, color: 'white', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Alertas & Novedades</span>
             </div>
             <div style={{ padding: 12 }}>
@@ -412,12 +412,12 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                 const ultimosReportes = {}
                 reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
                 Object.values(ultimosReportes).forEach(r => {
-                  if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} quejas sin resolver`, color: '#f97316', nav: () => setView('input') })
-                  if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: '#ef4444', nav: () => setView('input') })
+                  if (r.pqrs_pendientes > 0) alertas.push({ icon: '', text: `${r.territorio}: ${r.pqrs_pendientes} quejas sin resolver`, color: '#f97316', nav: () => setView('input') })
+                  if (r.incidentes > 0) alertas.push({ icon: '', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: '#ef4444', nav: () => setView('input') })
                 })
-                compromisosVencidos.slice(0, 3).forEach(s => alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 40)}`, color: '#ef4444', nav: () => setView('acuerdos') }))
-                cronograma.filter(c => c.estado === 'En proceso').slice(0, 3).forEach(c => alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 48)}`, color: C_navy, nav: () => setView('cronograma') }))
-                if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en acción inmediata`, color: '#ef4444', nav: () => setView('riesgos') })
+                compromisosVencidos.slice(0, 3).forEach(s => alertas.push({ icon: '', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 40)}`, color: '#ef4444', nav: () => setView('acuerdos') }))
+                cronograma.filter(c => c.estado === 'En proceso').slice(0, 3).forEach(c => alertas.push({ icon: '', text: `${c.territorio}: ${(c.evento || '').substring(0, 48)}`, color: C_navy, nav: () => setView('cronograma') }))
+                if (riesgosAltos.length > 0) alertas.push({ icon: '', text: `${riesgosAltos.length} riesgo(s) en acción inmediata`, color: '#ef4444', nav: () => setView('riesgos') })
                 if (!alertas.length) return <div style={{ padding: '20px 8px', textAlign: 'center', color: '#94a3b8', fontSize: 13 }}><div style={{ fontSize: 24, marginBottom: 6 }}>✅</div>Sin novedades por ahora</div>
                 return alertas.slice(0, 8).map((a, i) => (
                   <div key={i} onClick={a.nav} style={{ display: 'flex', gap: 8, padding: '9px 10px', marginBottom: 5, borderRadius: 8, cursor: 'pointer', borderLeft: `3px solid ${a.color}`, background: a.color === '#ef4444' ? '#fef2f2' : a.color === '#f97316' ? '#fff7ed' : '#eff6ff' }}>
@@ -433,7 +433,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           {isAdmin && actorEdits.length > 0 && (
             <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
               <div style={{ background: '#f59e0b', padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span>✏️</span>
+                <span></span>
                 <span style={{ fontSize: 12, fontWeight: 800, color: 'white', textTransform: 'uppercase' }}>Ediciones Pendientes</span>
                 <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.3)', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 800, color: 'white' }}>{actorEdits.length}</span>
               </div>
@@ -445,8 +445,8 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                       <div style={{ fontSize: 13, fontWeight: 700, color: C_text }}>{actorName}</div>
                       <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 6 }}>Por: {edit.user_name} · {new Date(edit.created_at).toLocaleDateString('es-CO')}</div>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        <button onClick={async () => { await approveActorEdit(edit.id, edit.actor_id, edit.campos, session.user.id); sendPushNotification({ title: 'Edición aprobada', body: `Tu edición de ${actorName} fue aprobada`, user_ids: [edit.user_id] }).catch(() => {}); await loadData() }} style={{ flex: 1, background: '#10b981', color: 'white', border: 'none', borderRadius: 6, padding: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>✅ Aprobar</button>
-                        <button onClick={async () => { await rejectActorEdit(edit.id, session.user.id); sendPushNotification({ title: 'Edición rechazada', body: `Tu edición de ${actorName} fue rechazada`, user_ids: [edit.user_id] }).catch(() => {}); await loadData() }} style={{ flex: 1, background: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: 6, padding: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>❌ Rechazar</button>
+                        <button onClick={async () => { await approveActorEdit(edit.id, edit.actor_id, edit.campos, session.user.id); sendPushNotification({ title: 'Edición aprobada', body: `Tu edición de ${actorName} fue aprobada`, user_ids: [edit.user_id] }).catch(() => {}); await loadData() }} style={{ flex: 1, background: '#10b981', color: 'white', border: 'none', borderRadius: 6, padding: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Aprobar</button>
+                        <button onClick={async () => { await rejectActorEdit(edit.id, session.user.id); sendPushNotification({ title: 'Edición rechazada', body: `Tu edición de ${actorName} fue rechazada`, user_ids: [edit.user_id] }).catch(() => {}); await loadData() }} style={{ flex: 1, background: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: 6, padding: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Rechazar</button>
                       </div>
                     </div>
                   )
