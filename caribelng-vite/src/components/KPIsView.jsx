@@ -458,21 +458,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
       {/* ── Gestoras tab ── */}
       {mainTab === 'gestoras' && (
         <div>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-            {[
-              { id: 'Todos', color: C.navy },
-              { id: 'Tolú', color: C.tolu },
-              { id: 'Barbosa', color: C.barbosa },
-            ].map(t => (
-              <button key={t.id} onClick={() => setTerrFilter(t.id)}
-                style={{ background: terrFilter === t.id ? t.color : 'white', color: terrFilter === t.id ? 'white' : '#64748b',
-                  border: `1px solid ${terrFilter === t.id ? t.color : '#e8ecf0'}`, borderRadius: 10, padding: '8px 18px', fontSize: 12, cursor: 'pointer', fontWeight: 700, transition: 'all 0.15s', letterSpacing: '0.3px' }}>
-                {t.id}
-              </button>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
+            <div>{renderTerritory('Tolú', KPIS_TOLU)}</div>
+            <div>{renderTerritory('Barbosa', KPIS_BARBOSA)}</div>
           </div>
-          {(terrFilter === 'Todos' || terrFilter === 'Barbosa') && renderTerritory('Barbosa', KPIS_BARBOSA)}
-          {(terrFilter === 'Todos' || terrFilter === 'Tolú') && renderTerritory('Tolú', KPIS_TOLU)}
           {totalReportes === 0 && (
             <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>
               <div style={{ fontSize: 14, marginBottom: 6 }}>No hay reportes semanales aún</div>
