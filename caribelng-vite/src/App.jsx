@@ -12,7 +12,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
-         addRegistroDiario, getRegistrosDiarios } from './lib/supabase'
+         addRegistroDiario, getRegistrosDiarios,
+         getAuditLog } from './lib/supabase'
 
 // ── Export helper ────────────────────────────────────────────────────────────
 function exportToExcel(data, filename, sheetName = 'Datos') {
@@ -326,6 +327,8 @@ export default function App() {
   const [registrosDiarios, setRegistrosDiarios] = useState([])
   const [inputSubTab, setInputSubTab] = useState('diario')
   const [showGuia, setShowGuia] = useState(false)
+  const [auditLog, setAuditLog] = useState([])
+  const [showAudit, setShowAudit] = useState(false)
   const [globalSearch, setGlobalSearch] = useState('')
   const [showGlobalSearch, setShowGlobalSearch] = useState(false)
 
@@ -913,6 +916,15 @@ export default function App() {
                     })}
                   </div>
                 </div>
+              )}
+              {/* Audit log button */}
+              {isAdmin && (
+                <button onClick={async () => { setAuditLog(await getAuditLog(30)); setShowAudit(true) }}
+                  style={{ width: '100%', marginTop: 12, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 10,
+                    padding: '10px 14px', fontSize: 13, fontWeight: 700, color: C.muted, cursor: 'pointer', textAlign: 'left',
+                    display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>📜</span> Ver historial de cambios
+                </button>
               )}
             </div>}
             </div>
@@ -2161,6 +2173,58 @@ export default function App() {
           <div style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>Diana Silva</div>
         </div>
       </div>
+
+      {/* ── Audit Log Modal ── */}
+      {showAudit && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowAudit(false) }}>
+          <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 600,
+            maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>📜 Historial de Cambios</h3>
+              <button onClick={() => setShowAudit(false)}
+                style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+            </div>
+            {auditLog.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 30, color: C.subtle }}>Sin cambios registrados</div>
+            ) : auditLog.map(log => {
+              const actorName = log.accion === 'delete'
+                ? log.cambios?.nombre || `#${log.registro_id}`
+                : (log.cambios?.despues?.nombre || actors.find(a => a.id === log.registro_id)?.nombre || `#${log.registro_id}`)
+              const changedFields = log.accion === 'update' && log.cambios?.antes && log.cambios?.despues
+                ? Object.keys(log.cambios.despues).filter(k => JSON.stringify(log.cambios.antes[k]) !== JSON.stringify(log.cambios.despues[k]) && k !== 'updated_at')
+                : []
+              return (
+                <div key={log.id} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: log.accion === 'insert' ? C.green : log.accion === 'delete' ? C.red : C.accent }}>
+                      {log.accion === 'insert' ? '➕ Creado' : log.accion === 'delete' ? '🗑️ Eliminado' : '✏️ Editado'}
+                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{actorName}</span>
+                    <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>
+                      {new Date(log.created_at).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {changedFields.length > 0 && (
+                    <div style={{ fontSize: 12, color: C.muted, paddingLeft: 8 }}>
+                      {changedFields.slice(0, 5).map(k => (
+                        <div key={k} style={{ marginBottom: 2 }}>
+                          <span style={{ fontWeight: 700 }}>{k}:</span>{' '}
+                          <span style={{ color: C.subtle, textDecoration: 'line-through' }}>{String(log.cambios.antes[k] ?? '')}</span>
+                          {' → '}
+                          <span style={{ color: C.accent, fontWeight: 600 }}>{String(log.cambios.despues[k] ?? '')}</span>
+                        </div>
+                      ))}
+                      {changedFields.length > 5 && <div style={{ color: C.subtle }}>+{changedFields.length - 5} campos más</div>}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {selectedActor && (
         <ActorModal actor={selectedActor} session={session} isAdmin={isAdmin} profile={profile}

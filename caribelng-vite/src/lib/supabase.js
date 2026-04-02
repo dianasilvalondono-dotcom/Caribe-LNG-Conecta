@@ -406,6 +406,17 @@ export async function getEvidencias(territorio) {
   return data || []
 }
 
+// ── Audit Log ────────────────────────────────────────────────────────────────
+
+export async function getAuditLog(limit = 50) {
+  const { data } = await supabase
+    .from('audit_log')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  return data || []
+}
+
 // ── Alertas ───────────────────────────────────────────────────────────────────
 
 export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
