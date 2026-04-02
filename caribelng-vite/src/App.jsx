@@ -1576,6 +1576,15 @@ export default function App() {
                     })
                     await loadData()
                     setSaved(true)
+                    // Notificar a admins
+                    const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+                    if (admins?.length) {
+                      sendPushNotification({
+                        title: `📝 Registro — ${territorio}`,
+                        body: `${tipoReunion}: ${descripcion.trim().substring(0, 80)}`,
+                        user_ids: admins.map(a => a.id)
+                      }).catch(() => {})
+                    }
                     setTimeout(() => {
                       setSaved(false)
                       setDescripcion(''); setLugarR(''); setAsistentes(''); setFile(null); setPreview(null); setGeo(null); setGeoLugar(null)

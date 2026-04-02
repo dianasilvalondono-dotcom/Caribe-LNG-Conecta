@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { C } from '../lib/constants'
 import { Field } from './ui'
-import { addReporteSemanal, deleteReporteSemanal, sendAlerta } from '../lib/supabase'
+import { supabase, addReporteSemanal, deleteReporteSemanal, sendAlerta, sendPushNotification } from '../lib/supabase'
 
 export default function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
@@ -76,6 +76,15 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
       onSaved()
+      // Notificar a admins
+      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+      if (admins?.length) {
+        sendPushNotification({
+          title: `Reporte Semanal — ${myTerr} S${semana}`,
+          body: `${profile?.full_name || 'Gestora'} envió el reporte de la semana ${semana}`,
+          user_ids: admins.map(a => a.id)
+        }).catch(() => {})
+      }
     } finally { setSaving(false) }
   }
 
@@ -92,6 +101,15 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       setAlertaMensaje('')
       setAlertaEnviada(true)
       setTimeout(() => setAlertaEnviada(false), 4000)
+      // Notificar a admins
+      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+      if (admins?.length) {
+        sendPushNotification({
+          title: `🚨 Alerta ${alertaUrgencia} — ${myTerr}`,
+          body: `${profile?.full_name || 'Gestora'}: ${alertaMensaje.substring(0, 100)}`,
+          user_ids: admins.map(a => a.id)
+        }).catch(() => {})
+      }
     } catch(e) {
       alert('Error enviando alerta: ' + e.message)
     } finally { setSaving(false) }
