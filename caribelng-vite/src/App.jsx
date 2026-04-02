@@ -492,8 +492,8 @@ export default function App() {
     ]},
     { id: 'riesgos', label: 'Riesgos DAC', icon: <IconAlert size={16} /> },
     { id: 'gestion', label: 'Gestión', icon: <IconClipboard size={16} />, children: [
-      { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
       { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
+      { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
     ]},
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
   ]
@@ -1036,9 +1036,28 @@ export default function App() {
         {/* ━━ ACUERDOS ━━ */}
         {view === 'acuerdos' && (
           <div>
-            <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
-              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>6 acuerdos · 3 Barbosa · 3 Tolu · Co-responsabilidad comunitaria</p>
+            <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #007A87 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '24px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{agreements.filter(a => a.estado_code === 'cumplido').length} cumplidos de {agreements.length}</span>
+              </div>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Acuerdos Territoriales</h1>
+              <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Co-responsabilidad comunitaria · {agreements.filter(a => a.territorio === 'Tolú').length} Tolú · {agreements.filter(a => a.territorio === 'Barbosa').length} Barbosa</p>
+              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: 'white' }}>{agreements.length ? Math.round(agreements.reduce((s, a) => s + (a.avance || 0), 0) / agreements.length) : 0}%</div>
+                  <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Avance prom.</div>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#34d399' }}>{agreements.filter(a => a.estado_code === 'cumplido').length}</div>
+                  <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#fbbf24' }}>{seguimiento.filter(s => s.estado === 'Pendiente').length}</div>
+                  <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
+                </div>
+              </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
               {['Barbosa', 'Tolú'].map(t => (
@@ -1066,10 +1085,36 @@ export default function App() {
         {/* ━━ CRONOGRAMA ━━ */}
         {view === 'cronograma' && (
           <div>
-            <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Cronograma 2026</h1>
-              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Gestión Social Territorial · Nov 2025 – Dic 2026</p>
-            </div>
+            {(() => {
+              const cumplido = cronograma.filter(c => c.estado === 'Cumplido').length
+              const enProceso = cronograma.filter(c => c.estado === 'En proceso').length
+              const pendiente = cronograma.filter(c => c.estado === 'Pendiente').length
+              return (
+                <div style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #0D47A1 50%, #1565C0 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '24px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: enProceso > 0 ? '#fbbf24' : '#34d399' }} />
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{enProceso} en proceso</span>
+                  </div>
+                  <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Cronograma 2026</h1>
+                  <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Gestión Social Territorial · Nov 2025 – Dic 2026</p>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                    <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: '#34d399' }}>{cumplido}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: '#fbbf24' }}>{enProceso}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>En proceso</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>{pendiente}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {(() => {
                 const cumplido = cronograma.filter(c => c.estado === 'Cumplido').length
@@ -1185,9 +1230,14 @@ export default function App() {
           ]
           return (
             <div>
-              <div style={{ marginBottom: 20 }}>
-                <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Huella Social Territorial</h1>
-                <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Lo que Caribe LNG deja en cada territorio · Modelo de co-responsabilidad</p>
+              <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #00BFB3 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '24px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 pilares · 2 territorios</span>
+                </div>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Huella Social Territorial</h1>
+                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Lo que Caribe LNG deja en cada territorio · Modelo de co-responsabilidad</p>
               </div>
 
               {/* Pilares legend */}
@@ -1581,7 +1631,7 @@ export default function App() {
         {view === 'kpis' && (
           <KPIsView reportes={reportes} seguimiento={seguimiento}
             isAdmin={isAdmin} onDeleted={loadData} agreements={agreements}
-            kpisDac={kpisDac} onKpiDacSaved={loadData} />
+            kpisDac={kpisDac} onKpiDacSaved={loadData} actors={actors} />
         )}
 
         {view === 'riesgos' && (
@@ -2075,17 +2125,18 @@ export default function App() {
         )}
       </div>
 
-      <div style={{ padding: '30px 40px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <svg viewBox="0 0 863.64 794.92" width="36" height="36"><path fill="#1565c0" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#08306b" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>Caribe LNG <span style={{ fontFamily: "'Courgette', cursive", color: '#1565C0', fontWeight: 400 }}>¡Conecta!</span></div>
-            <div style={{ fontSize: 13, color: C.subtle }}>Plan de Gestion Social &mdash; 2026</div>
+      {/* Footer with waves */}
+      <div style={{ marginTop: 40 }}>
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ display: 'block', width: '100%', height: 60 }}>
+          <path d="M0,40 C320,100 520,0 720,50 C920,100 1140,20 1440,60 L1440,120 L0,120 Z" fill="#1565C0" opacity="0.3" />
+          <path d="M0,60 C280,10 480,90 740,40 C1000,-10 1200,80 1440,40 L1440,120 L0,120 Z" fill="#1565C0" opacity="0.5" />
+          <path d="M0,80 C360,40 540,100 780,60 C1020,20 1260,90 1440,50 L1440,120 L0,120 Z" fill="#0D47A1" />
+        </svg>
+        <div style={{ background: '#0D47A1', padding: '20px 40px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 28 }} />
           </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 13, color: C.subtle }}>Direccion de Asuntos Corporativos</div>
-          <div style={{ fontSize: 13, color: C.muted, fontWeight: 600 }}>Diana Silva</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
         </div>
       </div>
 
