@@ -178,19 +178,41 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
     const totalReportes = reportes.filter(r => r.territorio === territorio).length
     return (
       <div key={territorio} style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '14px 16px', background: `linear-gradient(135deg, ${color}10, ${color}05)`, borderRadius: 14, border: `1px solid ${color}20` }}>
-          <div style={{ width: 4, height: 32, background: color, borderRadius: 2 }} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#2B2926' }}>{territorio}</div>
-            <div style={{ fontSize: 11, color: '#94a3b8' }}>
-              {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'} · {totalReportes} reportes
+        {(() => {
+          const heroGrad = territorio === 'Tolú'
+            ? 'linear-gradient(135deg, #004d5a 0%, #007A87 40%, #0891b2 100%)'
+            : 'linear-gradient(135deg, #064e3b 0%, #059669 40%, #34d399 100%)'
+          const tActores = (actors || []).filter(a => a.territorio === territorio)
+          const tVerdes = tActores.filter(a => a.semaforo === 'verde').length
+          return (
+            <div style={{ background: heroGrad, borderRadius: 18, padding: '20px 20px', marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: 'white' }}>{territorio}</h2>
+              <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>
+                {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'}
+              </p>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                {[
+                  { label: 'Reportes', value: totalReportes },
+                  { label: 'Actores', value: tActores.length },
+                  { label: 'Estables', value: tVerdes, color: '#34d399' },
+                ].map(s => (
+                  <div key={s.label} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 12px', flex: 1, textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 900, color: s.color || 'white' }}>{s.value}</div>
+                    <div style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color }}>{totalReportes}</div>
-        </div>
+          )
+        })()}
         {kpis.map(cat => (
-          <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 10 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: color, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>{cat.cat}</div>
+          <div key={cat.cat} style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <div style={{ width: 3, height: 14, background: color, borderRadius: 2 }} />
+              <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.2px' }}>{cat.cat}</span>
+            </div>
             <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4,1fr) 60px 56px', gap: 4, marginBottom: 6, minWidth: 420 }}>
                 {['KPI','Q1','Q2','Q3','Q4','Total','Meta'].map(h => (
@@ -239,8 +261,12 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
           const avg = Math.round(agT.reduce((s, a) => s + (a.avance || 0), 0) / agT.length)
           const ac = avg >= 90 ? C.green : avg >= 50 ? C.orange : C.red
           return (
-            <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.2 — ACUERDOS TERRITORIALES</div>
+            <div style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{ width: 3, height: 14, background: color, borderRadius: 2 }} />
+                <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Acuerdos Territoriales</span>
+              </div>
               <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 12 }}>
                 <div><div style={{ fontSize: 26, fontWeight: 900, color: ac }}>{avg}%</div><div style={{ fontSize: 11, color: C.muted }}>avance prom.</div></div>
                 <div style={{ flex: 1 }}><Bar value={avg} color={ac} height={7} /></div>
