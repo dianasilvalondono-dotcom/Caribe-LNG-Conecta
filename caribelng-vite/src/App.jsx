@@ -1643,7 +1643,7 @@ export default function App() {
                           style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
                       </div>
                       {/* Foto */}
-                      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
+                      <input ref={fileRef} type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
                       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
                         {!preview ? (
                           <button onClick={() => fileRef.current?.click()}
@@ -1651,7 +1651,7 @@ export default function App() {
                               padding: '12px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                             <span style={{ fontSize: 20 }}>📷</span>
                             <div style={{ textAlign: 'left' }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Tomar foto de evidencia</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
                               <div style={{ fontSize: 11, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
                             </div>
                           </button>
@@ -1754,12 +1754,12 @@ export default function App() {
                   <div>
                     {/* Upload card */}
                     <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
-                      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handleFile} style={{ display: 'none' }} />
+                      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
                       {!preview ? (
                         <div onClick={() => fileRef.current?.click()}
                           style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
                           <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Tomar foto de evidencia</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
                           <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>GPS + hora + lugar automáticos</div>
                         </div>
                       ) : (
@@ -2115,14 +2115,14 @@ export default function App() {
                       </div>
 
                       {/* Botón cámara */}
-                      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handleFile}
+                      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile}
                         style={{ display: 'none' }} />
                       {!preview ? (
                         <div onClick={() => fileRef.current?.click()}
                           style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '32px 16px',
                             textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: `${C.accent}08` }}>
                           <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Tomar foto</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
                           <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Se capturará ubicación GPS y hora automáticamente</div>
                         </div>
                       ) : (
