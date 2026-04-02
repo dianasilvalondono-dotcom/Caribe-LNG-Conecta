@@ -6,9 +6,9 @@ import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved }) {
   const [mainTab, setMainTab] = useState('dac')
   const [terrFilter, setTerrFilter] = useState('Todos')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+    const h = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -129,14 +129,15 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
     const totalReportes = reportes.filter(r => r.territorio === territorio).length
     return (
       <div key={territorio} style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <div style={{ width: 4, height: 28, background: color, borderRadius: 2 }} />
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}>{territorio}</div>
-            <div style={{ fontSize: 13, color: C.subtle }}>
-              {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta de regasificación · Antioquia'} · {totalReportes} reportes
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '14px 16px', background: `linear-gradient(135deg, ${color}10, ${color}05)`, borderRadius: 14, border: `1px solid ${color}20` }}>
+          <div style={{ width: 4, height: 32, background: color, borderRadius: 2 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#2B2926' }}>{territorio}</div>
+            <div style={{ fontSize: 11, color: '#94a3b8' }}>
+              {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'} · {totalReportes} reportes
             </div>
           </div>
+          <div style={{ fontSize: 22, fontWeight: 900, color }}>{totalReportes}</div>
         </div>
         {kpis.map(cat => (
           <div key={cat.cat} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 10 }}>
@@ -149,21 +150,34 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
               </div>
               {cat.items.map(kpi => {
                 const total = sumTotal(territorio, kpi.field)
-                const pct = kpi.meta > 0 ? Math.round((total / kpi.meta) * 100) : 0
+                const pct = kpi.meta > 0 ? Math.min(Math.round((total / kpi.meta) * 100), 100) : 0
                 const sc = kpi.invert
                   ? (total === 0 ? C.green : total <= 2 ? C.orange : C.red)
                   : (kpi.meta > 0 ? (pct >= 80 ? C.green : pct >= 50 ? C.orange : C.red) : C.subtle)
+                const semLabel = sc === C.green ? 'En meta' : sc === C.orange ? 'Atención' : sc === C.red ? 'Crítico' : ''
                 return (
-                  <div key={kpi.name} style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4,1fr) 60px 56px', gap: 4, alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${C.border}`, minWidth: 420 }}>
+                  <div key={kpi.name} style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4,1fr) 60px 56px', gap: 4, alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${C.border}`, minWidth: 420 }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{kpi.name}</div>
-                      <div style={{ fontSize: 11, color: C.subtle }}>{kpi.base}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ width: 7, height: 7, borderRadius: '50%', background: sc, flexShrink: 0, boxShadow: `0 0 5px ${sc}60` }} />
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>{kpi.name}</span>
+                      </div>
+                      <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2, paddingLeft: 13 }}>{kpi.base}</div>
+                      {kpi.meta > 0 && <div style={{ marginTop: 4, paddingLeft: 13 }}>
+                        <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', width: '80%' }}>
+                          <div style={{ height: '100%', width: `${pct}%`, background: sc, borderRadius: 100, transition: 'width 0.6s' }} />
+                        </div>
+                      </div>}
                     </div>
-                    {[1,2,3,4].map(q => (
-                      <div key={q} style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: C.text }}>{sumQ(territorio, kpi.field, q) || '—'}</div>
-                    ))}
-                    <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 800, color: sc }}>{total || '—'}</div>
-                    <div style={{ textAlign: 'center', fontSize: 12, color: C.muted, fontWeight: 600 }}>{kpi.meta || '—'}</div>
+                    {[1,2,3,4].map(q => {
+                      const qv = sumQ(territorio, kpi.field, q)
+                      return <div key={q} style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: qv ? '#2B2926' : '#cbd5e1' }}>{qv || '—'}</div>
+                    })}
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 16, fontWeight: 900, color: sc }}>{total || '—'}</div>
+                      {semLabel && <div style={{ fontSize: 8, fontWeight: 700, color: sc, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{semLabel}</div>}
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{kpi.meta || '—'}</div>
                   </div>
                 )
               })}
@@ -263,17 +277,34 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>KPIs 2026</h1>
-        <p style={{ margin: '3px 0 0', color: C.muted, fontSize: 13 }}>Caribe LNG · Dirección de Asuntos Corporativos · Enero–Diciembre 2026</p>
+      <div style={{ marginBottom: 20 }}>
+        <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>KPIs 2026</h1>
+        <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Caribe LNG · Dirección de Asuntos Corporativos · Enero–Diciembre 2026</p>
+      </div>
+
+      {/* Summary cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 10, marginBottom: 20 }}>
+        {[
+          { label: 'Reportes', value: totalReportes, color: C.navy },
+          { label: 'Eventos totales', value: totalEventos, color: C.tolu },
+          { label: 'Compromisos cumplidos', value: `${compromisosCumplidos}/${seguimiento.length}`, color: C.green },
+          { label: 'Incidentes', value: totalIncidentes, color: totalIncidentes === 0 ? C.green : C.red },
+        ].map(c => (
+          <div key={c.label} style={{ background: 'white', borderRadius: 14, padding: '16px 14px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: c.color }} />
+            <div style={{ fontSize: 28, fontWeight: 900, color: '#2B2926', letterSpacing: -1, lineHeight: 1 }}>{c.value}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{c.label}</div>
+          </div>
+        ))}
       </div>
 
       {/* Main tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+      <div style={{ display: 'flex', gap: 0, marginBottom: 20, background: '#f8fafc', borderRadius: 12, padding: 4, border: '1px solid #e8ecf0' }}>
         {[{ id: 'dac', label: 'Director DAC' }, { id: 'gestoras', label: 'Gestoras Territoriales' }].map(t => (
           <button key={t.id} onClick={() => setMainTab(t.id)}
-            style={{ flex: 1, background: mainTab === t.id ? C.navy : 'transparent', color: mainTab === t.id ? 'white' : C.muted,
-              border: 'none', borderRadius: 7, padding: '9px 8px', fontSize: isMobile ? 12 : 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: mainTab === t.id ? 'white' : 'transparent', color: mainTab === t.id ? C.navy : '#94a3b8',
+              border: 'none', borderRadius: 8, padding: '10px 8px', fontSize: isMobile ? 12 : 13, fontWeight: 700, cursor: 'pointer',
+              boxShadow: mainTab === t.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s', letterSpacing: '0.3px' }}>
             {t.label}
           </button>
         ))}
@@ -305,18 +336,16 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
       {/* ── Gestoras tab ── */}
       {mainTab === 'gestoras' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 10, marginBottom: 18 }}>
-            <StatCard label="Reportes" value={totalReportes} color={C.navy} />
-            <StatCard label="Eventos" value={totalEventos} color={C.tolu} />
-            <StatCard label="Compromisos" value={`${compromisosCumplidos}/${seguimiento.length}`} color={C.green} />
-            <StatCard label="Incidentes" value={totalIncidentes} color={totalIncidentes === 0 ? C.green : C.red} />
-          </div>
           <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-            {['Todos', 'Barbosa', 'Tolú'].map(t => (
-              <button key={t} onClick={() => setTerrFilter(t)}
-                style={{ background: terrFilter === t ? C.navy : '#f1f5f9', color: terrFilter === t ? 'white' : C.text,
-                  border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
-                {t}
+            {[
+              { id: 'Todos', color: C.navy },
+              { id: 'Tolú', color: C.tolu },
+              { id: 'Barbosa', color: C.barbosa },
+            ].map(t => (
+              <button key={t.id} onClick={() => setTerrFilter(t.id)}
+                style={{ background: terrFilter === t.id ? t.color : 'white', color: terrFilter === t.id ? 'white' : '#64748b',
+                  border: `1px solid ${terrFilter === t.id ? t.color : '#e8ecf0'}`, borderRadius: 10, padding: '8px 18px', fontSize: 12, cursor: 'pointer', fontWeight: 700, transition: 'all 0.15s', letterSpacing: '0.3px' }}>
+                {t.id}
               </button>
             ))}
           </div>
