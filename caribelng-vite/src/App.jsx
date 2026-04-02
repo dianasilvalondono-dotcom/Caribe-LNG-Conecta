@@ -1166,89 +1166,83 @@ export default function App() {
         )}
 
         {view === 'huella' && (() => {
-          const P = { c3: { label: 'C3', desc: 'Gente Capacitada', color: '#1565C0' }, hub: { label: 'HUB', desc: 'Infraestructura Funcionando', color: '#007A87' }, eco: { label: 'ECO', desc: 'Programa Ambiental', color: '#00BFB3' } }
+          const pilares = [
+            { key: 'c3', label: 'C3', desc: 'Gente Capacitada', color: '#1565C0', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd' },
+            { key: 'hub', label: 'HUB', desc: 'Infraestructura', color: '#007A87', bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7' },
+            { key: 'eco', label: 'ECO', desc: 'Programa Ambiental', color: '#00BFB3', bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4' },
+          ]
           const territorios = [
-            { nombre: 'TOLÚ', sub: 'Sucre', color: C.navy,
-              c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Si no hay infraestructura, Cargovolco y Suragas proveen lo necesario', 'Certificación en manejo de sustancias peligrosas', 'En 3 años los contratamos'] },
-              hub: { titulo: 'Muelle Astivik', items: ['Reformamos el muelle como hub operativo', 'Deportes acuáticos para jóvenes', 'Certificaciones marítimas y portuarias para adultos', 'Mercado de pescadores'] },
-              eco: { titulo: 'Ambiental Marino', items: ['Mini estudio de impacto ambiental con pescadores', 'Programa ambiental costero co-construido con la comunidad', 'Restauración de arrecifes o protección de ecosistemas marinos', 'Nace del mar, se construye con la gente del mar'] },
-              resumen: 'Tolú = Astivik + Licencia C3 + Programa Ambiental Marino con Pescadores'
+            { nombre: 'Tolú', sub: 'Terminal marítima · Sucre', color: C.tolu,
+              c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Infraestructura vía Cargovolco y Suragas', 'Certificación sustancias peligrosas', 'En 3 años los contratamos'] },
+              hub: { titulo: 'Muelle Astivik', items: ['Hub operativo reformado', 'Deportes acuáticos para jóvenes', 'Certificaciones marítimas y portuarias', 'Mercado de pescadores'] },
+              eco: { titulo: 'Ambiental Marino', items: ['Estudio impacto ambiental con pescadores', 'Programa costero co-construido', 'Restauración de arrecifes', 'Nace del mar, con su gente'] },
             },
-            { nombre: 'BARBOSA', sub: 'Antioquia', color: C.navy,
-              c3: { titulo: 'Licencia C3', items: ['Mismo programa de formación', 'Enfoque de género', 'Certificación en sustancias peligrosas', 'En 3 años los contratamos'] },
-              hub: { titulo: 'Cancha El Machete', items: ['Reforma con cubierta', 'Polideportivo: microfútbol, voleibol, básquetbol', 'Espacio comunitario de uso continuo'] },
-              eco: { titulo: 'Cadena de Reciclaje', items: ['Puntos ecológicos en la comunidad', 'La comunidad recicla y vende el producto', 'Acuerdo con Alcaldía y EPM para manejo de basuras', 'Siembra de 150 árboles', 'Genera ingreso para la comunidad'] },
-              resumen: 'Barbosa = El Machete + Licencia C3 + Cadena de Reciclaje que Genera Ingreso'
+            { nombre: 'Barbosa', sub: 'Planta regasificación · Antioquia', color: C.barbosa,
+              c3: { titulo: 'Licencia C3', items: ['Formación técnica', 'Enfoque de género', 'Certificación sustancias peligrosas', 'En 3 años los contratamos'] },
+              hub: { titulo: 'Cancha El Machete', items: ['Reforma con cubierta', 'Polideportivo multideporte', 'Espacio comunitario continuo'] },
+              eco: { titulo: 'Cadena de Reciclaje', items: ['Puntos ecológicos comunitarios', 'Reciclaje como ingreso', 'Acuerdo Alcaldía + EPM', 'Siembra 150 árboles'] },
             }
           ]
-          const HuellaCard = ({ pilar, data }) => (
-            <div style={{ flex: 1, minWidth: isMobile ? '100%' : 0, background: '#fff', border: '1px solid #E0E4EA', borderRadius: 14, padding: '24px 18px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 66, height: 66, borderRadius: '50%', background: pilar.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-                <span style={{ color: 'white', fontSize: 18, fontWeight: 900, letterSpacing: 0.5 }}>{pilar.label}</span>
-              </div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 14, textAlign: 'center' }}>{data.titulo}</div>
-              <div style={{ width: '100%', textAlign: 'left' }}>
-                {data.items.map((it, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 8, fontSize: 18, color: '#444', lineHeight: 1.6 }}>
-                    <span style={{ color: '#00BFB3', fontSize: 18, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>•</span>
-                    <span>{it}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )
           return (
-            <div style={{ background: '#fff', borderRadius: 16, padding: isMobile ? 16 : 32 }}>
-              {/* Header with logos */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <img src="/logo-simbolo.svg" alt="Caribe LNG" style={{ width: 36, height: 36 }} />
-                  <span style={{ fontSize: 16, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>Caribe LNG</span>
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: C.accent }}>Caribe LNG <span style={{ fontFamily: "'Courgette', cursive", color: '#1565C0' }}>¡Conecta!</span></div>
+            <div>
+              <div style={{ marginBottom: 20 }}>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Huella Social Territorial</h1>
+                <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Lo que Caribe LNG deja en cada territorio · Modelo de co-responsabilidad</p>
               </div>
-              {/* Title */}
-              <div style={{ textAlign: 'center', marginBottom: 28 }}>
-                <h1 style={{ margin: 0, fontSize: isMobile ? 24 : 34, fontWeight: 900, color: C.navy }}>HUELLA SOCIAL TERRITORIAL</h1>
-                <div style={{ width: 80, height: 4, background: C.accent, borderRadius: 2, margin: '10px auto 12px' }} />
-                <p style={{ margin: 0, color: '#5C6370', fontSize: 18, fontWeight: 500 }}>Lo que Caribe LNG deja en cada territorio</p>
-              </div>
-              {/* Legend bar */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 10 : 28, marginBottom: 32, flexWrap: 'wrap', background: '#F5F7FA', borderRadius: 10, padding: '14px 24px' }}>
-                {Object.values(P).map(p => (
-                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ background: p.color, color: 'white', fontSize: 14, fontWeight: 900, padding: '5px 14px', borderRadius: 14 }}>{p.label}</span>
-                    <span style={{ fontSize: 16, fontWeight: 600, color: C.text }}>{p.desc}</span>
+
+              {/* Pilares legend */}
+              <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
+                {pilares.map(p => (
+                  <div key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 12, padding: '10px 16px', border: `1px solid ${p.border}`, flex: 1, minWidth: isMobile ? '100%' : 0 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: 0.5, flexShrink: 0 }}>{p.label}</div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#2B2926' }}>{p.desc}</div>
+                      <div style={{ fontSize: 10, color: '#94a3b8' }}>Pilar {p.label}</div>
+                    </div>
                   </div>
                 ))}
               </div>
+
               {/* Territories */}
               {territorios.map(t => (
-                <div key={t.nombre} style={{ marginBottom: 40 }}>
-                  <div style={{ marginBottom: 16, borderBottom: '2px solid #E0E4EA', paddingBottom: 8 }}>
-                    <h2 style={{ margin: 0, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: C.navy }}>
-                      {t.nombre} <span style={{ fontSize: 18, fontWeight: 400, color: '#8D95A0', marginLeft: 8 }}>{t.sub}</span>
-                    </h2>
+                <div key={t.nombre} style={{ marginBottom: 28 }}>
+                  {/* Territory header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '14px 16px', background: `linear-gradient(135deg, ${t.color}10, ${t.color}05)`, borderRadius: 14, border: `1px solid ${t.color}20` }}>
+                    <div style={{ width: 4, height: 32, background: t.color, borderRadius: 2 }} />
+                    <div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: '#2B2926' }}>{t.nombre}</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>{t.sub}</div>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 16, flexWrap: isMobile ? 'wrap' : 'nowrap', marginBottom: 16 }}>
-                    <HuellaCard pilar={P.c3} data={t.c3} />
-                    <HuellaCard pilar={P.hub} data={t.hub} />
-                    <HuellaCard pilar={P.eco} data={t.eco} />
-                  </div>
-                  {/* Summary banner */}
-                  <div style={{ background: '#0D2137', borderRadius: 10, padding: '16px 24px', textAlign: 'center' }}>
-                    <span style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{t.resumen}</span>
+
+                  {/* 3 pilar cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
+                    {pilares.map(p => {
+                      const data = t[p.key]
+                      return (
+                        <div key={p.key} style={{ background: p.bg, borderRadius: 16, padding: '20px 18px', border: `1px solid ${p.border}`, position: 'relative', overflow: 'hidden' }}>
+                          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: p.color }} />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 10, fontWeight: 900 }}>{p.label}</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: '#2B2926' }}>{data.titulo}</div>
+                          </div>
+                          {data.items.map((item, i) => (
+                            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
+                              <div style={{ width: 5, height: 5, borderRadius: '50%', background: p.color, flexShrink: 0, marginTop: 6, boxShadow: `0 0 4px ${p.color}60` }} />
+                              <span style={{ fontSize: 12, color: '#475569', lineHeight: 1.5 }}>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               ))}
-              {/* Final banner */}
-              <div style={{ background: 'linear-gradient(135deg, #0D47A1, #007A87)', borderRadius: 12, padding: '32px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: isMobile ? 18 : 24, fontWeight: 900, color: 'white', marginBottom: 8 }}>Nace del territorio. Se construye con su gente.</div>
-                <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Eso es la huella social de Caribe LNG.</div>
-              </div>
-              {/* Footer */}
-              <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: '#8D95A0' }}>
-                Caribe LNG | Huella Social Territorial | 2026
+
+              {/* Bottom banner */}
+              <div style={{ background: `linear-gradient(135deg, #0D47A1 0%, #007A87 100%)`, borderRadius: 16, padding: '28px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>Nace del territorio. Se construye con su gente.</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Huella Social · Caribe LNG 2026</div>
               </div>
             </div>
           )
