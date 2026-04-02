@@ -1173,12 +1173,12 @@ export default function App() {
           ]
           const territorios = [
             { nombre: 'Tolú', sub: 'Terminal marítima · Sucre', color: C.tolu,
-              c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Infraestructura vía Cargovolco y Suragas', 'Certificación sustancias peligrosas', 'En 3 años los contratamos'] },
+              c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Infraestructura vía Cargovolco y Suragas', 'Certificación sustancias peligrosas', 'Empleabilidad local a mediano plazo'] },
               hub: { titulo: 'Muelle Astivik', items: ['Hub operativo reformado', 'Deportes acuáticos para jóvenes', 'Certificaciones marítimas y portuarias', 'Mercado de pescadores'] },
               eco: { titulo: 'Ambiental Marino', items: ['Estudio impacto ambiental con pescadores', 'Programa costero co-construido', 'Restauración de arrecifes', 'Nace del mar, con su gente'] },
             },
             { nombre: 'Barbosa', sub: 'Planta regasificación · Antioquia', color: C.barbosa,
-              c3: { titulo: 'Licencia C3', items: ['Formación técnica', 'Enfoque de género', 'Certificación sustancias peligrosas', 'En 3 años los contratamos'] },
+              c3: { titulo: 'Licencia C3', items: ['Formación técnica', 'Enfoque de género', 'Certificación sustancias peligrosas', 'Empleabilidad local a mediano plazo'] },
               hub: { titulo: 'Cancha El Machete', items: ['Reforma con cubierta', 'Polideportivo multideporte', 'Espacio comunitario continuo'] },
               eco: { titulo: 'Cadena de Reciclaje', items: ['Puntos ecológicos comunitarios', 'Reciclaje como ingreso', 'Acuerdo Alcaldía + EPM', 'Siembra 150 árboles'] },
             }
