@@ -298,6 +298,25 @@ export async function uploadKnowledgeFile(file) {
   return data.publicUrl
 }
 
+// ── Registros Diarios ────────────────────────────────────────────────────────
+
+export async function addRegistroDiario(registro) {
+  const { data, error } = await supabase
+    .from('registros_diarios')
+    .insert(registro)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getRegistrosDiarios(territorio) {
+  let q = supabase.from('registros_diarios').select('*').order('fecha', { ascending: false }).order('created_at', { ascending: false })
+  if (territorio) q = q.eq('territorio', territorio)
+  const { data } = await q
+  return data || []
+}
+
 // ── Actor Edits (pending approval) ──────────────────────────────────────────
 
 export async function submitActorEdit({ actor_id, user_id, user_name, campos }) {

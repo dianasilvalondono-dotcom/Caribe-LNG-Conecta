@@ -17,7 +17,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getKpisDac, upsertKpiDac, sendAlerta,
          getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias,
-         submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit } from './lib/supabase'
+         submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
+         addRegistroDiario, getRegistrosDiarios } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -2521,6 +2522,8 @@ export default function App() {
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
   const [actorEdits, setActorEdits] = useState([])
   const [editingActor, setEditingActor] = useState(null)
+  const [registrosDiarios, setRegistrosDiarios] = useState([])
+  const [inputSubTab, setInputSubTab] = useState('diario')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -2556,6 +2559,8 @@ export default function App() {
       setKnowledgeBase(kb || [])
       setEvidencias(ev || [])
       setActorEdits(ae || [])
+      const rd = await getRegistrosDiarios()
+      setRegistrosDiarios(rd || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -2648,7 +2653,7 @@ export default function App() {
     { id: 'riesgos', label: 'Riesgos DAC', icon: '⚠️' },
     { id: 'gestion', label: 'Gestión', icon: '📋', children: [
       { id: 'kpis', label: 'KPIs', icon: '🎯' },
-      { id: 'input', label: 'Input Semanal', icon: '✍️' },
+      { id: 'input', label: 'Registro de Campo', icon: '✍️' },
     ]},
     { id: 'gestora', label: 'Mi territorio', icon: '📍' },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: '🧠' }] : []),
@@ -3522,8 +3527,322 @@ export default function App() {
         })()}
 
         {view === 'input' && (
-          <InputSemanal session={session} profile={profile} territorio={myTerritorio}
-            reportes={reportes} seguimiento={seguimiento} onSaved={loadData} isAdmin={isAdmin} />
+          <div>
+            <div style={{ marginBottom: 18 }}>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Registro de Campo</h1>
+              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 13 : 16 }}>Registros diarios, reportes semanales y evidencias fotográficas</p>
+            </div>
+            {/* Sub-tabs */}
+            <div style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+              {[
+                { id: 'diario', label: '📝 Registro Diario' },
+                { id: 'semanal', label: '📊 Reporte Semanal' },
+                { id: 'evidencias', label: '📸 Evidencias' },
+              ].map(t => (
+                <button key={t.id} onClick={() => setInputSubTab(t.id)}
+                  style={{ flex: 1, background: inputSubTab === t.id ? 'white' : 'transparent',
+                    border: 'none', borderRadius: 7, padding: isMobile ? '8px 4px' : '8px 12px', fontSize: isMobile ? 12 : 14, fontWeight: 700,
+                    color: inputSubTab === t.id ? C.navy : C.muted, cursor: 'pointer',
+                    boxShadow: inputSubTab === t.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none' }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* ── SUB-TAB: REGISTRO DIARIO ── */}
+            {inputSubTab === 'diario' && (() => {
+              const DailyForm = () => {
+                const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+                const [territorio, setTerritorio] = useState(myTerritorio || 'Tolú')
+                const [tipoReunion, setTipoReunion] = useState('Comunidad')
+                const [lugarR, setLugarR] = useState('')
+                const [asistentes, setAsistentes] = useState('')
+                const [descripcion, setDescripcion] = useState('')
+                const [file, setFile] = useState(null)
+                const [preview, setPreview] = useState(null)
+                const [geo, setGeo] = useState(null)
+                const [geoLugar, setGeoLugar] = useState(null)
+                const [saving, setSaving] = useState(false)
+                const [saved, setSaved] = useState(false)
+                const fileRef = useRef(null)
+
+                const handlePhoto = (e) => {
+                  const f = e.target.files?.[0]
+                  if (!f) return
+                  setFile(f)
+                  setPreview(URL.createObjectURL(f))
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      async (pos) => {
+                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+                        try {
+                          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=es&zoom=16`)
+                          const data = await res.json()
+                          const a = data.address || {}
+                          const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
+                          setGeoLugar(parts.join(', ') || data.display_name)
+                          if (!lugarR) setLugarR(parts[0] || '')
+                        } catch {}
+                      },
+                      () => {},
+                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    )
+                  }
+                }
+
+                const handleSubmit = async () => {
+                  if (!descripcion.trim()) return alert('La descripción es obligatoria')
+                  setSaving(true)
+                  try {
+                    let foto_url = null
+                    if (file) foto_url = await uploadEvidenciaPhoto(file)
+                    await addRegistroDiario({
+                      user_id: session.user.id,
+                      territorio, fecha, tipo_reunion: tipoReunion,
+                      lugar: lugarR || geoLugar || null,
+                      asistentes: parseInt(asistentes) || 0,
+                      descripcion: descripcion.trim(),
+                      foto_url, latitud: geo?.lat || null, longitud: geo?.lng || null,
+                      precision_m: geo?.accuracy || null, geo_lugar: geoLugar || null
+                    })
+                    await loadData()
+                    setSaved(true)
+                    setTimeout(() => {
+                      setSaved(false)
+                      setDescripcion(''); setLugarR(''); setAsistentes(''); setFile(null); setPreview(null); setGeo(null); setGeoLugar(null)
+                    }, 2000)
+                  } catch (err) { alert('Error: ' + err.message) }
+                  finally { setSaving(false) }
+                }
+
+                if (saved) return (
+                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: C.green }}>Registro guardado</div>
+                    <div style={{ fontSize: 14, color: C.muted, marginTop: 6 }}>Con trazabilidad completa</div>
+                  </div>
+                )
+
+                return (
+                  <div>
+                    <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Fecha</label>
+                          <input type="date" value={fecha} onChange={e => setFecha(e.target.value)}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Territorio</label>
+                          <select value={territorio} onChange={e => setTerritorio(e.target.value)}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                            {['Tolú', 'Barbosa'].map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Tipo de reunión</label>
+                          <select value={tipoReunion} onChange={e => setTipoReunion(e.target.value)}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                            {['Comunidad', 'Pescadores', 'JAC', 'Institucional', 'Socialización', 'Vecindad', 'Diagnóstico', 'Otro'].map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Lugar / Vereda</label>
+                          <input value={lugarR} onChange={e => setLugarR(e.target.value)} placeholder="Ej: Vereda El Progreso"
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Asistentes</label>
+                          <input type="number" value={asistentes} onChange={e => setAsistentes(e.target.value)} placeholder="0"
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Descripción *</label>
+                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)}
+                          placeholder="¿Qué se habló? ¿Qué se acordó? ¿Hay algo que escalar?"
+                          rows={3}
+                          style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                      </div>
+                      {/* Foto */}
+                      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
+                        {!preview ? (
+                          <button onClick={() => fileRef.current?.click()}
+                            style={{ background: `${C.accent}10`, border: `1.5px dashed ${C.accent}`, borderRadius: 10,
+                              padding: '12px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                            <span style={{ fontSize: 20 }}>📷</span>
+                            <div style={{ textAlign: 'left' }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Tomar foto de evidencia</div>
+                              <div style={{ fontSize: 11, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
+                            </div>
+                          </button>
+                        ) : (
+                          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 1 }}>
+                            <img src={preview} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              {geo && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>📍 {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              {geoLugar && <div style={{ fontSize: 12, color: C.muted }}>{geoLugar}</div>}
+                            </div>
+                            <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setGeoLugar(null) }}
+                              style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>✕</button>
+                          </div>
+                        )}
+                      </div>
+                      <button onClick={handleSubmit} disabled={saving || !descripcion.trim()}
+                        style={{ width: '100%', background: saving || !descripcion.trim() ? '#cbd5e1' : C.navy,
+                          color: 'white', border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
+                          cursor: saving || !descripcion.trim() ? 'not-allowed' : 'pointer' }}>
+                        {saving ? '⏳ Guardando...' : '📤 Guardar registro'}
+                      </button>
+                    </div>
+
+                    {/* Timeline de registros recientes */}
+                    {registrosDiarios.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registros recientes</div>
+                        {registrosDiarios.slice(0, 15).map(r => (
+                          <div key={r.id} style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 12, alignItems: 'flex-start',
+                            borderLeft: `3px solid ${r.territorio === 'Tolú' ? C.tolu : C.barbosa}` }}>
+                            {r.foto_url && <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 12, fontWeight: 800, color: r.territorio === 'Tolú' ? C.tolu : C.barbosa }}>{r.territorio}</span>
+                                <span style={{ fontSize: 11, color: C.subtle }}>·</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{r.tipo_reunion}</span>
+                                {r.asistentes > 0 && <span style={{ fontSize: 11, color: C.subtle }}>· {r.asistentes} asistentes</span>}
+                              </div>
+                              <div style={{ fontSize: 13, color: C.text, marginBottom: 3, lineHeight: 1.4 }}>{r.descripcion}</div>
+                              <div style={{ fontSize: 11, color: C.subtle }}>
+                                📅 {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                {r.lugar && <span> · 📌 {r.lugar}</span>}
+                                {r.geo_lugar && !r.lugar && <span> · 📌 {r.geo_lugar}</span>}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+              return <DailyForm />
+            })()}
+
+            {/* ── SUB-TAB: REPORTE SEMANAL ── */}
+            {inputSubTab === 'semanal' && (
+              <InputSemanal session={session} profile={profile} territorio={myTerritorio}
+                reportes={reportes} seguimiento={seguimiento} onSaved={loadData} isAdmin={isAdmin} />
+            )}
+
+            {/* ── SUB-TAB: EVIDENCIAS ── */}
+            {inputSubTab === 'evidencias' && (() => {
+              const EvidenciasTab = () => {
+                const [file, setFile] = useState(null)
+                const [preview, setPreview] = useState(null)
+                const [desc, setDesc] = useState('')
+                const [geo, setGeo] = useState(null)
+                const [lugar, setLugar] = useState(null)
+                const [captureTime, setCaptureTime] = useState(null)
+                const [uploading, setUploading] = useState(false)
+                const fileRef = useRef(null)
+
+                const handleFile = (e) => {
+                  const f = e.target.files?.[0]
+                  if (!f) return
+                  setFile(f)
+                  setPreview(URL.createObjectURL(f))
+                  setCaptureTime(new Date().toISOString())
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      async (pos) => {
+                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+                        try {
+                          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=es&zoom=16`)
+                          const data = await res.json()
+                          const a = data.address || {}
+                          const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
+                          setLugar(parts.join(', ') || data.display_name)
+                        } catch {}
+                      },
+                      () => {},
+                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    )
+                  }
+                }
+
+                return (
+                  <div>
+                    {/* Upload card */}
+                    <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
+                      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handleFile} style={{ display: 'none' }} />
+                      {!preview ? (
+                        <div onClick={() => fileRef.current?.click()}
+                          style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Tomar foto de evidencia</div>
+                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>GPS + hora + lugar automáticos</div>
+                        </div>
+                      ) : (
+                        <div>
+                          <img src={preview} alt="" style={{ width: '100%', borderRadius: 10, maxHeight: 180, objectFit: 'cover', marginBottom: 10 }} />
+                          {captureTime && (
+                            <div style={{ background: '#f8fafc', borderRadius: 8, padding: 10, marginBottom: 10, fontSize: 13 }}>
+                              <div>🕐 {new Date(captureTime).toLocaleString('es-CO')}</div>
+                              {geo && <div>📍 {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              {lugar && <div>📌 {lugar}</div>}
+                            </div>
+                          )}
+                          <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Descripción de la evidencia *" rows={2}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setLugar(null); setCaptureTime(null) }}
+                              style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+                            <button onClick={async () => {
+                              if (!desc.trim() || !geo) return alert(geo ? 'Agrega una descripción' : 'Esperando GPS...')
+                              setUploading(true)
+                              try {
+                                const foto_url = await uploadEvidenciaPhoto(file)
+                                await addEvidencia({ user_id: session.user.id, territorio: myTerritorio || 'Nacional', foto_url, latitud: geo.lat, longitud: geo.lng, precision_m: geo.accuracy, descripcion: desc.trim(), capturada_at: captureTime, lugar })
+                                await loadData()
+                                setFile(null); setPreview(null); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null)
+                              } catch (err) { alert('Error: ' + err.message) }
+                              finally { setUploading(false) }
+                            }}
+                              disabled={uploading || !desc.trim() || !geo}
+                              style={{ flex: 2, background: uploading || !desc.trim() || !geo ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
+                              {uploading ? '⏳ Subiendo...' : '📤 Guardar'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* Gallery */}
+                    {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Evidencias recientes</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
+                          {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).slice(0, 20).map(ev => (
+                            <div key={ev.id} style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                              <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
+                              <div style={{ padding: '10px 12px' }}>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
+                                <div style={{ fontSize: 11, color: C.subtle }}>🕐 {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
+                                {ev.lugar && <div style={{ fontSize: 11, color: C.accent }}>📌 {ev.lugar}</div>}
+                                <div style={{ fontSize: 10, color: C.subtle }}>📍 {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+              return <EvidenciasTab />
+            })()}
+          </div>
         )}
 
         {view === 'kpis' && (
