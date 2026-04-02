@@ -477,6 +477,7 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'gestora', label: 'Mi territorio', icon: '📍' },
     { id: 'actores', label: 'Actores', icon: '👥' },
     { id: 'territorio', label: 'Territorio', icon: '🌎', children: [
       { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
@@ -488,7 +489,6 @@ export default function App() {
       { id: 'kpis', label: 'KPIs', icon: '🎯' },
       { id: 'input', label: 'Registro de Campo', icon: '✍️' },
     ]},
-    { id: 'gestora', label: 'Mi territorio', icon: '📍' },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: '🧠' }] : []),
   ]
   // helper: check if a view belongs to a dropdown group
