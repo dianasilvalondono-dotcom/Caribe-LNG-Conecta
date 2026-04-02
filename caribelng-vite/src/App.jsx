@@ -511,7 +511,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
-      {navOpen && <div onClick={() => setNavOpen(null)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />}
+      {navOpen && <div onClick={() => setNavOpen(null)} style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, zIndex: 99 }} />}
       <style>{`
         /* CSS responsive — bypasses JS isMobile detection */
         .clng-mobile-nav { display: none; }
