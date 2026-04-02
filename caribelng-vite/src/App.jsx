@@ -898,7 +898,18 @@ export default function App() {
   // helper: check if a view belongs to a dropdown group
   const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
 
-  const isPortraitMobile = isMobile && isPortrait
+  if (isMobile && isPortrait) return (
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      minHeight: '100vh', background: C.navy, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
+      <div style={{ fontSize: 64, marginBottom: 24, animation: 'spin90 1.5s ease-in-out infinite alternate' }}>📱</div>
+      <div style={{ fontSize: 22, fontWeight: 900, color: 'white', marginBottom: 12, letterSpacing: -0.5 }}>Rota tu cel</div>
+      <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, maxWidth: 260 }}>
+        Caribe LNG Conecta está optimizado para usarse en <strong style={{ color: 'rgba(255,255,255,0.85)' }}>modo horizontal</strong> en celular.
+      </div>
+      <style>{`@keyframes spin90 { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }`}</style>
+    </div>
+  )
 
   return (
     <div onClick={(e) => { if (!e.target.closest('[data-nav-dropdown]')) setNavOpen(null) }}
@@ -1099,7 +1110,7 @@ export default function App() {
           </div>
       </div>
 
-      <div style={{ padding: isPortraitMobile ? '10px 8px' : isMobile ? '10px 10px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ padding: isMobile ? '10px 10px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
