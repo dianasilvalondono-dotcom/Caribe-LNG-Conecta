@@ -1595,29 +1595,79 @@ export default function App() {
 
         {view === 'gestora' && (
           <div>
-            <div style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-              <div>
-                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: '#2B2926' }}>Mi Territorio</h1>
-                <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
-              </div>
-              <button onClick={() => setShowGuia(true)}
-                style={{ background: C.accent, color: 'white', border: 'none', borderRadius: 8,
-                  padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                <IconBook size={14} /> Guía
-              </button>
-              <button onClick={async () => {
-                if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones')
-                const perm = await Notification.requestPermission()
-                if (perm === 'granted') {
-                  await subscribeToPush(session.user.id)
-                  new Notification('Caribe LNG Conecta', { body: '¡Notificaciones activadas! Recibirás alertas en tiempo real.', icon: '/logo-simbolo.svg' })
-                } else { alert('Permiso denegado. Actívalo en la configuración del navegador.') }
-              }}
-                style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8,
-                  padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                <IconBell size={14} /> Notificaciones
-              </button>
-            </div>
+            {/* Hero header by territory */}
+            {(() => {
+              const isTolu = myTerritorio === 'Tolú'
+              const isBarbosa = myTerritorio === 'Barbosa'
+              const heroGrad = isTolu
+                ? 'linear-gradient(135deg, #004d5a 0%, #007A87 40%, #0891b2 100%)'
+                : isBarbosa
+                ? 'linear-gradient(135deg, #064e3b 0%, #059669 40%, #34d399 100%)'
+                : `linear-gradient(135deg, #0D47A1 0%, #1a3d7a 60%, #1565C0 100%)`
+              const heroSub = isTolu ? 'Terminal marítima · Sucre · Costa Caribe'
+                : isBarbosa ? 'Planta de regasificación · Antioquia · Magdalena Medio'
+                : 'Todos los territorios'
+              const actoresT = actors.filter(a => myTerritorio ? a.territorio === myTerritorio : true)
+              const rojos = actoresT.filter(a => a.semaforo === 'rojo' || a.semaforo === 'naranja').length
+              const verdes = actoresT.filter(a => a.semaforo === 'verde').length
+              return (
+                <div style={{ background: heroGrad, borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+                  {/* Decorative circles */}
+                  <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+                  <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
+                      <div>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>En campo</span>
+                        </div>
+                        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>
+                          {myTerritorio || 'Mi Territorio'}
+                        </h1>
+                        <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
+                          {profile?.full_name} · {heroSub}
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={() => setShowGuia(true)}
+                          style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10,
+                            padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <IconBook size={13} /> Guía
+                        </button>
+                        <button onClick={async () => {
+                          if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones')
+                          const perm = await Notification.requestPermission()
+                          if (perm === 'granted') {
+                            await subscribeToPush(session.user.id)
+                            new Notification('Caribe LNG Conecta', { body: 'Notificaciones activadas', icon: '/logo-simbolo.svg' })
+                          } else { alert('Permiso denegado') }
+                        }}
+                          style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10,
+                            padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <IconBell size={13} />
+                        </button>
+                      </div>
+                    </div>
+                    {/* Quick stats */}
+                    <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                      <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', flex: 1 }}>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{actoresT.length}</div>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actores</div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', flex: 1 }}>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: rojos > 0 ? '#fbbf24' : '#34d399' }}>{rojos}</div>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Atención hoy</div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', flex: 1 }}>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>{verdes}</div>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Estables</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* ── Modal Guía Gestora ── */}
             {showGuia && (
@@ -1717,23 +1767,37 @@ export default function App() {
                 </div>
               </div>
             )}
-            <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>Actores que necesitan atención hoy</h3>
-              {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => (
-                <div key={a.id} onClick={() => setSelectedActor(a)}
-                  style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '9px 0',
-                    borderBottom: `1px solid ${C.border}`, cursor: 'pointer' }}>
-                  <SemDot s={a.semaforo} size={10} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600 }}>{a.nombre}</div>
-                    <div style={{ fontSize: 15, color: C.subtle }}>{a.tipo}</div>
+            <div style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 14, background: '#ef4444', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Requieren atención</span>
+              </div>
+              {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => {
+                const sc = a.semaforo === 'rojo' ? '#ef4444' : '#f97316'
+                return (
+                  <div key={a.id} onClick={() => setSelectedActor(a)}
+                    style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 12px', marginBottom: 6,
+                      borderRadius: 10, cursor: 'pointer', background: '#f8fafc', border: '1px solid #e8ecf0', transition: 'all 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.boxShadow = 'none' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: sc, flexShrink: 0, boxShadow: `0 0 6px ${sc}60` }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>{a.tipo}</div>
+                    </div>
+                    <span style={{ fontSize: 14, color: '#cbd5e1' }}>›</span>
                   </div>
-                  <span style={{ fontSize: 15, color: C.subtle }}>›</span>
-                </div>
-              ))}
+                )
+              })}
+              {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).length === 0 && (
+                <div style={{ padding: 16, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>Sin actores en atención urgente</div>
+              )}
             </div>
-            <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>Próximas fechas importantes</h3>
+            <div style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 14, background: '#f59e0b', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Próximas fechas</span>
+              </div>
               {(() => {
                 const today = new Date()
                 const todayMM = today.getMonth()
@@ -1792,15 +1856,27 @@ export default function App() {
               })()}
             </div>
             {/* ── Captura de Evidencia ── */}
-            <div onClick={() => setShowEvidenciaCapture(true)}
-              style={{ background: C.navy, borderRadius: 12, padding: '16px 20px', marginBottom: 12,
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-              <span style={{ fontSize: 28 }}></span>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: 'white' }}>Capturar Evidencia</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Foto con geolocalización y hora exacta</div>
-              </div>
-            </div>
+            {(() => {
+              const isTolu = myTerritorio === 'Tolú'
+              const btnGrad = isTolu
+                ? 'linear-gradient(135deg, #004d5a, #0891b2)'
+                : myTerritorio === 'Barbosa'
+                ? 'linear-gradient(135deg, #064e3b, #059669)'
+                : `linear-gradient(135deg, #0D47A1, #1565C0)`
+              return (
+                <div onClick={() => setShowEvidenciaCapture(true)}
+                  style={{ background: btnGrad, borderRadius: 14, padding: '18px 20px', marginBottom: 12,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 4px 16px rgba(0,0,0,0.15)', transition: 'all 0.2s' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <IconCamera size={22} color="white" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: 'white' }}>Capturar Evidencia</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Foto con GPS y hora exacta</div>
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* ── Modal captura ── */}
             {showEvidenciaCapture && (() => {
