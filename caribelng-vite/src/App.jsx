@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import * as XLSX from 'xlsx'
+import { PieChart, Pie, BarChart, Bar as RBar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
 
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, addActor, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
@@ -826,6 +827,47 @@ export default function App() {
                 ))}
               </div>
             </div>
+
+            {/* ── Gráficos ── */}
+            {!isMobile && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+                {/* Pie: distribución semáforo */}
+                <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Distribución de Relaciones</div>
+                  <PieChart width={280} height={200}>
+                    <Pie data={[
+                      { name: 'Verde', value: stats.verde, fill: C.green },
+                      { name: 'Amarillo', value: stats.amarillo, fill: C.yellow },
+                      { name: 'Naranja', value: stats.naranja, fill: C.orange },
+                      { name: 'Rojo', value: stats.rojo, fill: C.red },
+                    ].filter(d => d.value > 0)} cx={140} cy={95} innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
+                    </Pie>
+                    <Tooltip formatter={(v, name) => [`${v} actores`, name]} />
+                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </div>
+                {/* Bar: gestión semanal */}
+                <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Actividad Semanal</div>
+                  <BarChart width={280} height={200} data={
+                    reportes.slice(0, 8).reverse().map(r => ({
+                      sem: `S${r.semana}`,
+                      Reuniones: (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0),
+                      Actores: r.actores_gestionados || 0,
+                      PQRS: r.pqrs_recibidas || 0,
+                    }))
+                  }>
+                    <XAxis dataKey="sem" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} width={30} />
+                    <Tooltip contentStyle={{ fontSize: 12 }} />
+                    <RBar dataKey="Reuniones" fill={C.accent} radius={[3, 3, 0, 0]} />
+                    <RBar dataKey="Actores" fill={C.tolu} radius={[3, 3, 0, 0]} />
+                    <RBar dataKey="PQRS" fill={C.orange} radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </div>
+              </div>
+            )}
+
             </div>
 
             {!isMobile && <div style={{ position: 'sticky', top: 80 }}>
