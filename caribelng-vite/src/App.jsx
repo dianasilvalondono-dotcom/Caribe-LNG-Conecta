@@ -14,7 +14,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
          addRegistroDiario, getRegistrosDiarios,
-         getAuditLog } from './lib/supabase'
+         getAuditLog, subscribeToPush, sendPushNotification } from './lib/supabase'
 
 // ── Export helper ────────────────────────────────────────────────────────────
 function exportToExcel(data, filename, sheetName = 'Datos') {
@@ -347,6 +347,8 @@ export default function App() {
     const u = session.user
     upsertProfile(u.id, { full_name: u.user_metadata?.full_name, avatar_url: u.user_metadata?.avatar_url, email: u.email })
     getProfile(u.id).then(setProfile)
+    // Subscribe to push notifications
+    subscribeToPush(u.id).catch(() => {})
   }, [session])
 
   // Core data — always loaded (needed for dashboard + navigation)
@@ -955,6 +957,7 @@ export default function App() {
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button onClick={async () => {
                               await approveActorEdit(edit.id, edit.actor_id, edit.campos, session.user.id)
+                              sendPushNotification({ title: 'Edición aprobada', body: `Tu edición de ${actorName} fue aprobada`, user_ids: [edit.user_id] }).catch(() => {})
                               await loadData()
                             }}
                               style={{ flex: 1, background: C.green, color: 'white', border: 'none', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
@@ -962,6 +965,7 @@ export default function App() {
                             </button>
                             <button onClick={async () => {
                               await rejectActorEdit(edit.id, session.user.id)
+                              sendPushNotification({ title: 'Edición rechazada', body: `Tu edición de ${actorName} fue rechazada`, user_ids: [edit.user_id] }).catch(() => {})
                               await loadData()
                             }}
                               style={{ flex: 1, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>

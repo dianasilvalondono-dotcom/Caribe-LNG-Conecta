@@ -1,4 +1,4 @@
-const CACHE_NAME = 'caribe-lng-v20';
+const CACHE_NAME = 'caribe-lng-v21';
 
 // Assets to cache on install (app shell)
 const PRECACHE_ASSETS = [
@@ -65,4 +65,25 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
+});
+
+// ── Push Notifications ──────────────────────────────────────────────────────
+self.addEventListener('push', (event) => {
+  let data = { title: 'Caribe LNG Conecta', body: 'Nueva notificación', url: '/' };
+  try { data = event.data.json(); } catch {}
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/logo-simbolo.svg',
+      badge: '/logo-simbolo.svg',
+      data: { url: data.url },
+      vibrate: [200, 100, 200],
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(clients.openWindow(url));
 });

@@ -417,6 +417,45 @@ export async function getAuditLog(limit = 50) {
   return data || []
 }
 
+// ── Push Notifications ──────────────────────────────────────────────────────
+
+const VAPID_PUBLIC = 'BEy_rY5v5ndxTzAuGo_8teAI9S8jjmkkk76iILNo9rMvavjtXRj6ntL9NBJ_u7xVSeyKfDLpih2952bGL3IgRKM'
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = atob(base64)
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)))
+}
+
+export async function subscribeToPush(userId) {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null
+  const reg = await navigator.serviceWorker.ready
+  let sub = await reg.pushManager.getSubscription()
+  if (!sub) {
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
+    })
+  }
+  const keys = sub.toJSON().keys
+  await supabase.from('push_subscriptions').upsert({
+    user_id: userId,
+    endpoint: sub.endpoint,
+    keys_p256dh: keys.p256dh,
+    keys_auth: keys.auth,
+  }, { onConflict: 'endpoint' })
+  return sub
+}
+
+export async function sendPushNotification({ title, body, user_ids, url }) {
+  const { data, error } = await supabase.functions.invoke('send-push', {
+    body: { title, body, user_ids, url }
+  })
+  if (error) throw error
+  return data
+}
+
 // ── Alertas ───────────────────────────────────────────────────────────────────
 
 export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
