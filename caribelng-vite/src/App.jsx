@@ -28,107 +28,8 @@ function exportToExcel(data, filename, sheetName = 'Datos') {
   XLSX.writeFile(wb, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`)
 }
 
-// ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const C = {
-  navy:    '#0D47A1',  // Pantone 294 C — primary dark
-  blue:    '#1565C0',  // Pantone 2145 C — primary medium
-  accent:  '#1565C0',  // primary blue for links/accents
-  tolu:    '#007A87',  // Pantone 7716 C — secondary teal
-  barbosa: '#00BFB3',  // Pantone 3262 C — secondary cyan
-  green:   '#22c55e',
-  yellow:  '#eab308',
-  orange:  '#f97316',
-  red:     '#ef4444',
-  bg:      '#FAFBFC',  // very light neutral
-  card:    '#FFFFFF',
-  border:  '#E8ECF0',
-  text:    '#2B2926',  // Pantone Black C
-  muted:   '#5C6370',
-  subtle:  '#8D95A0',
-}
-
-const SEMAFORO = {
-  verde:    { color: C.green,  bg: '#dcfce7', label: 'Verde',    dot: '🟢' },
-  amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: '🟡' },
-  naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: '🟠' },
-  rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: '🔴' },
-}
-
-const TIPO_COLOR = {
-  Comunitario: C.tolu, Político: '#ec4899', Institucional: C.barbosa,
-  Empresarial: '#f59e0b', Mediático: C.muted, Social: '#10b981', Educativo: '#06b6d4',
-}
-function getTipoColor(tipo = '') {
-  for (const k of Object.keys(TIPO_COLOR)) if (tipo.includes(k)) return TIPO_COLOR[k]
-  return C.subtle
-}
-function initials(name = '') {
-  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
-}
-
-// ━━ Tiny UI helpers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function Avatar({ name, size = 40, color }) {
-  const c = color || getTipoColor(name)
-  return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: c, color: 'white',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.3, fontWeight: 700, flexShrink: 0 }}>
-      {initials(name)}
-    </div>
-  )
-}
-
-function Tag({ children, color = C.accent, bg }) {
-  return (
-    <span style={{ fontSize: 16, background: bg || color + '22', color,
-      padding: '2px 8px', borderRadius: 20, fontWeight: 700, whiteSpace: 'nowrap' }}>
-      {children}
-    </span>
-  )
-}
-
-function Pill({ value, max = 5, color = C.accent }) {
-  return (
-    <div style={{ display: 'flex', gap: 2 }}>
-      {Array.from({ length: max }).map((_, i) => (
-        <div key={i} style={{ width: 7, height: 7, borderRadius: 2,
-          background: i < value ? color : '#e2e8f0' }} />
-      ))}
-    </div>
-  )
-}
-
-function Bar({ value, color = C.accent, height = 6 }) {
-  return (
-    <div style={{ height, background: '#f1f5f9', borderRadius: height / 2, overflow: 'hidden' }}>
-      <div style={{ height: '100%', width: `${Math.min(value, 100)}%`, background: color,
-        borderRadius: height / 2, transition: 'width 0.6s ease' }} />
-    </div>
-  )
-}
-
-function StatCard({ label, value, sub, color = C.navy, icon, compact }) {
-  return (
-    <div style={{ background: C.card, borderRadius: 10, padding: compact ? '8px 10px' : '16px 20px',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${color}` }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <div style={{ fontSize: compact ? 22 : 38, fontWeight: 900, color, letterSpacing: -1, lineHeight: 1 }}>{value}</div>
-          <div style={{ fontSize: compact ? 10 : 15, color: C.muted, marginTop: 2, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-          {sub && <div style={{ fontSize: compact ? 10 : 15, color: C.subtle, marginTop: 1 }}>{sub}</div>}
-        </div>
-        {icon && <div style={{ fontSize: compact ? 14 : 26, opacity: 0.12 }}>{icon}</div>}
-      </div>
-    </div>
-  )
-}
-
-function SemDot({ s, size = 9 }) {
-  const sc = SEMAFORO[s] || SEMAFORO.amarillo
-  return <span style={{ display: 'inline-block', width: size, height: size, borderRadius: '50%',
-    background: sc.color, flexShrink: 0 }} />
-}
+import { C, SEMAFORO, TIPO_COLOR, getTipoColor, initials } from './lib/constants'
+import { Avatar, Tag, Pill, Bar, StatCard, SemDot, InfoRow, Block, Field } from './components/ui'
 
 // ━━ Login screen ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function LoginScreen() {
@@ -686,34 +587,7 @@ function ActorModal({ actor, session, onClose, onUpdated, isAdmin, profile }) {
   )
 }
 
-function InfoRow({ label, val }) {
-  return (
-    <div style={{ display: 'flex', gap: 8, marginBottom: 5, alignItems: 'flex-start' }}>
-      <span style={{ fontSize: 16, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', minWidth: 76, paddingTop: 1 }}>{label}</span>
-      <span style={{ fontSize: 16, color: C.text }}>{val}</span>
-    </div>
-  )
-}
-
-function Block({ label, bg, color, children }) {
-  return (
-    <div style={{ marginBottom: 8 }}>
-      <div style={{ fontSize: 15, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-      <div style={{ fontSize: 16, color, background: bg, padding: '9px 11px', borderRadius: 8, lineHeight: 1.6 }}>{children}</div>
-    </div>
-  )
-}
-
-function Field({ label, value, onChange, type = 'text', placeholder }) {
-  return (
-    <div>
-      <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '7px 10px', fontSize: 16,
-          outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: C.text }} />
-    </div>
-  )
-}
+// InfoRow, Block, Field → imported from components/ui
 
 // ━━ Agreement card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
