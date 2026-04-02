@@ -84,27 +84,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
       sc: pqrsPct >= 90 ? '#10b981' : pqrsPct >= 70 ? '#f59e0b' : '#ef4444',
       sub: `PQRS cerradas: ${pqrsCerradas}/${totalPqrs} · Incidentes: ${totalIncidentesD} · Alertas escaladas: ${totalAlertas}`
     },
-    { num: 4, titulo: 'Hitos Críticos Cubiertos con Material de Comunicación', peso: '5%', color: '#f59e0b',
-      fecha: 'Continuo / trimestral', medicion: '% hitos cubiertos',
-      meta: '≥85% hitos cubiertos con material ≥72h antes', alertaRoja: 'Hito crítico sin material en 72h',
-      value: dacMap['hitos_material']?.valor || '—', pct: parseInt(dacMap['hitos_material']?.valor) || 0, metaNum: 85,
-      reconocimiento: reconocer(parseInt(dacMap['hitos_material']?.valor) || 0, 85),
-      sc: (parseInt(dacMap['hitos_material']?.valor) || 0) >= 85 ? '#10b981' : (parseInt(dacMap['hitos_material']?.valor) || 0) >= 55 ? '#f59e0b' : '#ef4444',
-      sub: dacMap['hitos_material']?.notas || 'Requiere input manual — lista de hitos A+ aprobada trimestralmente',
-      manual: true
-    },
-    { num: 5, titulo: 'Informes ESG Entregados para Financiamiento', peso: '5%', color: '#10b981',
-      fecha: 'Según solicitudes', medicion: '% informes en plazo',
-      meta: '100% informes ≤15 días hábiles', alertaRoja: 'Informe >20 días hábiles después de solicitud',
-      value: dacMap['esg_en_plazo']?.valor || '—', pct: parseInt(dacMap['esg_en_plazo']?.valor) || 0, metaNum: 100,
-      reconocimiento: reconocer(parseInt(dacMap['esg_en_plazo']?.valor) || 0, 100),
-      sc: (parseInt(dacMap['esg_en_plazo']?.valor) || 0) >= 100 ? '#10b981' : (parseInt(dacMap['esg_en_plazo']?.valor) || 0) >= 50 ? '#f59e0b' : '#ef4444',
-      sub: dacMap['esg_en_plazo']?.notas || 'Requiere input manual — según solicitudes formales de financiamiento',
-      manual: true
-    },
   ]
 
   const totalReconocimiento = DAC_KPIS.reduce((s, k) => s + k.reconocimiento, 0)
+  const maxReconocimiento = DAC_KPIS.length * 5
 
   // ── Gestora KPI definitions (updated to match PDF) ────────────────────────
   const KPIS_BARBOSA = [
@@ -385,16 +368,16 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
             <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Reconocimiento proporcional</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontSize: 36, fontWeight: 900, color: 'white' }}>{totalReconocimiento.toFixed(1)}%</span>
-              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>de 25% posible</span>
+              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>de {maxReconocimiento}% posible</span>
             </div>
             <div style={{ height: 6, background: 'rgba(255,255,255,0.15)', borderRadius: 100, marginTop: 12, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.min((totalReconocimiento / 25) * 100, 100)}%`, background: 'white', borderRadius: 100, transition: 'width 0.8s' }} />
+              <div style={{ height: '100%', width: `${Math.min((totalReconocimiento / maxReconocimiento) * 100, 100)}%`, background: 'white', borderRadius: 100, transition: 'width 0.8s' }} />
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>5 indicadores × 5% · Período Pre-COD · Proporcional al avance</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>{DAC_KPIS.length} indicadores × 5% · Alimentados desde gestión territorial · Tiempo real</div>
           </div>
 
           <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 12, padding: '10px 14px', marginBottom: 16, fontSize: 11, color: '#1e40af', lineHeight: 1.5 }}>
-            KPIs 1-3 se calculan automáticamente. KPIs 4-5 requieren input manual (Comunicaciones y ESG).
+            Estos indicadores se calculan automáticamente desde los datos de las gestoras territoriales. Se actualizan en tiempo real.
           </div>
 
           {DAC_KPIS.map(kpi => (
