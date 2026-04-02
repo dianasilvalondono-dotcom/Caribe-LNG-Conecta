@@ -36,24 +36,75 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   const semColorInv = (val) => val === 0 ? '#10b981' : val <= 2 ? '#f59e0b' : '#ef4444'
   const semLabel = (pct, meta = 80) => pct >= meta ? 'En meta' : pct >= meta * 0.7 ? 'Atención' : 'Crítico'
 
+  // Hitos de acuerdos: 4 por territorio (mapeo, mesas, propuesta, firma)
+  // Aproximación: avance >=25% = mapeo, >=50% = mesas, >=75% = propuesta, 100% = firma
+  const hitosCompletados = agreements.reduce((s, a) => {
+    let h = 0
+    if (a.avance >= 25) h++
+    if (a.avance >= 50) h++
+    if (a.avance >= 75) h++
+    if (a.avance >= 100) h++
+    return s + h
+  }, 0)
+  const totalHitos = 8 // 4 por territorio × 2
+  const hitosPct = Math.round((hitosCompletados / totalHitos) * 100)
+
+  // PGS ejecutado: promedio avance acuerdos como proxy
+  const pgsEjecutado = acuerdosAvgPct
+
+  // Alertas escaladas a tiempo: proxy desde reportes
+  const totalAlertas = reportes.reduce((s, r) => s + (r.alertas_escaladas_dac || 0), 0)
+  const alertasPct = totalAlertas > 0 ? Math.min(90, Math.round((totalAlertas / Math.max(totalAlertas, 1)) * 100)) : (reportes.length > 0 ? 100 : 0)
+
+  // Reconocimiento proporcional: (logrado / meta) × 5%
+  const reconocer = (logrado, meta) => meta > 0 ? Math.min(Number(((logrado / meta) * 5).toFixed(2)), 5) : 0
+
   const DAC_KPIS = [
-    { obj: 1, titulo: 'Ejecución del Plan de Gestión Social (PGS)', color: C.tolu, items: [
-      { name: 'Avance promedio de acuerdos', value: `${acuerdosAvgPct}%`, pct: acuerdosAvgPct, meta: 80, sc: semColor(acuerdosAvgPct) },
-      { name: 'Eventos y socializaciones realizados', value: totalEventosD, pct: Math.min(Math.round((totalEventosD / 24) * 100), 100), meta: 24, sc: semColor(Math.round((totalEventosD / 24) * 100)) },
-      { name: 'Actores gestionados acumulado', value: actoresGestionados, pct: Math.min(Math.round((actoresGestionados / 100) * 100), 100), meta: 100, sc: semColor(Math.round((actoresGestionados / 100) * 100)) },
-      { name: 'Relacionamiento estable (% verde)', value: `${relacionamientoPct}%`, pct: relacionamientoPct, meta: 60, sc: semColor(relacionamientoPct, 60) },
-    ]},
-    { obj: 2, titulo: 'Acuerdos sociales con comunidades', color: C.barbosa, items: [
-      { name: 'Acuerdos formalizados', value: `${acuerdosCumplidos}/${totalAcuerdos}`, pct: totalAcuerdos ? Math.round((acuerdosCumplidos / totalAcuerdos) * 100) : 0, meta: totalAcuerdos, sc: semColor(totalAcuerdos ? Math.round((acuerdosCumplidos / totalAcuerdos) * 100) : 0) },
-      { name: 'Compromisos cumplidos', value: `${compromisosCumplidosD}/${totalCompromisos}`, pct: compromisosPct, meta: 90, sc: semColor(compromisosPct, 90) },
-      { name: 'Compromisos vencidos', value: compromisosVencidos, pct: 0, meta: 0, sc: semColorInv(compromisosVencidos), invert: true },
-    ]},
-    { obj: 3, titulo: 'Gestión de riesgos, PQRS e incidentes', color: '#ef4444', items: [
-      { name: 'PQRS cerradas', value: `${pqrsPct}%`, pct: pqrsPct, meta: 90, sc: semColor(pqrsPct, 90) },
-      { name: 'Incidentes acumulados', value: totalIncidentesD, pct: 0, meta: 0, sc: semColorInv(totalIncidentesD), invert: true },
-      { name: 'Reportes semanales entregados', value: reportes.length, pct: Math.min(Math.round((reportes.length / 48) * 100), 100), meta: 48, sc: semColor(Math.round((reportes.length / 48) * 100)) },
-    ]},
+    { num: 1, titulo: 'Formalización de Acuerdos Sociales Tolú y Barbosa', peso: '5%', color: C.tolu,
+      fecha: '30 junio 2026', medicion: '% hitos completados',
+      meta: '≥75% hitos (6/8)', alertaRoja: '<50% hitos al 30 junio o sin mesas de diálogo',
+      value: `${hitosCompletados}/8`, pct: hitosPct, metaNum: 75,
+      reconocimiento: reconocer(hitosPct, 100),
+      sc: hitosPct >= 75 ? '#10b981' : hitosPct >= 50 ? '#f59e0b' : '#ef4444',
+      sub: `Tolú: ${agreements.filter(a => a.territorio === 'Tolú').reduce((s, a) => s + (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0), 0)}/4 · Barbosa: ${agreements.filter(a => a.territorio === 'Barbosa').reduce((s, a) => s + (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0), 0)}/4`
+    },
+    { num: 2, titulo: 'Ejecución del Plan de Gestión Social (PGS)', peso: '5%', color: C.barbosa,
+      fecha: '31 dic 2026', medicion: '% PGS ejecutado',
+      meta: 'PGS ≥80% ejecutado', alertaRoja: '<60% en cualquier territorio o bloqueo sin protocolo',
+      value: `${pgsEjecutado}%`, pct: pgsEjecutado, metaNum: 80,
+      reconocimiento: reconocer(pgsEjecutado, 80),
+      sc: pgsEjecutado >= 80 ? '#10b981' : pgsEjecutado >= 60 ? '#f59e0b' : '#ef4444',
+      sub: `Tolú: ${agreements.filter(a => a.territorio === 'Tolú').length ? Math.round(agreements.filter(a => a.territorio === 'Tolú').reduce((s, a) => s + (a.avance || 0), 0) / agreements.filter(a => a.territorio === 'Tolú').length) : 0}% · Barbosa: ${agreements.filter(a => a.territorio === 'Barbosa').length ? Math.round(agreements.filter(a => a.territorio === 'Barbosa').reduce((s, a) => s + (a.avance || 0), 0) / agreements.filter(a => a.territorio === 'Barbosa').length) : 0}% · Incidentes: ${totalIncidentesD}`
+    },
+    { num: 3, titulo: 'Gestión de Riesgos Sociales y Reputacionales', peso: '5%', color: '#ef4444',
+      fecha: 'Continuo', medicion: '% alertas gestionadas a tiempo',
+      meta: '≥90% alertas escaladas a tiempo', alertaRoja: '<70% alertas o incidente sin respuesta en 72h',
+      value: `${pqrsPct}%`, pct: pqrsPct, metaNum: 90,
+      reconocimiento: reconocer(pqrsPct, 90),
+      sc: pqrsPct >= 90 ? '#10b981' : pqrsPct >= 70 ? '#f59e0b' : '#ef4444',
+      sub: `PQRS cerradas: ${pqrsCerradas}/${totalPqrs} · Incidentes: ${totalIncidentesD} · Alertas escaladas: ${totalAlertas}`
+    },
+    { num: 4, titulo: 'Hitos Críticos Cubiertos con Material de Comunicación', peso: '5%', color: '#f59e0b',
+      fecha: 'Continuo / trimestral', medicion: '% hitos cubiertos',
+      meta: '≥85% hitos cubiertos con material ≥72h antes', alertaRoja: 'Hito crítico sin material en 72h',
+      value: dacMap['hitos_material']?.valor || '—', pct: parseInt(dacMap['hitos_material']?.valor) || 0, metaNum: 85,
+      reconocimiento: reconocer(parseInt(dacMap['hitos_material']?.valor) || 0, 85),
+      sc: (parseInt(dacMap['hitos_material']?.valor) || 0) >= 85 ? '#10b981' : (parseInt(dacMap['hitos_material']?.valor) || 0) >= 55 ? '#f59e0b' : '#ef4444',
+      sub: dacMap['hitos_material']?.notas || 'Requiere input manual — lista de hitos A+ aprobada trimestralmente',
+      manual: true
+    },
+    { num: 5, titulo: 'Informes ESG Entregados para Financiamiento', peso: '5%', color: '#10b981',
+      fecha: 'Según solicitudes', medicion: '% informes en plazo',
+      meta: '100% informes ≤15 días hábiles', alertaRoja: 'Informe >20 días hábiles después de solicitud',
+      value: dacMap['esg_en_plazo']?.valor || '—', pct: parseInt(dacMap['esg_en_plazo']?.valor) || 0, metaNum: 100,
+      reconocimiento: reconocer(parseInt(dacMap['esg_en_plazo']?.valor) || 0, 100),
+      sc: (parseInt(dacMap['esg_en_plazo']?.valor) || 0) >= 100 ? '#10b981' : (parseInt(dacMap['esg_en_plazo']?.valor) || 0) >= 50 ? '#f59e0b' : '#ef4444',
+      sub: dacMap['esg_en_plazo']?.notas || 'Requiere input manual — según solicitudes formales de financiamiento',
+      manual: true
+    },
   ]
+
+  const totalReconocimiento = DAC_KPIS.reduce((s, k) => s + k.reconocimiento, 0)
 
   // ── Gestora KPI definitions (updated to match PDF) ────────────────────────
   const KPIS_BARBOSA = [
@@ -325,38 +376,71 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
         ))}
       </div>
 
-      {/* ── DAC Director tab — auto-calculated ── */}
+      {/* ── DAC Director tab — 5 KPIs individuales ── */}
       {mainTab === 'dac' && (
         <div>
-          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 14, padding: '14px 18px', marginBottom: 20, fontSize: 12, color: '#1e40af', lineHeight: 1.6 }}>
-            Estos indicadores se calculan automáticamente desde los reportes semanales, acuerdos y actores. Se actualizan en tiempo real.
+          {/* Scorecard summary */}
+          <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1a3d7a 60%, #1565C0 100%)', borderRadius: 16, padding: '20px 22px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Reconocimiento proporcional</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <span style={{ fontSize: 36, fontWeight: 900, color: 'white' }}>{totalReconocimiento.toFixed(1)}%</span>
+              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>de 25% posible</span>
+            </div>
+            <div style={{ height: 6, background: 'rgba(255,255,255,0.15)', borderRadius: 100, marginTop: 12, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${Math.min((totalReconocimiento / 25) * 100, 100)}%`, background: 'white', borderRadius: 100, transition: 'width 0.8s' }} />
+            </div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>5 indicadores × 5% · Período Pre-COD · Proporcional al avance</div>
           </div>
-          {DAC_KPIS.map(obj => (
-            <div key={obj.obj} style={{ background: 'white', borderRadius: 16, padding: '20px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: obj.color }} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, background: obj.color, color: 'white', padding: '3px 10px', borderRadius: 6, letterSpacing: '0.5px' }}>OBJ {obj.obj}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#2B2926' }}>{obj.titulo}</span>
-              </div>
-              {obj.items.map((kpi, i) => (
-                <div key={i} style={{ padding: '12px 0', borderTop: i > 0 ? '1px solid #f1f5f9' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: kpi.sc, flexShrink: 0, boxShadow: `0 0 6px ${kpi.sc}60` }} />
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#2B2926' }}>{kpi.name}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      <span style={{ fontSize: 18, fontWeight: 900, color: kpi.sc }}>{kpi.value}</span>
-                      {kpi.meta > 0 && <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>/ {kpi.meta}</span>}
-                    </div>
+
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 12, padding: '10px 14px', marginBottom: 16, fontSize: 11, color: '#1e40af', lineHeight: 1.5 }}>
+            KPIs 1-3 se calculan automáticamente. KPIs 4-5 requieren input manual (Comunicaciones y ESG).
+          </div>
+
+          {DAC_KPIS.map(kpi => (
+            <div key={kpi.num} style={{ background: 'white', borderRadius: 16, padding: '20px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 4, background: kpi.sc }} />
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, background: kpi.color, color: 'white', padding: '3px 10px', borderRadius: 6 }}>{kpi.peso}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: '#94a3b8' }}>{kpi.fecha}</span>
+                    {kpi.manual && <span style={{ fontSize: 9, fontWeight: 700, background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: 4 }}>Manual</span>}
                   </div>
-                  {!kpi.invert && kpi.meta > 0 && (
-                    <div style={{ height: 5, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${Math.min(kpi.pct, 100)}%`, background: kpi.sc, borderRadius: 100, transition: 'width 0.6s' }} />
-                    </div>
-                  )}
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#2B2926', lineHeight: 1.3 }}>{kpi.num}. {kpi.titulo}</div>
                 </div>
-              ))}
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: kpi.sc }}>{kpi.value}</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: kpi.sc, textTransform: 'uppercase' }}>
+                    {kpi.pct >= kpi.metaNum ? 'En meta' : kpi.pct >= kpi.metaNum * 0.7 ? 'Atención' : kpi.pct > 0 ? 'Crítico' : '—'}
+                  </div>
+                </div>
+              </div>
+              {/* Progress bar */}
+              {kpi.metaNum > 0 && (
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ height: 6, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.min(kpi.pct, 100)}%`, background: kpi.sc, borderRadius: 100, transition: 'width 0.6s' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                    <span style={{ fontSize: 10, color: '#94a3b8' }}>Meta: {kpi.meta}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: kpi.sc }}>Reconocimiento: {kpi.reconocimiento.toFixed(2)}%</span>
+                  </div>
+                </div>
+              )}
+              {/* Sub details */}
+              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>{kpi.sub}</div>
+              {/* Alerta roja */}
+              <div style={{ fontSize: 10, color: '#dc2626', marginTop: 6, padding: '4px 8px', background: '#fef2f2', borderRadius: 6, display: 'inline-block' }}>
+                Alerta roja: {kpi.alertaRoja}
+              </div>
+              {/* Manual input for KPIs 4 & 5 */}
+              {kpi.manual && isAdmin && (
+                <div style={{ marginTop: 10, padding: '10px 12px', background: '#f8fafc', borderRadius: 10, border: '1px solid #e8ecf0' }}>
+                  <DACKpiRow kpi={{ id: kpi.num === 4 ? 'hitos_material' : 'esg_en_plazo', name: 'Actualizar valor', formula: kpi.medicion, frecuencia: kpi.fecha, meta: kpi.meta }} saved={dacMap[kpi.num === 4 ? 'hitos_material' : 'esg_en_plazo']} isAdmin={isAdmin} onSaved={onKpiDacSaved} />
+                </div>
+              )}
             </div>
           ))}
         </div>
