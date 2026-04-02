@@ -735,6 +735,15 @@ export default function App() {
                     'Registros_Diarios', 'Registros'
                   )}
                     style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>📥 Excel Registros</button>
+                  <button onClick={async () => {
+                    if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones')
+                    const perm = await Notification.requestPermission()
+                    if (perm === 'granted') {
+                      await subscribeToPush(session.user.id)
+                      new Notification('Caribe LNG Conecta', { body: '¡Notificaciones activadas!', icon: '/logo-simbolo.svg' })
+                    } else { alert('Permiso denegado') }
+                  }}
+                    style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>🔔 Notificaciones</button>
                 </>}
               </div>
             </div>
@@ -1853,6 +1862,18 @@ export default function App() {
                 style={{ background: C.accent, color: 'white', border: 'none', borderRadius: 8,
                   padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                 📖 Guía
+              </button>
+              <button onClick={async () => {
+                if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones')
+                const perm = await Notification.requestPermission()
+                if (perm === 'granted') {
+                  await subscribeToPush(session.user.id)
+                  new Notification('Caribe LNG Conecta', { body: '¡Notificaciones activadas! Recibirás alertas en tiempo real.', icon: '/logo-simbolo.svg' })
+                } else { alert('Permiso denegado. Actívalo en la configuración del navegador.') }
+              }}
+                style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8,
+                  padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                🔔 Notificaciones
               </button>
             </div>
 
