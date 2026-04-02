@@ -34,6 +34,7 @@ import RiesgosView from './components/RiesgosView'
 import KPIsView from './components/KPIsView'
 import KnowledgeBaseView from './components/KnowledgeBaseView'
 import ChatBot from './components/ChatBot'
+import Dashboard from './components/Dashboard'
 
 // LoginScreen → imported from components/LoginScreen
 
@@ -714,295 +715,37 @@ export default function App() {
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                <img src="/logo-conecta.svg" alt="Caribe LNG Conecta" style={{ height: isMobile ? 32 : 44 }} />
-                <span style={{ fontSize: isMobile ? 15 : 22, fontWeight: 800, color: C.muted }}>|</span>
-                <h1 style={{ margin: 0, fontSize: isMobile ? 17 : 24, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Estado del territorio</h1>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 12 : 16, flex: 1, minWidth: 0 }}>Resumen de relacionamiento · Caribe LNG 2026 · Tiempo real</p>
-                {!isMobile && <>
-                  <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
-                  <button onClick={() => exportToExcel(
-                    actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Posición: a.posicion, Riesgo: a.riesgo, Poder: a.poder, Interés: a.interes, Prioridad: a.prioridad, Responsable: a.owner, Contacto: a.contacto })),
-                    'Actores_CaribeLNG', 'Actores'
-                  )}
-                    style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>📥 Excel Actores</button>
-                  <button onClick={() => exportToExcel(
-                    registrosDiarios.map(r => ({ Fecha: r.fecha, Territorio: r.territorio, Tipo: r.tipo_reunion, Lugar: r.lugar || r.geo_lugar, Asistentes: r.asistentes, Descripción: r.descripcion, GPS: r.latitud ? `${r.latitud},${r.longitud}` : '' })),
-                    'Registros_Diarios', 'Registros'
-                  )}
-                    style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>📥 Excel Registros</button>
-                  <button onClick={async () => {
-                    if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones')
-                    const perm = await Notification.requestPermission()
-                    if (perm === 'granted') {
-                      await subscribeToPush(session.user.id)
-                      new Notification('Caribe LNG Conecta', { body: '¡Notificaciones activadas!', icon: '/logo-simbolo.svg' })
-                    } else { alert('Permiso denegado') }
-                  }}
-                    style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>🔔 Notificaciones</button>
-                </>}
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
-            <div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(220px, 1fr))', gap: isMobile ? 8 : 16, marginBottom: 20 }}>
-              <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8, marginBottom: -4 }}>
-                <div style={{ width: 3, height: 16, background: C.navy, borderRadius: 2 }} />
-                <span style={{ fontSize: isMobile ? 13 : 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapeo de Actores</span>
-              </div>
-              <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ cursor: 'pointer' }}><StatCard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} color={C.navy} icon="👥" compact={isMobile} /></div>
-              <div onClick={() => { setView('actores'); setFilterS('verde') }} style={{ cursor: 'pointer' }}><StatCard label="Relación estable" value={stats.verde} color={C.green} icon="✅" compact={isMobile} /></div>
-              <div onClick={() => { setView('actores'); setFilterS('amarillo') }} style={{ cursor: 'pointer' }}><StatCard label="En atención" value={stats.amarillo + stats.naranja} sub="Amarillo + Naranja" color={C.orange} icon="⚠️" compact={isMobile} /></div>
-              <div onClick={() => { setView('actores'); setFilterS('rojo') }} style={{ cursor: 'pointer' }}><StatCard label="Por iniciar" value={stats.rojo} color={C.red} icon="🚨" compact={isMobile} /></div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
-              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Mapa de Riesgos</span>
-            </div>
-            <div style={{ marginBottom: 24 }}>
-              <div onClick={() => setView('riesgos')} style={{ cursor: 'pointer', display: 'block', maxWidth: isMobile ? '100%' : 320 }}>
-                <StatCard label="Riesgos en acción inmediata" value={riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente'))).length} sub="Ver mapa completo →" color='#dc2626' icon="🗺️" compact={isMobile} />
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 3, height: 18, background: C.tolu, borderRadius: 2 }} />
-              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores por Territorio</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
-              {[
-                { label: 'Tolú', value: stats.tolu, color: C.tolu, desc: 'Terminal marítima →  Sucre' },
-                { label: 'Barbosa', value: stats.barbosa, color: C.barbosa, desc: 'Planta regasificación →  Antioquia' },
-                { label: 'Nacional', value: stats.nacional, color: C.muted, desc: 'Legislativo →  Regulatorio' },
-              ].map(t => (
-                <div key={t.label} onClick={() => { setView('actores'); setFilterT(t.label) }} style={{ background: C.card, borderRadius: 10, padding: isMobile ? '8px 10px' : '14px 18px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderTop: `4px solid ${t.color}`, cursor: 'pointer' }}>
-                  <div style={{ fontSize: isMobile ? 24 : 34, fontWeight: 900, color: t.color }}>{t.value}</div>
-                  <div style={{ fontSize: isMobile ? 12 : 15, fontWeight: 700, color: C.text }}>{t.label}</div>
-                  <div style={{ fontSize: isMobile ? 11 : 15, color: C.subtle, marginTop: 1 }}>{t.desc}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 3, height: 18, background: C.accent, borderRadius: 2 }} />
-              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Semáforo de Relacionamiento & Acuerdos</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: isMobile ? 12 : 20 }}>
-              <div style={{ background: C.card, borderRadius: 10, padding: isMobile ? '10px 12px' : 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: isMobile ? '0 0 8px' : '0 0 14px', fontSize: isMobile ? 12 : 15, fontWeight: 700, color: C.text }}>Semáforo de relacionamiento</h3>
-                {[['verde', 'Relación estable', stats.verde], ['amarillo', 'Requiere atención', stats.amarillo],
-                  ['naranja', 'Riesgo moderado', stats.naranja], ['rojo', 'Acercamiento por iniciar', stats.rojo]].map(([k, lbl, v]) => (
-                  <div key={k} onClick={() => { setView('actores'); setFilterS(k) }} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: isMobile ? 6 : 9, cursor: 'pointer' }}>
-                    <SemDot s={k} size={8} />
-                    <span style={{ fontSize: isMobile ? 12 : 16, color: C.muted, minWidth: 0, flex: '0 1 120px' }}>{lbl}</span>
-                    <div style={{ flex: 1 }}><Bar value={stats.total ? (v / stats.total) * 100 : 0} color={SEMAFORO[k].color} /></div>
-                    <span style={{ fontSize: isMobile ? 12 : 15, fontWeight: 700, color: SEMAFORO[k].color, width: 22, textAlign: 'right' }}>{v}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: C.card, borderRadius: 10, padding: isMobile ? '10px 12px' : 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                <h3 style={{ margin: isMobile ? '0 0 8px' : '0 0 14px', fontSize: isMobile ? 12 : 15, fontWeight: 700, color: C.text }}>Estado de acuerdos territoriales</h3>
-                {agreements.map(ag => {
-                  const barColor = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }[ag.estado_code] || C.accent
-                  return (
-                    <div key={ag.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: isMobile ? 6 : 8, cursor: 'pointer' }}>
-                      <span style={{ fontSize: isMobile ? 12 : 16, fontWeight: 700, color: C.muted, width: 20 }}>{ag.id}</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: isMobile ? 12 : 15, color: C.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
-                        <Bar value={ag.avance} color={barColor} height={4} />
-                      </div>
-                      <span style={{ fontSize: isMobile ? 12 : 16, fontWeight: 700, width: 28, textAlign: 'right', color: barColor }}>{ag.avance}%</span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 3, height: 18, background: C.red, borderRadius: 2 }} />
-              <span style={{ fontSize: 15, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actores en Gestión Prioritaria</span>
-            </div>
-            <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? '12px' : 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-              <h3 style={{ margin: isMobile ? '0 0 10px' : '0 0 14px', fontSize: isMobile ? 13 : 15, fontWeight: 700, color: C.text }}>⚠️ Actores en gestion prioritaria — Acción requerida</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
-                {actors.filter(a => a.semaforo === 'rojo' && a.prioridad === 'A').slice(0, 8).map(a => (
-                  <div key={a.id} onClick={() => { setSelectedActor(a); setView('actores') }}
-                    style={{ display: 'flex', gap: 10, background: '#fff5f5', borderRadius: 8,
-                      padding: '10px 12px', border: '1px solid #fecaca', cursor: 'pointer', alignItems: 'flex-start' }}>
-                    <Avatar name={a.nombre} size={30} color={getTipoColor(a.tipo)} />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 16, fontWeight: 700, color: '#991b1b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
-                      <div style={{ fontSize: 15, color: C.muted }}>{a.territorio} →  {a.tipo}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ── Gráficos ── */}
-            {(
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 24 }}>
-                {/* Chart 1: Progreso de Acuerdos */}
-                <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Progreso de Acuerdos</div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart layout="vertical" data={
-                      agreements.map(ag => ({
-                        nombre: `${ag.id}. ${(ag.nombre || '').substring(0, 25)}`,
-                        avance: ag.avance || 0,
-                        territorio: ag.territorio,
-                      }))
-                    } margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
-                      <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={v => `${v}%`} />
-                      <YAxis type="category" dataKey="nombre" tick={{ fontSize: 10 }} width={130} />
-                      <Tooltip formatter={(v) => [`${v}%`, 'Avance']} contentStyle={{ fontSize: 12 }} />
-                      <RBar dataKey="avance" radius={[0, 4, 4, 0]}>
-                        {agreements.map((ag, i) => (
-                          <Cell key={i} fill={ag.avance >= 100 ? C.green : ag.avance > 0 ? (ag.territorio === 'Tolú' ? C.tolu : C.barbosa) : C.yellow} />
-                        ))}
-                      </RBar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                {/* Chart 2: Actores por Territorio y Semáforo */}
-                <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Relaciones por Territorio</div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={
-                      ['Tolú', 'Barbosa', 'Nacional'].map(t => {
-                        const ta = actors.filter(a => a.territorio === t)
-                        return {
-                          territorio: t,
-                          Verde: ta.filter(a => a.semaforo === 'verde').length,
-                          Amarillo: ta.filter(a => a.semaforo === 'amarillo').length,
-                          Naranja: ta.filter(a => a.semaforo === 'naranja').length,
-                          Rojo: ta.filter(a => a.semaforo === 'rojo').length,
-                        }
-                      })
-                    } margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
-                      <XAxis dataKey="territorio" tick={{ fontSize: 12, fontWeight: 700 }} />
-                      <YAxis tick={{ fontSize: 11 }} width={30} />
-                      <Tooltip contentStyle={{ fontSize: 12 }} />
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                      <RBar dataKey="Verde" stackId="a" fill={C.green} />
-                      <RBar dataKey="Amarillo" stackId="a" fill={C.yellow} />
-                      <RBar dataKey="Naranja" stackId="a" fill={C.orange} />
-                      <RBar dataKey="Rojo" stackId="a" fill={C.red} radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-
-            </div>
-
-            {!isMobile && <div style={{ position: 'sticky', top: 80 }}>
-              <div style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
-                <div style={{ background: C.navy, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 16 }}>🔔</span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: 'white', letterSpacing: '0.04em' }}>NOVEDADES</span>
-                </div>
-                <div style={{ padding: 12 }}>
-                  {(() => {
-                    const alertas = []
-                    const hoy = new Date()
-                    const ultimosReportes = {}
-                    reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
-                    Object.values(ultimosReportes).forEach(r => {
-                      if (r.pqrs_pendientes > 0) alertas.push({ icon: '⚠️', text: `${r.territorio}: ${r.pqrs_pendientes} quejas sin resolver`, color: C.orange, nav: () => setView('input') })
-                      if (r.incidentes > 0) alertas.push({ icon: '🚨', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: C.red, nav: () => setView('input') })
-                    })
-                    seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada).forEach(s => {
-                      if (new Date(s.fecha_pactada) < hoy) alertas.push({ icon: '📋', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 45)}...`, color: C.red, nav: () => setView('input') })
-                    })
-                    cronograma.filter(c => c.estado === 'En proceso').forEach(c => {
-                      alertas.push({ icon: '📅', text: `${c.territorio}: ${(c.evento || '').substring(0, 50)}...`, color: C.accent, nav: () => setView('cronograma') })
-                    })
-                    const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.includes('Alto') || r.semaforo.includes('urgente')))
-                    if (riesgosAltos.length > 0) alertas.push({ icon: '🔴', text: `${riesgosAltos.length} riesgo(s) en acción inmediata`, color: C.red, nav: () => setView('riesgos') })
-                    if (!alertas.length) return (
-                      <div style={{ padding: '20px 8px', textAlign: 'center', color: C.subtle, fontSize: 14 }}>
-                        <div style={{ fontSize: 24, marginBottom: 6 }}>✅</div>
-                        Sin novedades por ahora
-                      </div>
-                    )
-                    return alertas.map((a, i) => (
-                      <div key={i} onClick={a.nav} style={{ display: 'flex', gap: 8, alignItems: 'flex-start',
-                        padding: '9px 10px', marginBottom: 6, borderRadius: 8, cursor: 'pointer',
-                        borderLeft: `3px solid ${a.color}`, background: a.color === C.red ? '#fef2f2' : a.color === C.orange ? '#fff7ed' : '#eff6ff' }}>
-                        <span style={{ fontSize: 14, marginTop: 1 }}>{a.icon}</span>
-                        <span style={{ fontSize: 13, color: a.color, fontWeight: 600, lineHeight: 1.4 }}>{a.text}</span>
-                      </div>
-                    ))
-                  })()}
-                </div>
-              </div>
-              {/* ── Ediciones pendientes (admin only) ── */}
-              {isAdmin && actorEdits.length > 0 && (
-                <div style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden', marginTop: 12 }}>
-                  <div style={{ background: '#f59e0b', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>✏️</span>
-                    <span style={{ fontSize: 15, fontWeight: 800, color: 'white', letterSpacing: '0.04em' }}>EDICIONES PENDIENTES</span>
-                    <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.3)', borderRadius: 10, padding: '2px 8px', fontSize: 12, fontWeight: 800, color: 'white' }}>{actorEdits.length}</span>
-                  </div>
-                  <div style={{ padding: 12 }}>
-                    {actorEdits.map(edit => {
-                      const actorName = actors.find(a => a.id === edit.actor_id)?.nombre || `Actor #${edit.actor_id}`
-                      const changedKeys = Object.keys(edit.campos || {})
-                      return (
-                        <div key={edit.id} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 2 }}>{actorName}</div>
-                          <div style={{ fontSize: 12, color: C.subtle, marginBottom: 4 }}>
-                            Por: {edit.user_name} · {new Date(edit.created_at).toLocaleDateString('es-CO')}
-                          </div>
-                          <div style={{ fontSize: 12, marginBottom: 6 }}>
-                            {changedKeys.map(k => (
-                              <div key={k} style={{ display: 'flex', gap: 4, marginBottom: 2 }}>
-                                <span style={{ fontWeight: 700, color: C.muted }}>{k}:</span>
-                                <span style={{ color: C.accent, fontWeight: 600 }}>{String(edit.campos[k])}</span>
-                              </div>
-                            ))}
-                          </div>
-                          <div style={{ display: 'flex', gap: 6 }}>
-                            <button onClick={async () => {
-                              await approveActorEdit(edit.id, edit.actor_id, edit.campos, session.user.id)
-                              sendPushNotification({ title: 'Edición aprobada', body: `Tu edición de ${actorName} fue aprobada`, user_ids: [edit.user_id] }).catch(() => {})
-                              await loadData()
-                            }}
-                              style={{ flex: 1, background: C.green, color: 'white', border: 'none', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                              ✅ Aprobar
-                            </button>
-                            <button onClick={async () => {
-                              await rejectActorEdit(edit.id, session.user.id)
-                              sendPushNotification({ title: 'Edición rechazada', body: `Tu edición de ${actorName} fue rechazada`, user_ids: [edit.user_id] }).catch(() => {})
-                              await loadData()
-                            }}
-                              style={{ flex: 1, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                              ❌ Rechazar
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-              {/* Audit log button */}
-              {isAdmin && (
-                <button onClick={async () => { setAuditLog(await getAuditLog(30)); setShowAudit(true) }}
-                  style={{ width: '100%', marginTop: 12, background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 10,
-                    padding: '10px 14px', fontSize: 13, fontWeight: 700, color: C.muted, cursor: 'pointer', textAlign: 'left',
-                    display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span>📜</span> Ver historial de cambios
-                </button>
-              )}
-            </div>}
-            </div>
-          </div>
+          <Dashboard
+            stats={stats}
+            actors={actors}
+            agreements={agreements}
+            riesgos={riesgos}
+            seguimiento={seguimiento}
+            reportes={reportes}
+            cronograma={cronograma}
+            isMobile={isMobile}
+            isAdmin={isAdmin}
+            profile={profile}
+            session={session}
+            actorEdits={actorEdits}
+            setView={setView}
+            setFilterS={setFilterS}
+            setFilterT={setFilterT}
+            setSelectedActor={setSelectedActor}
+            loadData={loadData}
+            exportToExcel={exportToExcel}
+            approveActorEdit={approveActorEdit}
+            rejectActorEdit={rejectActorEdit}
+            sendPushNotification={sendPushNotification}
+            auditLog={auditLog}
+            setAuditLog={setAuditLog}
+            showAudit={showAudit}
+            setShowAudit={setShowAudit}
+            getAuditLog={getAuditLog}
+            registrosDiarios={registrosDiarios}
+            subscribeToPush={subscribeToPush}
+          />
         )}
-
         {/* ━━ ACTORES ━━ */}
         {view === 'actores' && (
           <div>
