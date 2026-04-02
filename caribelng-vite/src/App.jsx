@@ -16,6 +16,9 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          addRegistroDiario, getRegistrosDiarios,
          getAuditLog, subscribeToPush, sendPushNotification } from './lib/supabase'
 
+import { IconDashboard, IconPin, IconUsers, IconGlobe, IconHandshake, IconLeaf, IconCalendar,
+         IconAlert, IconClipboard, IconTarget, IconEdit, IconBrain, IconCamera, IconBell, IconSearch, IconDownload, IconBook } from './components/Icons'
+
 // ── Export helper ────────────────────────────────────────────────────────────
 function exportToExcel(data, filename, sheetName = 'Datos') {
   const ws = XLSX.utils.json_to_sheet(data)
@@ -479,20 +482,20 @@ export default function App() {
   if (!session) return <LoginScreen />
 
   const NAV = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'gestora', label: 'Mi territorio', icon: '📍' },
-    { id: 'actores', label: 'Actores', icon: '👥' },
-    { id: 'territorio', label: 'Territorio', icon: '🌎', children: [
-      { id: 'acuerdos', label: 'Acuerdos', icon: '🤝' },
-      { id: 'huella', label: 'Huella Social', icon: '🌱' },
-      { id: 'cronograma', label: 'Cronograma', icon: '📅' },
+    { id: 'dashboard', label: 'Dashboard', icon: <IconDashboard size={16} /> },
+    { id: 'gestora', label: 'Mi territorio', icon: <IconPin size={16} /> },
+    { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
+    { id: 'territorio', label: 'Territorio', icon: <IconGlobe size={16} />, children: [
+      { id: 'acuerdos', label: 'Acuerdos', icon: <IconHandshake size={16} /> },
+      { id: 'huella', label: 'Huella Social', icon: <IconLeaf size={16} /> },
+      { id: 'cronograma', label: 'Cronograma', icon: <IconCalendar size={16} /> },
     ]},
-    { id: 'riesgos', label: 'Riesgos DAC', icon: '⚠️' },
-    { id: 'gestion', label: 'Gestión', icon: '📋', children: [
-      { id: 'kpis', label: 'KPIs', icon: '🎯' },
-      { id: 'input', label: 'Registro de Campo', icon: '✍️' },
+    { id: 'riesgos', label: 'Riesgos DAC', icon: <IconAlert size={16} /> },
+    { id: 'gestion', label: 'Gestión', icon: <IconClipboard size={16} />, children: [
+      { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
+      { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
     ]},
-    ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: '🧠' }] : []),
+    ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
   ]
   // helper: check if a view belongs to a dropdown group
   const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
@@ -560,7 +563,7 @@ export default function App() {
                     border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer',
                     fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
                     whiteSpace: 'nowrap' }}>
-                  <span style={{ fontSize: 13 }}>{n.icon}</span>
+                  {n.icon}
                   <span>{n.label}</span>
                   <span style={{ fontSize: 9, marginLeft: 2 }}>▼</span>
                 </button>
@@ -573,7 +576,7 @@ export default function App() {
                   border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer',
                   fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
                   whiteSpace: 'nowrap' }}>
-                <span style={{ fontSize: 13 }}>{n.icon}</span>
+                {n.icon}
                 <span>{n.label}</span>
               </button>
             ))}
@@ -602,7 +605,7 @@ export default function App() {
                       color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
                       border: 'none', borderRadius: 8, padding: '10px 14px', cursor: 'pointer',
                       fontSize: 14, fontWeight: 600 }}>
-                    <span style={{ fontSize: 15 }}>{c.icon}</span><span>{c.label}</span>
+                    {c.icon}<span>{c.label}</span>
                   </button>
                 ))}
               </div>
@@ -621,7 +624,7 @@ export default function App() {
                       color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                       border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
                       fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span>{n.icon}</span><span>{n.label}</span>
+                    {n.icon}<span>{n.label}</span>
                     <span style={{ fontSize: 10, marginLeft: 2 }}>▼</span>
                   </button>
                   {navOpen === n.id && (
@@ -634,7 +637,7 @@ export default function App() {
                             color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
                             border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer',
                             fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                          <span>{c.icon}</span><span>{c.label}</span>
+                          {c.icon}<span>{c.label}</span>
                         </button>
                       ))}
                     </div>
@@ -646,7 +649,7 @@ export default function App() {
                     color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                     border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
                     fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span>{n.icon}</span><span>{n.label}</span>
+                  {n.icon}<span>{n.label}</span>
                 </button>
               ))}
             </div>
@@ -1258,9 +1261,9 @@ export default function App() {
             {/* Sub-tabs */}
             <div style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
               {[
-                { id: 'diario', label: '📝 Registro Diario' },
-                { id: 'semanal', label: '📊 Reporte Semanal' },
-                { id: 'evidencias', label: '📸 Evidencias' },
+                { id: 'diario', label: 'Registro Diario' },
+                { id: 'semanal', label: 'Reporte Semanal' },
+                { id: 'evidencias', label: 'Evidencias' },
               ].map(t => (
                 <button key={t.id} onClick={() => setInputSubTab(t.id)}
                   style={{ flex: 1, background: inputSubTab === t.id ? 'white' : 'transparent',
@@ -1604,7 +1607,7 @@ export default function App() {
               <button onClick={() => setShowGuia(true)}
                 style={{ background: C.accent, color: 'white', border: 'none', borderRadius: 8,
                   padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                📖 Guía
+                <IconBook size={14} /> Guía
               </button>
               <button onClick={async () => {
                 if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones')
@@ -1616,7 +1619,7 @@ export default function App() {
               }}
                 style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8,
                   padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                🔔 Notificaciones
+                <IconBell size={14} /> Notificaciones
               </button>
             </div>
 
