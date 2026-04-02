@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { C } from '../lib/constants'
-import { Bar, Tag } from './ui'
+import { Bar, Tag, StatCard } from './ui'
 import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 
 export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved }) {
