@@ -1037,8 +1037,8 @@ export default function App() {
         {view === 'acuerdos' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>6 acuerdos →  3 Barbosa →  3 Tolú →  Co-responsabilidad comunitaria</p>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Acuerdos Territoriales</h1>
+              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>6 acuerdos · 3 Barbosa · 3 Tolu · Co-responsabilidad comunitaria</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
               {['Barbosa', 'Tolú'].map(t => (
@@ -1067,8 +1067,8 @@ export default function App() {
         {view === 'cronograma' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Cronograma 2026</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>Gestión Social Territorial → Nov 2025 – Dic 2026</p>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Cronograma 2026</h1>
+              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Gestión Social Territorial · Nov 2025 – Dic 2026</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               {(() => {
@@ -1257,8 +1257,8 @@ export default function App() {
         {view === 'input' && (
           <div>
             <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Registro de Campo</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 13 : 16 }}>Registros diarios, reportes semanales y evidencias fotográficas</p>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Registro de Campo</h1>
+              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Registros diarios, reportes semanales y evidencias</p>
             </div>
             {/* Sub-tabs */}
             <div style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
@@ -1603,8 +1603,8 @@ export default function App() {
           <div>
             <div style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div>
-                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>Mi Territorio</h1>
-                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
+                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: '#2B2926' }}>Mi Territorio</h1>
+                <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
               </div>
               <button onClick={() => setShowGuia(true)}
                 style={{ background: C.accent, color: 'white', border: 'none', borderRadius: 8,

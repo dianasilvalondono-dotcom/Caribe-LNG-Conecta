@@ -103,14 +103,15 @@ export default function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
       {/* Chat panel */}
       {open && (
         <div style={{ position: 'fixed', bottom: isMobile ? 80 : 90, right: isMobile ? '4vw' : 24,
-          width: panelW, height: panelH, background: 'white', borderRadius: 16,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)', zIndex: 9998, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          width: panelW, height: panelH, background: 'white', borderRadius: 20,
+          boxShadow: '0 12px 40px rgba(0,0,0,0.2)', zIndex: 9998, display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          border: '1px solid #e8ecf0' }}>
           {/* Header */}
-          <div style={{ background: C.navy, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ background: `linear-gradient(135deg, #0D47A1 0%, #1a3d7a 60%, #1565C0 100%)`, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <svg viewBox="0 0 863.64 794.92" width="28" height="28"><path fill="#fff" d="M426.09,605.21c-24.95-5.2-50.05-7.83-74.6-7.83-48.9,0-95.09,10.12-137.27,30.12-.03,0-.06.03-.09.03,27.18,53.3,68.19,109.2,126.41,167.39,0,0,101.03-72.55,127.8-180.89l-42.25-8.82ZM407.3,369.29c-19.9-76.36-26.5-218.87,123.5-369.29,0,0-398.92,193.08-357.66,500.5,59.71-38.26,129.97-58.41,204.07-58.41,21.36,0,43.15,1.7,64.88,5.08-1.15-1.95-2.32-3.9-3.53-5.88-13.74-22.44-24.64-46.55-31.26-72h0ZM559.06,623.91c-8.45,0-16.78-.28-24.73-.77-.84-.06-1.67-.09-2.51-.19-12.26,55.56-48.97,116.1-132.11,171.97,0,0,168.23-15.1,253.62-182.4-30.43,7.55-62.03,11.39-94.28,11.39ZM617.35,254.06c-43.8-53.15-83.6-131.24-56.95-224.47,0,0-139.72,129.38-95.09,328.93,7,31.11,19.41,60.67,35.16,88.31,2.04,3.59,4.21,7.55,6.44,11.89l48.25,8.7c21.42,3.87,43.05,5.82,64.32,5.82s43.64-2.1,64.44-6.22c2.75-.56,5.51-1.11,8.26-1.73,1.42-75.86-25.13-150.96-74.84-211.22h0Z"/><path fill="#90caf9" d="M863.64,410.8c-42.84,81.22-111.86,138.14-193.92,164.85-34.88,11.39-72.09,17.3-110.66,17.3-7.55,0-15.14-.22-22.78-.71-19.16-1.15-38.6-3.75-58.19-7.8l-4.4-.93-41.26-8.6c-27.21-5.66-54.32-8.48-80.94-8.48-53.05,0-104.22,11.17-150.52,33.09-4.83,2.29-9.63,4.7-14.39,7.24L0,706.43l133.28-134.18c14.27-14.36,29.62-27.27,45.9-38.6,57.01-39.68,125.42-60.6,198.03-60.6,22.9,0,46.27,2.1,69.8,6.35l11.89,2.14,62.74,11.3,28.04,5.05c23.49,4.24,46.83,6.31,69.8,6.31s47.57-2.26,70.45-6.81c47.14-9.29,91.34-28.01,130.31-55.68l43.4-30.89Z"/></svg>
             <div>
-              <div style={{ color: 'white', fontSize: 15, fontWeight: 800 }}>Conecta te habla</div>
-              <div style={{ color: '#94a3b8', fontSize: 11 }}>Tu asistente personal</div>
+              <div style={{ color: 'white', fontSize: 14, fontWeight: 800 }}>Conecta</div>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>Asistente IA · Caribe LNG</div>
             </div>
           </div>
 
@@ -123,8 +124,8 @@ export default function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', marginTop: 14 }}>
                   {['¿Cuántos actores hay en Tolú?', '¿Cuál es la huella social de Barbosa?', '¿Qué riesgos legislativos tenemos?', '¿Cómo van los acuerdos?'].map(q => (
                     <button key={q} onClick={() => { setInput(q); }}
-                      style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 10px',
-                        fontSize: 12, color: C.text, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      style={{ background: 'white', border: '1px solid #e8ecf0', borderRadius: 10, padding: '7px 12px',
+                        fontSize: 11, color: '#2B2926', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, transition: 'all 0.15s' }}>
                       {q}
                     </button>
                   ))}
@@ -158,15 +159,15 @@ export default function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
           </div>
 
           {/* Input */}
-          <div style={{ borderTop: '1px solid #e2e8f0', padding: '10px 12px', display: 'flex', gap: 8 }}>
+          <div style={{ borderTop: '1px solid #e8ecf0', padding: '12px 14px', display: 'flex', gap: 8 }}>
             <input value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder="Escribe tu pregunta..."
-              style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 14px',
-                fontSize: 14, outline: 'none', fontFamily: 'inherit', color: C.text }} />
+              style={{ flex: 1, border: '1px solid #e8ecf0', borderRadius: 12, padding: '10px 14px',
+                fontSize: 13, outline: 'none', fontFamily: 'inherit', color: '#2B2926', background: '#f8fafc' }} />
             <button onClick={handleSend} disabled={loading || !input.trim()}
               style={{ background: loading ? '#94a3b8' : C.navy, color: 'white', border: 'none',
-                borderRadius: 10, padding: '10px 16px', fontSize: 14, fontWeight: 700, cursor: loading ? 'wait' : 'pointer' }}>
+                borderRadius: 12, width: 44, height: 44, fontSize: 18, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
               →
             </button>
           </div>
