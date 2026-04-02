@@ -379,13 +379,31 @@ async function compressImage(file, maxWidth = 1200, quality = 0.75) {
   })
 }
 
-export async function uploadEvidenciaPhoto(file) {
+export async function uploadEvidenciaPhoto(file, territorio) {
   const compressed = await compressImage(file)
   const timestamp = Date.now()
-  const path = `evidencias/${timestamp}_foto.jpg`
+  const fileName = `foto_${timestamp}.jpg`
+  const path = `evidencias/${fileName}`
+
+  // 1. Upload to Supabase Storage
   const { error } = await supabase.storage.from('archivos').upload(path, compressed, { contentType: 'image/jpeg' })
   if (error) throw error
   const { data } = supabase.storage.from('archivos').getPublicUrl(path)
+
+  // 2. Upload to OneDrive (async, non-blocking)
+  try {
+    const reader = new FileReader()
+    const base64 = await new Promise((resolve) => {
+      reader.onload = () => resolve(reader.result.split(',')[1])
+      reader.readAsDataURL(compressed)
+    })
+    fetch('/api/upload-onedrive', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileName, territorio: territorio || 'General', fileBase64: base64 })
+    }).catch(() => {}) // silently fail — Supabase is the source of truth
+  } catch {}
+
   return data.publicUrl
 }
 
