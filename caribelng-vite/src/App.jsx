@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import * as XLSX from 'xlsx'
-import { PieChart, Pie, BarChart, Bar as RBar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { BarChart, Bar as RBar, XAxis, YAxis, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts'
 
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, addActor, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
@@ -831,39 +831,54 @@ export default function App() {
             {/* ── Gráficos ── */}
             {!isMobile && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
-                {/* Pie: distribución semáforo */}
+                {/* Chart 1: Progreso de Acuerdos */}
                 <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Distribución de Relaciones</div>
-                  <PieChart width={280} height={200}>
-                    <Pie data={[
-                      { name: 'Verde', value: stats.verde, fill: C.green },
-                      { name: 'Amarillo', value: stats.amarillo, fill: C.yellow },
-                      { name: 'Naranja', value: stats.naranja, fill: C.orange },
-                      { name: 'Rojo', value: stats.rojo, fill: C.red },
-                    ].filter(d => d.value > 0)} cx={140} cy={95} innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                    </Pie>
-                    <Tooltip formatter={(v, name) => [`${v} actores`, name]} />
-                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                  </PieChart>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Progreso de Acuerdos</div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart layout="vertical" data={
+                      agreements.map(ag => ({
+                        nombre: `${ag.id}. ${(ag.nombre || '').substring(0, 25)}`,
+                        avance: ag.avance || 0,
+                        territorio: ag.territorio,
+                      }))
+                    } margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
+                      <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={v => `${v}%`} />
+                      <YAxis type="category" dataKey="nombre" tick={{ fontSize: 10 }} width={130} />
+                      <Tooltip formatter={(v) => [`${v}%`, 'Avance']} contentStyle={{ fontSize: 12 }} />
+                      <RBar dataKey="avance" radius={[0, 4, 4, 0]}>
+                        {agreements.map((ag, i) => (
+                          <Cell key={i} fill={ag.avance >= 100 ? C.green : ag.avance > 0 ? (ag.territorio === 'Tolú' ? C.tolu : C.barbosa) : C.yellow} />
+                        ))}
+                      </RBar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                {/* Bar: gestión semanal */}
+                {/* Chart 2: Actores por Territorio y Semáforo */}
                 <div style={{ background: C.card, borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Actividad Semanal</div>
-                  <BarChart width={280} height={200} data={
-                    reportes.slice(0, 8).reverse().map(r => ({
-                      sem: `S${r.semana}`,
-                      Reuniones: (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0),
-                      Actores: r.actores_gestionados || 0,
-                      PQRS: r.pqrs_recibidas || 0,
-                    }))
-                  }>
-                    <XAxis dataKey="sem" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} width={30} />
-                    <Tooltip contentStyle={{ fontSize: 12 }} />
-                    <RBar dataKey="Reuniones" fill={C.accent} radius={[3, 3, 0, 0]} />
-                    <RBar dataKey="Actores" fill={C.tolu} radius={[3, 3, 0, 0]} />
-                    <RBar dataKey="PQRS" fill={C.orange} radius={[3, 3, 0, 0]} />
-                  </BarChart>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Relaciones por Territorio</div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={
+                      ['Tolú', 'Barbosa', 'Nacional'].map(t => {
+                        const ta = actors.filter(a => a.territorio === t)
+                        return {
+                          territorio: t,
+                          Verde: ta.filter(a => a.semaforo === 'verde').length,
+                          Amarillo: ta.filter(a => a.semaforo === 'amarillo').length,
+                          Naranja: ta.filter(a => a.semaforo === 'naranja').length,
+                          Rojo: ta.filter(a => a.semaforo === 'rojo').length,
+                        }
+                      })
+                    } margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                      <XAxis dataKey="territorio" tick={{ fontSize: 12, fontWeight: 700 }} />
+                      <YAxis tick={{ fontSize: 11 }} width={30} />
+                      <Tooltip contentStyle={{ fontSize: 12 }} />
+                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                      <RBar dataKey="Verde" stackId="a" fill={C.green} />
+                      <RBar dataKey="Amarillo" stackId="a" fill={C.yellow} />
+                      <RBar dataKey="Naranja" stackId="a" fill={C.orange} />
+                      <RBar dataKey="Rojo" stackId="a" fill={C.red} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             )}
