@@ -5,9 +5,9 @@ import { getBowTie, deleteRiesgo, addCronogramaLegislativo, deleteCronogramaLegi
 
 export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, onDeleted }) {
   const [tab, setTab] = useState('mapa')
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   useEffect(() => {
-    const h = () => setIsMobile(window.innerWidth < 960 || navigator.maxTouchPoints > 0)
+    const h = () => setIsMobile(window.innerWidth < 960)
     window.addEventListener('resize', h)
     return () => window.removeEventListener('resize', h)
   }, [])
@@ -61,16 +61,11 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em',
-              background: C.navy, color: 'white', padding: '3px 8px', borderRadius: 6 }}>DAC</span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dirección de Asuntos Corporativos</span>
-          </div>
-          <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Gestión de Riesgos</h1>
-          <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 13 : 15 }}>
-            {total} riesgos sociales · {totalLeg} legislativos · {rojos.length + legAlto.length} requieren acción inmediata
+          <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Gestión de Riesgos</h1>
+          <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>
+            {total} sociales · {totalLeg} legislativos · {rojos.length + legAlto.length} acción inmediata
           </p>
         </div>
         {/* Dual mini status bars */}
@@ -109,30 +104,26 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
         </div>
       </div>
 
-      {/* Filter cards — social risks only */}
-      <div style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Riesgos Sociales y Comunitarios</div>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
+      {/* Filter cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
         {[
-          { label: 'Acción inmediata', key: 'Alto', count: rojos.length, pct: pct(rojos.length), color: C.red, bg: '#fee2e2' },
-          { label: 'Vigilar', key: 'Medio', count: amarillos.length, pct: pct(amarillos.length), color: C.yellow, bg: '#fef9c3' },
-          { label: 'Bajo control', key: 'Bajo', count: verdes.length, pct: pct(verdes.length), color: C.green, bg: '#dcfce7' },
-          { label: 'En revisión', key: 'Revision', count: azules.length, pct: pct(azules.length), color: C.accent, bg: '#dbeafe' },
+          { label: 'Acción inmediata', key: 'Alto', count: rojos.length, pct: pct(rojos.length), color: C.red, bg: 'linear-gradient(135deg,#fff1f2,#fee2e2)', border: '#fecaca' },
+          { label: 'Vigilar', key: 'Medio', count: amarillos.length, pct: pct(amarillos.length), color: C.yellow, bg: 'linear-gradient(135deg,#fffbeb,#fef3c7)', border: '#fde68a' },
+          { label: 'Bajo control', key: 'Bajo', count: verdes.length, pct: pct(verdes.length), color: C.green, bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#a7f3d0' },
+          { label: 'En revisión', key: 'Revision', count: azules.length, pct: pct(azules.length), color: C.accent, bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd' },
         ].map(s => {
           const isActive = riesgoFilter === s.key
           return (
             <div key={s.key} onClick={() => { setRiesgoFilter(isActive ? 'Todos' : s.key); setTab('mapa') }}
-              style={{ background: isActive ? s.color : C.card, borderRadius: 12,
-                padding: isMobile ? '10px 12px' : '14px 16px',
-                borderTop: `3px solid ${s.color}`, cursor: 'pointer',
-                boxShadow: isActive ? `0 4px 14px ${s.color}44` : '0 1px 4px rgba(0,0,0,0.07)',
-                transform: isActive ? 'translateY(-2px)' : 'none', transition: 'all 0.15s' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 900, color: isActive ? 'white' : s.color, lineHeight: 1 }}>{s.count}</div>
-                <span style={{ fontSize: isMobile ? 16 : 20 }}>{s.icon}</span>
-              </div>
-              <div style={{ fontSize: isMobile ? 11 : 13, fontWeight: 700, color: isActive ? 'rgba(255,255,255,0.9)' : s.color, marginTop: 6 }}>{s.label}</div>
-              {total > 0 && <div style={{ marginTop: 6, height: 3, borderRadius: 2, background: isActive ? 'rgba(255,255,255,0.3)' : `${s.color}30` }}>
-                <div style={{ height: '100%', width: `${s.pct}%`, background: isActive ? 'white' : s.color, borderRadius: 2, transition: 'width 0.6s' }} />
+              style={{ background: isActive ? s.color : s.bg, borderRadius: 14,
+                padding: '16px 14px', border: `1px solid ${isActive ? s.color : s.border}`, cursor: 'pointer',
+                boxShadow: isActive ? `0 8px 20px ${s.color}30` : '0 1px 4px rgba(0,0,0,0.04)',
+                transform: isActive ? 'translateY(-2px)' : 'none', transition: 'all 0.2s' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: isActive ? 'white' : s.color, marginBottom: 8, boxShadow: `0 0 8px ${isActive ? 'rgba(255,255,255,0.5)' : s.color + '60'}` }} />
+              <div style={{ fontSize: 28, fontWeight: 900, color: isActive ? 'white' : '#2B2926', lineHeight: 1 }}>{s.count}</div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: isActive ? 'rgba(255,255,255,0.9)' : s.color, textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{s.label}</div>
+              {total > 0 && <div style={{ marginTop: 8, height: 4, borderRadius: 100, background: isActive ? 'rgba(255,255,255,0.3)' : `${s.color}20`, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${s.pct}%`, background: isActive ? 'white' : s.color, borderRadius: 100, transition: 'width 0.6s' }} />
               </div>}
             </div>
           )
@@ -140,20 +131,21 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
       </div>
 
       {/* Sub-tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
+      <div style={{ display: 'flex', gap: 0, marginBottom: 20, background: '#f8fafc', borderRadius: 12, padding: 4, border: '1px solid #e8ecf0' }}>
         {[
-          { id: 'mapa', label: 'Riesgos Sociales', count: riesgos.length },
-          { id: 'legislativo', label: 'Riesgos Legislativos', count: riesgosLeg.length },
-          { id: 'cronograma', label: 'Agenda Gubernamental', count: cronoLeg.length },
+          { id: 'mapa', label: 'Sociales', count: riesgos.length },
+          { id: 'legislativo', label: 'Legislativos', count: riesgosLeg.length },
+          { id: 'cronograma', label: 'Agenda', count: cronoLeg.length },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ flex: 1, background: tab === t.id ? C.navy : '#f1f5f9',
-              color: tab === t.id ? 'white' : C.text,
-              border: 'none', borderRadius: 8, padding: isMobile ? '7px 4px' : '9px 4px',
-              fontSize: isMobile ? 11 : 13, fontWeight: 700, cursor: 'pointer',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            style={{ flex: 1, background: tab === t.id ? 'white' : 'transparent',
+              color: tab === t.id ? C.navy : '#94a3b8',
+              border: 'none', borderRadius: 8, padding: '10px 4px',
+              fontSize: isMobile ? 11 : 12, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.3px',
+              boxShadow: tab === t.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <span>{t.label}</span>
-            {t.count > 0 && <span style={{ fontSize: 10, opacity: 0.7, fontWeight: 600 }}>{t.count} registros</span>}
+            {t.count > 0 && <span style={{ fontSize: 9, fontWeight: 600, color: tab === t.id ? '#94a3b8' : '#cbd5e1' }}>{t.count}</span>}
           </button>
         ))}
       </div>
@@ -186,7 +178,8 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
                 const isExp = expandedRisk === r.id
                 const bt = bowTieData[r.id] || []
                 return (
-                  <div key={r.id} style={{ background: C.card, borderRadius: 12, marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', borderLeft: `4px solid ${semColor}`, overflow: 'hidden' }}>
+                  <div key={r.id} style={{ background: 'white', borderRadius: 14, marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 4, background: semColor }} />
                     <div onClick={() => toggleRisk(r.id)} style={{ padding: '14px 16px', cursor: 'pointer' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
