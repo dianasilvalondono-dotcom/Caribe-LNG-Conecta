@@ -753,26 +753,28 @@ export default function App() {
         {view === 'actores' && (
           <div>
             {/* Header */}
-            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
               <div>
-                <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: C.text, letterSpacing: -0.5 }}>Base de Actores</h1>
-                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{filtered.length} de {actors.length} actores</p>
+                <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Base de Actores</h1>
+                <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>{filtered.length} de {actors.length} actores</p>
               </div>
-              {(isAdmin || profile?.role === 'gestora') && (
-                <button onClick={() => setShowNewActor(!showNewActor)}
-                  style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
-                    padding: '8px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 18 }}>+</span> Nuevo Actor
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {(isAdmin || profile?.role === 'gestora') && (
+                  <button onClick={() => setShowNewActor(!showNewActor)}
+                    style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10,
+                      padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s' }}>
+                    + Nuevo Actor
+                  </button>
+                )}
+                <button onClick={() => exportToExcel(
+                  filtered.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Posición: a.posicion, Riesgo: a.riesgo, Poder: a.poder, Interés: a.interes, Prioridad: a.prioridad, Responsable: a.owner, Contacto: a.contacto, 'Última acción': a.accion_tomada, 'Fecha acción': a.fecha_accion })),
+                  'Actores_CaribeLNG', 'Actores'
+                )}
+                  style={{ background: 'white', color: '#64748b', border: '1px solid #e8ecf0', borderRadius: 10,
+                    padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <IconDownload size={14} /> Excel
                 </button>
-              )}
-              <button onClick={() => exportToExcel(
-                filtered.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Posición: a.posicion, Riesgo: a.riesgo, Poder: a.poder, Interés: a.interes, Prioridad: a.prioridad, Responsable: a.owner, Contacto: a.contacto, 'Última acción': a.accion_tomada, 'Fecha acción': a.fecha_accion })),
-                'Actores_CaribeLNG', 'Actores'
-              )}
-                style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8,
-                  padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                📥 Excel
-              </button>
+              </div>
             </div>
 
             {/* ── Formulario nuevo actor ── */}
