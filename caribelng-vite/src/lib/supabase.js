@@ -298,6 +298,35 @@ export async function uploadKnowledgeFile(file) {
   return data.publicUrl
 }
 
+// ── Evidencias ───────────────────────────────────────────────────────────────
+
+export async function uploadEvidenciaPhoto(file) {
+  const timestamp = Date.now()
+  const safeName = file.name ? file.name.replace(/[^a-zA-Z0-9._-]/g, '_') : `foto_${timestamp}.jpg`
+  const path = `evidencias/${timestamp}_${safeName}`
+  const { error } = await supabase.storage.from('archivos').upload(path, file)
+  if (error) throw error
+  const { data } = supabase.storage.from('archivos').getPublicUrl(path)
+  return data.publicUrl
+}
+
+export async function addEvidencia({ user_id, territorio, foto_url, latitud, longitud, precision_m, descripcion, capturada_at }) {
+  const { data, error } = await supabase
+    .from('evidencias')
+    .insert({ user_id, territorio, foto_url, latitud, longitud, precision_m, descripcion, capturada_at })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getEvidencias(territorio) {
+  let q = supabase.from('evidencias').select('*').order('capturada_at', { ascending: false })
+  if (territorio) q = q.eq('territorio', territorio)
+  const { data } = await q
+  return data || []
+}
+
 // ── Alertas ───────────────────────────────────────────────────────────────────
 
 export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {

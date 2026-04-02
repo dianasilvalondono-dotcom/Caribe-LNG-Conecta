@@ -15,7 +15,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
          getKpisDac, upsertKpiDac, sendAlerta,
-         getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile } from './lib/supabase'
+         getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
+         uploadEvidenciaPhoto, addEvidencia, getEvidencias } from './lib/supabase'
 
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
@@ -2376,6 +2377,8 @@ export default function App() {
   const [seguimiento, setSeguimiento] = useState([])
   const [kpisDac, setKpisDac] = useState([])
   const [knowledgeBase, setKnowledgeBase] = useState([])
+  const [evidencias, setEvidencias] = useState([])
+  const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -2397,7 +2400,7 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd, kb] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac(), getKnowledgeBase()])
+      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd, kb, ev] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac(), getKnowledgeBase(), getEvidencias()])
       setActors(a || [])
       setAgreements(ag || [])
       setCronograma(cr || [])
@@ -2409,6 +2412,7 @@ export default function App() {
       setCronoLeg(cleg || [])
       setKpisDac(kd || [])
       setKnowledgeBase(kb || [])
+      setEvidencias(ev || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -3433,6 +3437,183 @@ export default function App() {
                 ))
               })()}
             </div>
+            {/* ── Captura de Evidencia ── */}
+            <div onClick={() => setShowEvidenciaCapture(true)}
+              style={{ background: C.navy, borderRadius: 12, padding: '16px 20px', marginBottom: 12,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+              <span style={{ fontSize: 28 }}>📸</span>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: 'white' }}>Capturar Evidencia</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Foto con geolocalización y hora exacta</div>
+              </div>
+            </div>
+
+            {/* ── Modal captura ── */}
+            {showEvidenciaCapture && (() => {
+              const CaptureForm = () => {
+                const [file, setFile] = useState(null)
+                const [preview, setPreview] = useState(null)
+                const [desc, setDesc] = useState('')
+                const [geo, setGeo] = useState(null)
+                const [geoError, setGeoError] = useState(null)
+                const [captureTime, setCaptureTime] = useState(null)
+                const [uploading, setUploading] = useState(false)
+                const fileRef = useRef(null)
+
+                const handleFile = (e) => {
+                  const f = e.target.files?.[0]
+                  if (!f) return
+                  setFile(f)
+                  setPreview(URL.createObjectURL(f))
+                  setCaptureTime(new Date().toISOString())
+                  // Capturar GPS inmediatamente
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }),
+                      (err) => setGeoError('No se pudo obtener ubicación: ' + err.message),
+                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    )
+                  } else {
+                    setGeoError('Geolocalización no disponible en este dispositivo')
+                  }
+                }
+
+                const handleSubmit = async () => {
+                  if (!file || !desc.trim() || !geo) return
+                  setUploading(true)
+                  try {
+                    const foto_url = await uploadEvidenciaPhoto(file)
+                    await addEvidencia({
+                      user_id: session.user.id,
+                      territorio: myTerritorio || 'Nacional',
+                      foto_url,
+                      latitud: geo.lat,
+                      longitud: geo.lng,
+                      precision_m: geo.accuracy,
+                      descripcion: desc.trim(),
+                      capturada_at: captureTime
+                    })
+                    await loadData()
+                    setShowEvidenciaCapture(false)
+                  } catch (err) {
+                    alert('Error subiendo evidencia: ' + err.message)
+                  } finally { setUploading(false) }
+                }
+
+                return (
+                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+                    onClick={(e) => { if (e.target === e.currentTarget) setShowEvidenciaCapture(false) }}>
+                    <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480,
+                      maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>📸 Capturar Evidencia</h3>
+                        <button onClick={() => setShowEvidenciaCapture(false)}
+                          style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+                      </div>
+
+                      {/* Botón cámara */}
+                      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handleFile}
+                        style={{ display: 'none' }} />
+                      {!preview ? (
+                        <div onClick={() => fileRef.current?.click()}
+                          style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '32px 16px',
+                            textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: `${C.accent}08` }}>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Tomar foto</div>
+                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Se capturará ubicación GPS y hora automáticamente</div>
+                        </div>
+                      ) : (
+                        <div style={{ marginBottom: 16 }}>
+                          <img src={preview} alt="Evidencia" style={{ width: '100%', borderRadius: 10, maxHeight: 200, objectFit: 'cover' }} />
+                          <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setCaptureTime(null) }}
+                            style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6,
+                              padding: '4px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
+                            Volver a tomar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Metadata GPS + hora */}
+                      {captureTime && (
+                        <div style={{ background: '#f8fafc', borderRadius: 10, padding: 12, marginBottom: 16, fontSize: 13 }}>
+                          <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+                            <span style={{ fontWeight: 700, color: C.text }}>🕐 Hora:</span>
+                            <span style={{ color: C.muted }}>{new Date(captureTime).toLocaleString('es-CO')}</span>
+                          </div>
+                          {geo ? (
+                            <>
+                              <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontWeight: 700, color: C.text }}>📍 GPS:</span>
+                                <span style={{ color: C.muted }}>{geo.lat.toFixed(6)}, {geo.lng.toFixed(6)}</span>
+                              </div>
+                              <div style={{ display: 'flex', gap: 8 }}>
+                                <span style={{ fontWeight: 700, color: C.text }}>🎯 Precisión:</span>
+                                <span style={{ color: geo.accuracy > 50 ? C.orange : C.green, fontWeight: 600 }}>
+                                  ±{Math.round(geo.accuracy)}m {geo.accuracy > 50 ? '(baja)' : '(buena)'}
+                                </span>
+                              </div>
+                            </>
+                          ) : geoError ? (
+                            <div style={{ color: C.red, fontWeight: 600 }}>⚠️ {geoError}</div>
+                          ) : (
+                            <div style={{ color: C.accent }}>📡 Obteniendo ubicación...</div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Descripción */}
+                      <div style={{ marginBottom: 16 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Descripción de la evidencia *</label>
+                        <textarea value={desc} onChange={e => setDesc(e.target.value)}
+                          placeholder="Ej: Acta de reunión con JAC vereda El Progreso, firma de acuerdo de socialización"
+                          rows={3}
+                          style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                            fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                      </div>
+
+                      {/* Territorio */}
+                      <div style={{ fontSize: 13, color: C.muted, marginBottom: 16 }}>
+                        Territorio: <strong style={{ color: C.text }}>{myTerritorio || 'Nacional'}</strong>
+                      </div>
+
+                      {/* Enviar */}
+                      <button onClick={handleSubmit}
+                        disabled={!file || !desc.trim() || !geo || uploading}
+                        style={{ width: '100%', background: (!file || !desc.trim() || !geo || uploading) ? '#cbd5e1' : C.navy,
+                          color: 'white', border: 'none', borderRadius: 10, padding: '12px 20px',
+                          fontSize: 15, fontWeight: 700, cursor: (!file || !desc.trim() || !geo || uploading) ? 'not-allowed' : 'pointer' }}>
+                        {uploading ? '⏳ Subiendo...' : '📤 Guardar evidencia'}
+                      </button>
+                    </div>
+                  </div>
+                )
+              }
+              return <CaptureForm />
+            })()}
+
+            {/* ── Galería de evidencias recientes ── */}
+            {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).length > 0 && (
+              <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
+                <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>📸 Evidencias recientes</h3>
+                {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).slice(0, 10).map(ev => (
+                  <div key={ev.id} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start' }}>
+                    <img src={ev.foto_url} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 2 }}>{ev.descripcion}</div>
+                      <div style={{ fontSize: 12, color: C.subtle }}>
+                        🕐 {new Date(ev.capturada_at).toLocaleString('es-CO')}
+                      </div>
+                      <div style={{ fontSize: 12, color: C.subtle }}>
+                        📍 {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
+                        {ev.precision_m && <span> · ±{Math.round(ev.precision_m)}m</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <p style={{ fontSize: 16, color: C.subtle, textAlign: 'center' }}>
               Abre cualquier actor desde "Actores" para registrar novedades en tiempo real.
             </p>
