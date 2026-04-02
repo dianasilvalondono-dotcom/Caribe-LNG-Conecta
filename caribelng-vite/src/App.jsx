@@ -551,7 +551,7 @@ export default function App() {
             </div>
             {/* Nav tabs */}
             {NAV.map(n => n.children ? (
-              <div key={n.id} data-nav-dropdown style={{ position: 'relative', flexShrink: 0, zIndex: 200 }}>
+              <div key={n.id} ref={el => { if (el) el._navId = n.id }} style={{ position: 'relative', flexShrink: 0 }}>
                 <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
                   style={{ flexShrink: 0,
                     background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
@@ -563,21 +563,6 @@ export default function App() {
                   <span>{n.label}</span>
                   <span style={{ fontSize: 9, marginLeft: 2 }}>▼</span>
                 </button>
-                {navOpen === n.id && (
-                  <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#1a2744',
-                    borderRadius: 8, padding: 4, zIndex: 200, minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
-                    {n.children.map(c => (
-                      <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%',
-                          background: view === c.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                          color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
-                          border: 'none', borderRadius: 6, padding: '7px 10px', cursor: 'pointer',
-                          fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                        <span style={{ fontSize: 13 }}>{c.icon}</span><span>{c.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             ) : (
               <button key={n.id} onClick={() => { setView(n.id); setNavOpen(null) }}
@@ -605,6 +590,23 @@ export default function App() {
               </button>
             </div>
           </div>
+          {/* Mobile dropdown portal — rendered outside scroll container */}
+          {navOpen && NAV.filter(n => n.children && n.id === navOpen).map(n => (
+            <div key={n.id} className="clng-mobile-nav" style={{ position: 'absolute', left: 12, right: 12, top: 46, zIndex: 300 }}>
+              <div style={{ background: '#1a2744', borderRadius: 10, padding: 6, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+                {n.children.map(c => (
+                  <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+                      background: view === c.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                      color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
+                      border: 'none', borderRadius: 8, padding: '10px 14px', cursor: 'pointer',
+                      fontSize: 14, fontWeight: 600 }}>
+                    <span style={{ fontSize: 15 }}>{c.icon}</span><span>{c.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
           <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, maxWidth: '100vw' }} className="clng-desktop-nav">
             <div onClick={() => setView('dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
