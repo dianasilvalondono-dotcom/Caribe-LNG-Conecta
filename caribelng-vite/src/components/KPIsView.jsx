@@ -28,8 +28,8 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   const pqrsCerradas = reportes.reduce((s, r) => s + (r.pqrs_cerradas || 0), 0)
   const pqrsPct = totalPqrs ? Math.round((pqrsCerradas / totalPqrs) * 100) : 0
   const actoresGestionados = reportes.reduce((s, r) => s + (r.actores_gestionados || 0), 0)
-  const actoresVerdes = (reportes.length > 0 ? actors : []).filter(a => a.semaforo === 'verde').length
-  const actoresTotal = actors?.length || 0
+  const actoresVerdes = (actors || []).filter(a => a.semaforo === 'verde').length
+  const actoresTotal = (actors || []).length
   const relacionamientoPct = actoresTotal ? Math.round((actoresVerdes / actoresTotal) * 100) : 0
 
   const semColor = (pct, meta = 80) => pct >= meta ? '#10b981' : pct >= meta * 0.7 ? '#f59e0b' : '#ef4444'
