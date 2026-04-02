@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { C } from '../lib/constants'
 import { Field } from './ui'
-import { supabase, addReporteSemanal, deleteReporteSemanal, sendAlerta, sendPushNotification } from '../lib/supabase'
+import { supabase, addReporteSemanal, deleteReporteSemanal, sendAlerta, sendPushNotification, uploadReporteToOneDrive } from '../lib/supabase'
 
 export default function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
@@ -76,6 +76,15 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
       onSaved()
+      // Subir reporte a OneDrive
+      uploadReporteToOneDrive({
+        semana: parseInt(semana), fecha_corte: fechaCorte, territorio: myTerr,
+        gestora: profile?.full_name, acuerdos_firmados: acuerdosFirmados,
+        compromisos_nuevos: compromisosNuevos, compromisos_cumplidos: compromisosCumplidos,
+        eventos_aid: eventosAid, eventos_aii: eventosAii, eventos_institucional: eventosInst,
+        asistentes_total: asistentes, pqrs_recibidas: pqrsRecibidas, pqrs_cerradas: pqrsCerradas,
+        incidentes, actores_gestionados: actoresGest, logros, dificultades, escalamientos, prioridades_proxima: prioridades
+      }, myTerr, semana).catch(() => {})
       // Notificar a admins
       const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
       if (admins?.length) {
@@ -283,12 +292,9 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
               border: 'none', borderRadius: 10, padding: '13px', fontSize: 16, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', marginBottom: 20 }}>
             {saving ? 'Guardando...' : 'Guardar Reporte Semanal'}
           </button>
-          <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgC30umcdhdBRY5F1Sjx_MMrAa8c1li2QamoYiBNuVLR3LE?e=ZvD6QH" target="_blank" rel="noopener"
-            style={{ display: 'block', width: '100%', background: '#f1f5f9', border: '1px solid #e2e8f0',
-              borderRadius: 10, padding: '11px', fontSize: 15, fontWeight: 600, cursor: 'pointer',
-              textAlign: 'center', textDecoration: 'none', color: C.accent, boxSizing: 'border-box' }}>
-            Abrir OneDrive — Subir evidencias ({myTerr})
-          </a>
+          <div style={{ textAlign: 'center', fontSize: 13, color: C.subtle, marginTop: 4 }}>
+            El reporte se sube automáticamente a OneDrive
+          </div>
         </div>
       )}
 

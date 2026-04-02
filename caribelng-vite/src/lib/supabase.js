@@ -363,6 +363,34 @@ export async function rejectActorEdit(editId, adminId) {
 
 // ── Evidencias ───────────────────────────────────────────────────────────────
 
+// ── OneDrive upload helper ───────────────────────────────────────────────────
+
+async function blobToBase64(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result.split(',')[1])
+    reader.readAsDataURL(blob)
+  })
+}
+
+export async function uploadToOneDrive(fileOrBlob, fileName, territorio, type) {
+  const base64 = await blobToBase64(fileOrBlob)
+  return fetch('/api/upload-onedrive', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileName, territorio: territorio || 'General', fileBase64: base64, type, contentType: type === 'reporte' ? 'application/json' : 'image/jpeg' })
+  })
+}
+
+export async function uploadReporteToOneDrive(reporteData, territorio, semana) {
+  const json = JSON.stringify(reporteData, null, 2)
+  const blob = new Blob([json], { type: 'application/json' })
+  const fileName = `S${semana}_${territorio}_${new Date().toISOString().split('T')[0]}.json`
+  return uploadToOneDrive(blob, fileName, territorio, 'reporte').catch(() => {})
+}
+
+// ── Image compression ────────────────────────────────────────────────────────
+
 async function compressImage(file, maxWidth = 1200, quality = 0.75) {
   return new Promise((resolve) => {
     const img = new Image()
@@ -391,18 +419,7 @@ export async function uploadEvidenciaPhoto(file, territorio) {
   const { data } = supabase.storage.from('archivos').getPublicUrl(path)
 
   // 2. Upload to OneDrive (async, non-blocking)
-  try {
-    const reader = new FileReader()
-    const base64 = await new Promise((resolve) => {
-      reader.onload = () => resolve(reader.result.split(',')[1])
-      reader.readAsDataURL(compressed)
-    })
-    fetch('/api/upload-onedrive', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fileName, territorio: territorio || 'General', fileBase64: base64 })
-    }).catch(() => {}) // silently fail — Supabase is the source of truth
-  } catch {}
+  uploadToOneDrive(compressed, fileName, territorio, 'evidencia').catch(() => {})
 
   return data.publicUrl
 }

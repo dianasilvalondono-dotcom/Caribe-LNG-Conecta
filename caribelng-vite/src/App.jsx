@@ -1566,7 +1566,7 @@ export default function App() {
                   setSaving(true)
                   try {
                     let foto_url = null
-                    if (file) foto_url = await uploadEvidenciaPhoto(file)
+                    if (file) foto_url = await uploadEvidenciaPhoto(file, territorio)
                     await addRegistroDiario({
                       user_id: session.user.id,
                       territorio, fecha, tipo_reunion: tipoReunion,
@@ -1783,7 +1783,7 @@ export default function App() {
                               if (!desc.trim() || !geo) return alert(geo ? 'Agrega una descripción' : 'Esperando GPS...')
                               setUploading(true)
                               try {
-                                const foto_url = await uploadEvidenciaPhoto(file)
+                                const foto_url = await uploadEvidenciaPhoto(file, myTerritorio)
                                 await addEvidencia({ user_id: session.user.id, territorio: myTerritorio || 'Nacional', foto_url, latitud: geo.lat, longitud: geo.lng, precision_m: geo.accuracy, descripcion: desc.trim(), capturada_at: captureTime, lugar })
                                 await loadData()
                                 setFile(null); setPreview(null); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null)
@@ -2087,7 +2087,7 @@ export default function App() {
                   if (!file || !desc.trim() || !geo) return
                   setUploading(true)
                   try {
-                    const foto_url = await uploadEvidenciaPhoto(file)
+                    const foto_url = await uploadEvidenciaPhoto(file, myTerritorio)
                     await addEvidencia({
                       user_id: session.user.id,
                       territorio: myTerritorio || 'Nacional',
