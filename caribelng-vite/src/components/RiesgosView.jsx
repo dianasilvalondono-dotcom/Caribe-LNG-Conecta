@@ -60,47 +60,37 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
 
   return (
     <div>
-      {/* Header */}
-      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Gestión de Riesgos</h1>
-          <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>
-            {total} sociales · {totalLeg} legislativos · {rojos.length + legAlto.length} acción inmediata
-          </p>
-        </div>
-        {/* Dual mini status bars */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: isMobile ? '100%' : 200 }}>
-          {/* Social risks bar — clickable → switches to mapa sub-tab */}
-          {total > 0 && <div onClick={() => setTab('mapa')} style={{ cursor: 'pointer' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Sociales y Comunitarios ↗</div>
-            <div style={{ display: 'flex', height: 7, borderRadius: 4, overflow: 'hidden', gap: 1, marginBottom: 3 }}>
-              {rojos.length > 0 && <div style={{ background: C.red, flex: rojos.length }} title={`${rojos.length} acción inmediata`} />}
-              {amarillos.length > 0 && <div style={{ background: C.yellow, flex: amarillos.length }} title={`${amarillos.length} vigilar`} />}
-              {verdes.length > 0 && <div style={{ background: C.green, flex: verdes.length }} title={`${verdes.length} bajo control`} />}
-              {azules.length > 0 && <div style={{ background: C.accent, flex: azules.length }} title={`${azules.length} en revisión`} />}
+      {/* Hero header */}
+      <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 30%, #dc2626 70%, #f87171 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: rojos.length > 0 ? '#fbbf24' : '#34d399', animation: rojos.length > 0 ? 'none' : 'none' }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{rojos.length + legAlto.length > 0 ? `${rojos.length + legAlto.length} requieren acción` : 'Bajo control'}</span>
+          </div>
+          <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Gestión de Riesgos</h1>
+          <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>DAC · Dirección de Asuntos Corporativos</p>
+
+          {/* Quick stats */}
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{total}</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sociales</div>
             </div>
-            <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
-              {[[C.red, rojos.length], [C.yellow, amarillos.length], [C.green, verdes.length], [C.accent, azules.length]].map(([c, n], i) => (
-                <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: c, fontWeight: 700 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: c, display: 'inline-block' }} />{n}
-                </span>
-              ))}
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{totalLeg}</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Legislativos</div>
             </div>
-          </div>}
-          {/* Legislative risks bar — clickable → switches to legislativo sub-tab */}
-          {totalLeg > 0 && <div onClick={() => setTab('legislativo')} style={{ cursor: 'pointer' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Legislativos y Regulatorios ↗</div>
-            <div style={{ display: 'flex', height: 7, borderRadius: 4, overflow: 'hidden', gap: 1, marginBottom: 3 }}>
-              {legAlto.length > 0 && <div style={{ background: C.red, flex: legAlto.length }} title={`${legAlto.length} alto`} />}
-              {legMedio.length > 0 && <div style={{ background: C.orange, flex: legMedio.length }} title={`${legMedio.length} medio`} />}
-              {legBajo.length > 0 && <div style={{ background: C.green, flex: legBajo.length }} title={`${legBajo.length} bajo`} />}
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24' }}>{rojos.length}</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Críticos</div>
             </div>
-            <div style={{ display: 'flex', gap: 8, fontSize: 11, color: C.muted, justifyContent: 'flex-end' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: C.red, fontWeight: 700 }}><span style={{ width: 7, height: 7, borderRadius: '50%', background: C.red, display: 'inline-block' }} />{legAlto.length}</span>
-              <span style={{ color: C.orange, fontWeight: 700 }}>{legMedio.length}</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: C.green, fontWeight: 700 }}><span style={{ width: 7, height: 7, borderRadius: '50%', background: C.green, display: 'inline-block' }} />{legBajo.length}</span>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>{verdes.length}</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Controlados</div>
             </div>
-          </div>}
+          </div>
         </div>
       </div>
 
@@ -196,29 +186,32 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
                           )}
                         </div>
                       </div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: C.text, lineHeight: 1.4 }}>{r.nombre}</div>
-                      {!isExp && r.que_hacemos && <div style={{ fontSize: 15, color: C.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#2B2926', lineHeight: 1.4 }}>{r.nombre}</div>
+                      {!isExp && r.que_hacemos && <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.que_hacemos}</div>}
                     </div>
                     {isExp && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
                         <div style={{ paddingTop: 12 }}>
-                          {r.descripcion && <div style={{ fontSize: 16, color: C.muted, lineHeight: 1.5, marginBottom: 10, background: '#fff7ed', padding: '8px 10px', borderRadius: 8 }}><span style={{ fontWeight: 700, color: '#9a3412' }}>Que puede pasar: </span>{r.descripcion}</div>}
-                          {r.quien_detona && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.red }}>Actores clave a gestionar: </span>{r.quien_detona}</div>}
-                          {r.quien_mitiga && <div style={{ fontSize: 15, color: C.muted, marginBottom: 6, lineHeight: 1.5 }}><span style={{ fontWeight: 700, color: C.green }}>Quien nos ayuda a controlarlo: </span>{r.quien_mitiga}</div>}
-                          {r.que_hacemos && <div style={{ fontSize: 15, color: '#166534', background: '#f0fdf4', padding: '8px 10px', borderRadius: 8, lineHeight: 1.5, marginBottom: 10 }}><span style={{ fontWeight: 700 }}>Que estamos haciendo hoy: </span>{r.que_hacemos}</div>}
+                          {r.descripcion && <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6, marginBottom: 10, background: 'linear-gradient(135deg,#fff7ed,#fffbeb)', padding: '12px 14px', borderRadius: 10, border: '1px solid #fde68a' }}><span style={{ fontWeight: 700, color: '#9a3412', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qué puede pasar</span><br/>{r.descripcion}</div>}
+                          {r.quien_detona && <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8, lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}><div style={{ width: 3, height: 14, background: C.red, borderRadius: 2, flexShrink: 0, marginTop: 2 }} /><div><span style={{ fontWeight: 700, color: '#dc2626', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actores clave</span><br/>{r.quien_detona}</div></div>}
+                          {r.quien_mitiga && <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8, lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}><div style={{ width: 3, height: 14, background: C.green, borderRadius: 2, flexShrink: 0, marginTop: 2 }} /><div><span style={{ fontWeight: 700, color: '#059669', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quién nos ayuda</span><br/>{r.quien_mitiga}</div></div>}
+                          {r.que_hacemos && <div style={{ fontSize: 12, color: '#166534', background: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', padding: '12px 14px', borderRadius: 10, lineHeight: 1.6, marginBottom: 10, border: '1px solid #a7f3d0' }}><span style={{ fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qué estamos haciendo</span><br/>{r.que_hacemos}</div>}
                           {bt.length > 0 && (
-                            <div style={{ marginTop: 10 }}>
-                              <div style={{ fontSize: 16, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Causa y efecto</div>
+                            <div style={{ marginTop: 12 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                <div style={{ width: 3, height: 14, background: C.accent, borderRadius: 2 }} />
+                                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Causa y efecto</span>
+                              </div>
                               {bt.map((b, idx) => (
-                                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, marginBottom: 8, fontSize: 16, lineHeight: 1.4 }}>
-                                  <div>
-                                    {b.causa && <div style={{ background: '#fee2e2', padding: '6px 8px', borderRadius: 6, color: '#991b1b', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Causa: </span>{b.causa}</div>}
-                                    {b.control_preventivo && <div style={{ background: '#dbeafe', padding: '6px 8px', borderRadius: 6, color: '#1e40af' }}><span style={{ fontWeight: 700 }}>Que hacemos para evitarlo: </span>{b.control_preventivo}</div>}
+                                <div key={idx} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr auto 1fr', gap: 8, marginBottom: 10, fontSize: 12, lineHeight: 1.5 }}>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {b.causa && <div style={{ background: 'linear-gradient(135deg,#fff1f2,#fee2e2)', padding: '10px 12px', borderRadius: 10, color: '#991b1b', border: '1px solid #fecaca' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Causa</span><br/>{b.causa}</div>}
+                                    {b.control_preventivo && <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', padding: '10px 12px', borderRadius: 10, color: '#1e40af', border: '1px solid #93c5fd' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Prevención</span><br/>{b.control_preventivo}</div>}
                                   </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', color: C.subtle, fontSize: 16, padding: '0 4px' }}>&rarr;</div>
-                                  <div>
-                                    {b.control_detectivo && <div style={{ background: '#fef9c3', padding: '6px 8px', borderRadius: 6, color: '#854d0e', marginBottom: 3 }}><span style={{ fontWeight: 700 }}>Como nos enteramos: </span>{b.control_detectivo}</div>}
-                                    {b.consecuencia && <div style={{ background: '#fce7f3', padding: '6px 8px', borderRadius: 6, color: '#9d174d' }}><span style={{ fontWeight: 700 }}>Si no actuamos: </span>{b.consecuencia}</div>}
+                                  {!isMobile && <div style={{ display: 'flex', alignItems: 'center', color: '#cbd5e1', fontSize: 18, padding: '0 4px' }}>&rarr;</div>}
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {b.control_detectivo && <div style={{ background: 'linear-gradient(135deg,#fffbeb,#fef3c7)', padding: '10px 12px', borderRadius: 10, color: '#854d0e', border: '1px solid #fde68a' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Detección</span><br/>{b.control_detectivo}</div>}
+                                    {b.consecuencia && <div style={{ background: 'linear-gradient(135deg,#fdf2f8,#fce7f3)', padding: '10px 12px', borderRadius: 10, color: '#9d174d', border: '1px solid #fbcfe8' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Consecuencia</span><br/>{b.consecuencia}</div>}
                                   </div>
                                 </div>
                               ))}
