@@ -1,4 +1,4 @@
-const CACHE_NAME = 'caribe-lng-v21';
+const CACHE_NAME = 'caribe-lng-v22';
 
 // Assets to cache on install (app shell)
 const PRECACHE_ASSETS = [
@@ -52,7 +52,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets (JS, CSS, images, fonts)
+  // Network-first for SVGs (logos change)
+  if (url.pathname.endsWith('.svg')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Cache-first for other static assets (JS, CSS, images, fonts)
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
