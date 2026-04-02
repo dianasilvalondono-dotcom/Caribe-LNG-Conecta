@@ -11,7 +11,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
          getKpisDac, upsertKpiDac, sendAlerta,
          getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
-         uploadEvidenciaPhoto, addEvidencia, getEvidencias,
+         uploadEvidenciaPhoto, addEvidencia, getEvidencias, deleteEvidencia,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
          addRegistroDiario, getRegistrosDiarios,
          getAuditLog, subscribeToPush, sendPushNotification } from './lib/supabase'
@@ -1809,6 +1809,8 @@ export default function App() {
                                 <div style={{ fontSize: 11, color: C.subtle }}>🕐 {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
                                 {ev.lugar && <div style={{ fontSize: 11, color: C.accent }}>📌 {ev.lugar}</div>}
                                 <div style={{ fontSize: 10, color: C.subtle }}>📍 {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
+                                {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
+                                  style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>🗑 Eliminar</button>}
                               </div>
                             </div>
                           ))}
@@ -2213,6 +2215,8 @@ export default function App() {
                       {ev.lugar && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>
                         📌 {ev.lugar}
                       </div>}
+                      {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
+                        style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>🗑 Eliminar</button>}
                       <div style={{ fontSize: 11, color: C.subtle }}>
                         📍 {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
                         {ev.precision_m && <span> · ±{Math.round(ev.precision_m)}m</span>}

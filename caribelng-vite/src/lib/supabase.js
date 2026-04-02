@@ -424,6 +424,15 @@ export async function getEvidencias(territorio) {
   return data || []
 }
 
+export async function deleteEvidencia(id) {
+  // NOTE: requires RLS policy for admin delete on evidencias table
+  // Run in Supabase SQL editor:
+  // CREATE POLICY "Admins can delete evidencias" ON evidencias FOR DELETE
+  // USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'));
+  const { error } = await supabase.from('evidencias').delete().eq('id', id)
+  if (error) throw error
+}
+
 // ── Audit Log ────────────────────────────────────────────────────────────────
 
 export async function getAuditLog(limit = 50) {
