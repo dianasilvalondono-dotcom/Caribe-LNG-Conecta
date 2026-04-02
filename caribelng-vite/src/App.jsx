@@ -20,6 +20,14 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
          addRegistroDiario, getRegistrosDiarios } from './lib/supabase'
 
+// ── Export helper ────────────────────────────────────────────────────────────
+function exportToExcel(data, filename, sheetName = 'Datos') {
+  const ws = XLSX.utils.json_to_sheet(data)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, sheetName)
+  XLSX.writeFile(wb, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`)
+}
+
 // ━━ Design tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const C = {
   navy:    '#0D47A1',  // Pantone 294 C — primary dark
@@ -2525,6 +2533,8 @@ export default function App() {
   const [registrosDiarios, setRegistrosDiarios] = useState([])
   const [inputSubTab, setInputSubTab] = useState('diario')
   const [showGuia, setShowGuia] = useState(false)
+  const [globalSearch, setGlobalSearch] = useState('')
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -2828,6 +2838,53 @@ export default function App() {
               ))}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Búsqueda global */}
+              <div style={{ position: 'relative' }}>
+                <input value={globalSearch} onChange={e => { setGlobalSearch(e.target.value); setShowGlobalSearch(!!e.target.value) }}
+                  onFocus={() => { if (globalSearch) setShowGlobalSearch(true) }}
+                  placeholder="🔍 Buscar todo..."
+                  style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
+                    padding: '5px 12px', fontSize: 13, color: 'white', width: 180, outline: 'none', fontFamily: 'inherit' }} />
+                {showGlobalSearch && globalSearch.length >= 2 && (() => {
+                  const q = globalSearch.toLowerCase()
+                  const results = []
+                  // Actores
+                  actors.filter(a => a.nombre?.toLowerCase().includes(q) || a.tipo?.toLowerCase().includes(q) || a.contacto?.toLowerCase().includes(q)).slice(0, 4)
+                    .forEach(a => results.push({ icon: '👤', label: a.nombre, sub: `${a.tipo} · ${a.territorio}`, action: () => { setSelectedActor(a); setView('actores') } }))
+                  // Registros diarios
+                  registrosDiarios.filter(r => r.descripcion?.toLowerCase().includes(q) || r.lugar?.toLowerCase().includes(q) || r.tipo_reunion?.toLowerCase().includes(q)).slice(0, 3)
+                    .forEach(r => results.push({ icon: '📝', label: r.descripcion?.substring(0, 50), sub: `${r.tipo_reunion} · ${r.fecha}`, action: () => { setView('input'); setInputSubTab('diario') } }))
+                  // Acuerdos
+                  agreements.filter(a => a.nombre?.toLowerCase().includes(q)).slice(0, 2)
+                    .forEach(a => results.push({ icon: '🤝', label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('acuerdos') }))
+                  // Riesgos
+                  riesgos.filter(r => r.riesgo?.toLowerCase().includes(q) || r.accion_inmediata?.toLowerCase().includes(q)).slice(0, 2)
+                    .forEach(r => results.push({ icon: '⚠️', label: r.riesgo?.substring(0, 50), sub: r.semaforo, action: () => setView('riesgos') }))
+                  // Seguimiento
+                  seguimiento.filter(s => s.compromiso?.toLowerCase().includes(q) || s.actividad?.toLowerCase().includes(q)).slice(0, 2)
+                    .forEach(s => results.push({ icon: '📋', label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('acuerdos') }))
+                  if (!results.length) results.push({ icon: '🔍', label: 'Sin resultados', sub: '', action: () => {} })
+                  return (
+                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#1a2744',
+                      borderRadius: 10, padding: 6, zIndex: 300, minWidth: 300, maxHeight: 350, overflowY: 'auto',
+                      boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}>
+                      {results.map((r, i) => (
+                        <div key={i} onClick={() => { r.action(); setShowGlobalSearch(false); setGlobalSearch('') }}
+                          style={{ display: 'flex', gap: 8, padding: '8px 10px', borderRadius: 6, cursor: 'pointer',
+                            alignItems: 'flex-start' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>{r.icon}</span>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
+                            {r.sub && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{r.sub}</div>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+              </div>
               {profile?.avatar_url
                 ? <img src={profile.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%' }} />
                 : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
@@ -2854,7 +2911,19 @@ export default function App() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                 <p style={{ margin: '4px 0 0', color: C.muted, fontSize: isMobile ? 12 : 16, flex: 1, minWidth: 0 }}>Resumen de relacionamiento · Caribe LNG 2026 · Tiempo real</p>
-                {!isMobile && <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>}
+                {!isMobile && <>
+                  <button onClick={() => window.print()} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>Exportar PDF</button>
+                  <button onClick={() => exportToExcel(
+                    actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Posición: a.posicion, Riesgo: a.riesgo, Poder: a.poder, Interés: a.interes, Prioridad: a.prioridad, Responsable: a.owner, Contacto: a.contacto })),
+                    'Actores_CaribeLNG', 'Actores'
+                  )}
+                    style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>📥 Excel Actores</button>
+                  <button onClick={() => exportToExcel(
+                    registrosDiarios.map(r => ({ Fecha: r.fecha, Territorio: r.territorio, Tipo: r.tipo_reunion, Lugar: r.lugar || r.geo_lugar, Asistentes: r.asistentes, Descripción: r.descripcion, GPS: r.latitud ? `${r.latitud},${r.longitud}` : '' })),
+                    'Registros_Diarios', 'Registros'
+                  )}
+                    style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 16px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>📥 Excel Registros</button>
+                </>}
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 24, alignItems: 'start' }}>
@@ -3062,6 +3131,14 @@ export default function App() {
                   <span style={{ fontSize: 18 }}>+</span> Nuevo Actor
                 </button>
               )}
+              <button onClick={() => exportToExcel(
+                filtered.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Posición: a.posicion, Riesgo: a.riesgo, Poder: a.poder, Interés: a.interes, Prioridad: a.prioridad, Responsable: a.owner, Contacto: a.contacto, 'Última acción': a.accion_tomada, 'Fecha acción': a.fecha_accion })),
+                'Actores_CaribeLNG', 'Actores'
+              )}
+                style={{ background: '#f1f5f9', color: C.navy, border: '1px solid #e2e8f0', borderRadius: 8,
+                  padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                📥 Excel
+              </button>
             </div>
 
             {/* ── Formulario nuevo actor ── */}
