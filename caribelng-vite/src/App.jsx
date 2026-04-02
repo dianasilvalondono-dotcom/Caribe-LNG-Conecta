@@ -2542,30 +2542,55 @@ export default function App() {
     getProfile(u.id).then(setProfile)
   }, [session])
 
-  const loadData = useCallback(async () => {
+  // Core data — always loaded (needed for dashboard + navigation)
+  const loadCoreData = useCallback(async () => {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, cr, hs, rp, sg, ri, rl, cleg, kd, kb, ev, ae] = await Promise.all([getActors(), getAgreements(), getCronograma(), getHuellaSocial(), getReportesSemanales(), getSeguimientoAcuerdos(), getRiesgos(), getRiesgosLegislativos(), getCronogramaLegislativo(), getKpisDac(), getKnowledgeBase(), getEvidencias(), getActorEdits()])
+      const [a, ag, rp, sg, ri, ae] = await Promise.all([
+        getActors(), getAgreements(), getReportesSemanales(),
+        getSeguimientoAcuerdos(), getRiesgos(), getActorEdits()
+      ])
       setActors(a || [])
       setAgreements(ag || [])
-      setCronograma(cr || [])
-      setHuellaSocial(hs || [])
       setReportes(rp || [])
       setSeguimiento(sg || [])
       setRiesgos(ri || [])
-      setRiesgosLeg(rl || [])
-      setCronoLeg(cleg || [])
-      setKpisDac(kd || [])
-      setKnowledgeBase(kb || [])
-      setEvidencias(ev || [])
       setActorEdits(ae || [])
-      const rd = await getRegistrosDiarios()
-      setRegistrosDiarios(rd || [])
     } finally { setDataLoading(false) }
   }, [session])
 
-  useEffect(() => { loadData() }, [loadData])
+  // View-specific data — loaded on demand
+  const loadViewData = useCallback(async (v) => {
+    if (!session) return
+    try {
+      if (v === 'cronograma' && !cronograma.length) setCronograma(await getCronograma() || [])
+      if (v === 'huella' && !huellaSocial.length) setHuellaSocial(await getHuellaSocial() || [])
+      if (v === 'riesgos' && !riesgosLeg.length) {
+        const [rl, cleg] = await Promise.all([getRiesgosLegislativos(), getCronogramaLegislativo()])
+        setRiesgosLeg(rl || []); setCronoLeg(cleg || [])
+      }
+      if (v === 'kpis' && !kpisDac.length) setKpisDac(await getKpisDac() || [])
+      if (v === 'knowledge' && !knowledgeBase.length) setKnowledgeBase(await getKnowledgeBase() || [])
+      if (v === 'input') {
+        const [ev, rd] = await Promise.all([getEvidencias(), getRegistrosDiarios()])
+        setEvidencias(ev || []); setRegistrosDiarios(rd || [])
+      }
+      if (v === 'gestora') {
+        const [ev, rd] = await Promise.all([getEvidencias(), getRegistrosDiarios()])
+        setEvidencias(ev || []); setRegistrosDiarios(rd || [])
+      }
+    } catch (err) { console.error('Error loading view data:', err) }
+  }, [session, cronograma.length, huellaSocial.length, riesgosLeg.length, kpisDac.length, knowledgeBase.length])
+
+  // Full reload (for real-time updates)
+  const loadData = useCallback(async () => {
+    await loadCoreData()
+    await loadViewData(view)
+  }, [loadCoreData, loadViewData, view])
+
+  useEffect(() => { loadCoreData() }, [loadCoreData])
+  useEffect(() => { loadViewData(view) }, [view, loadViewData])
 
   useEffect(() => {
     if (!session) return
@@ -2662,18 +2687,7 @@ export default function App() {
   // helper: check if a view belongs to a dropdown group
   const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
 
-  if (isMobile && isPortrait) return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      minHeight: '100vh', background: C.navy, display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
-      <div style={{ fontSize: 64, marginBottom: 24, animation: 'spin90 1.5s ease-in-out infinite alternate' }}>📱</div>
-      <div style={{ fontSize: 22, fontWeight: 900, color: 'white', marginBottom: 12, letterSpacing: -0.5 }}>Rota el dispositivo</div>
-      <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, maxWidth: 260 }}>
-        Caribe LNG Conecta está optimizado para usarse en <strong style={{ color: 'rgba(255,255,255,0.85)' }}>modo horizontal</strong> en celular.
-      </div>
-      <style>{`@keyframes spin90 { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }`}</style>
-    </div>
-  )
+  const isPortraitMobile = isMobile && isPortrait
 
   return (
     <div onClick={(e) => { if (!e.target.closest('[data-nav-dropdown]')) setNavOpen(null) }}
@@ -2827,7 +2841,7 @@ export default function App() {
           </div>
       </div>
 
-      <div style={{ padding: isMobile ? '10px 10px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ padding: isPortraitMobile ? '10px 8px' : isMobile ? '10px 10px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
