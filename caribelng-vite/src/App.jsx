@@ -510,8 +510,8 @@ export default function App() {
   )
 
   return (
-    <div onClick={(e) => { if (!e.target.closest('[data-nav-dropdown]')) setNavOpen(null) }}
-      style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+      {navOpen && <div onClick={() => setNavOpen(null)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />}
       <style>{`
         /* CSS responsive — bypasses JS isMobile detection */
         .clng-mobile-nav { display: none; }
@@ -551,7 +551,7 @@ export default function App() {
             </div>
             {/* Nav tabs */}
             {NAV.map(n => n.children ? (
-              <div key={n.id} data-nav-dropdown style={{ position: 'relative', flexShrink: 0 }}>
+              <div key={n.id} data-nav-dropdown style={{ position: 'relative', flexShrink: 0, zIndex: 200 }}>
                 <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
                   style={{ flexShrink: 0,
                     background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
@@ -612,7 +612,7 @@ export default function App() {
             </div>
             <div style={{ display: 'flex', gap: 2 }}>
               {NAV.map(n => n.children ? (
-                <div key={n.id} data-nav-dropdown style={{ position: 'relative' }}>
+                <div key={n.id} data-nav-dropdown style={{ position: 'relative', zIndex: 200 }}>
                   <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
                     style={{ background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
                       color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
