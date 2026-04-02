@@ -2524,6 +2524,7 @@ export default function App() {
   const [editingActor, setEditingActor] = useState(null)
   const [registrosDiarios, setRegistrosDiarios] = useState([])
   const [inputSubTab, setInputSubTab] = useState('diario')
+  const [showGuia, setShowGuia] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -3862,17 +3863,116 @@ export default function App() {
 
         {view === 'gestora' && (
           <div>
-            <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
-              <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
-            </div>
-            {/* Explanation banner */}
-            <div style={{ background: `${C.accent}12`, border: `1px solid ${C.accent}33`, borderRadius: 12, padding: '12px 16px', marginBottom: 18, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 20, flexShrink: 0 }}>💡</span>
-              <div style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>
-                <strong>Panel de campo.</strong> Aquí ves de un vistazo los actores que necesitan atención inmediata en tu territorio y los cumpleaños próximos — para que puedas priorizar tu gestión del día. Toca cualquier actor para registrar una novedad.
+            <div style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+              <div>
+                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.text }}>📍 Mi Territorio</h1>
+                <p style={{ margin: '4px 0 0', color: C.muted, fontSize: 16 }}>{profile?.full_name} · {myTerritorio || 'Todos los territorios'}</p>
               </div>
+              <button onClick={() => setShowGuia(true)}
+                style={{ background: C.accent, color: 'white', border: 'none', borderRadius: 8,
+                  padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                📖 Guía
+              </button>
             </div>
+
+            {/* ── Modal Guía Gestora ── */}
+            {showGuia && (
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+                onClick={(e) => { if (e.target === e.currentTarget) setShowGuia(false) }}>
+                <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 520,
+                  maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: C.navy }}>📖 Guía de la Gestora</h2>
+                    <button onClick={() => setShowGuia(false)}
+                      style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+                  </div>
+
+                  <div style={{ fontSize: 14, color: C.text, lineHeight: 1.7 }}>
+
+                    <div style={{ background: '#eff6ff', borderRadius: 10, padding: 14, marginBottom: 16 }}>
+                      <div style={{ fontWeight: 800, color: C.navy, marginBottom: 4 }}>Tu rol en Conecta</div>
+                      Eres los ojos y oídos del proyecto en el territorio. Todo lo que registras aquí construye la trazabilidad que necesita Caribe LNG para demostrar su compromiso con las comunidades.
+                    </div>
+
+                    <div style={{ fontWeight: 800, fontSize: 15, color: C.navy, marginBottom: 8 }}>Lo que DEBES hacer cada día</div>
+
+                    <div style={{ background: '#f0fdf4', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: `3px solid ${C.green}` }}>
+                      <div style={{ fontWeight: 700, color: '#166534', marginBottom: 4 }}>1. Registrar cada reunión o visita</div>
+                      Gestión → Registro de Campo → <strong>Registro Diario</strong><br/>
+                      Llena: fecha, tipo de reunión, lugar, asistentes, qué se habló y qué se acordó. Toma foto si puedes — queda con GPS y hora automáticos.
+                    </div>
+
+                    <div style={{ background: '#f0fdf4', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: `3px solid ${C.green}` }}>
+                      <div style={{ fontWeight: 700, color: '#166534', marginBottom: 4 }}>2. Registrar novedades con actores</div>
+                      Ve a <strong>Actores</strong> → toca el actor → tab <strong>Relacionamiento</strong><br/>
+                      Registra: qué tipo de contacto fue (visita, llamada, reunión), qué pasó, y actualiza el semáforo si cambió la relación.
+                    </div>
+
+                    <div style={{ background: '#f0fdf4', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: `3px solid ${C.green}` }}>
+                      <div style={{ fontWeight: 700, color: '#166534', marginBottom: 4 }}>3. Subir evidencias fotográficas</div>
+                      Gestión → Registro de Campo → <strong>Evidencias</strong><br/>
+                      Toma la foto directo desde la app. Se guarda con ubicación GPS exacta, hora y nombre del lugar. Esto es tu respaldo forense.
+                    </div>
+
+                    <div style={{ fontWeight: 800, fontSize: 15, color: C.navy, marginBottom: 8, marginTop: 16 }}>Lo que DEBES hacer cada viernes</div>
+
+                    <div style={{ background: '#fffbeb', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: '3px solid #f59e0b' }}>
+                      <div style={{ fontWeight: 700, color: '#92400e', marginBottom: 4 }}>4. Enviar el Reporte Semanal</div>
+                      Gestión → Registro de Campo → <strong>Reporte Semanal</strong><br/>
+                      Llena todos los indicadores de la semana: acuerdos, compromisos, eventos, quejas (PQRS), incidentes, logros, dificultades y prioridades de la próxima semana.
+                    </div>
+
+                    <div style={{ fontWeight: 800, fontSize: 15, color: C.navy, marginBottom: 8, marginTop: 16 }}>Lo que PUEDES hacer</div>
+
+                    <div style={{ background: '#f8fafc', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: `3px solid ${C.accent}` }}>
+                      <div style={{ fontWeight: 700, color: C.navy, marginBottom: 4 }}>5. Editar información de actores</div>
+                      Actores → toca el actor → tab <strong>Editar</strong><br/>
+                      Puedes proponer cambios a cualquier campo. Tus cambios quedan <strong>pendientes</strong> hasta que la directora DAC los apruebe.
+                    </div>
+
+                    <div style={{ background: '#f8fafc', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: `3px solid ${C.accent}` }}>
+                      <div style={{ fontWeight: 700, color: C.navy, marginBottom: 4 }}>6. Actualizar datos personales de actores</div>
+                      Actores → toca el actor → tab <strong>Datos Personales</strong><br/>
+                      Cumpleaños, familia, intereses, fechas importantes. Esto alimenta los recordatorios en "Mi Territorio" para que nunca se te pase una fecha clave.
+                    </div>
+
+                    <div style={{ background: '#f8fafc', borderRadius: 10, padding: 14, marginBottom: 10, borderLeft: `3px solid ${C.accent}` }}>
+                      <div style={{ fontWeight: 700, color: C.navy, marginBottom: 4 }}>7. Enviar alertas urgentes al DAC</div>
+                      Dentro del Reporte Semanal hay un botón de <strong>alerta rápida</strong>. Úsalo si hay algo que no puede esperar al viernes: incidente, bloqueo, queja grave.
+                    </div>
+
+                    <div style={{ fontWeight: 800, fontSize: 15, color: C.navy, marginBottom: 8, marginTop: 16 }}>Checklist diario</div>
+
+                    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 14 }}>
+                      {[
+                        'Revisar "Mi Territorio" — ver qué actores necesitan atención',
+                        'Después de cada reunión → Registro Diario + foto',
+                        'Después de contactar un actor → Registrar novedad',
+                        'Si hay fecha importante esta semana → llamar o visitar',
+                        'Viernes → Enviar Reporte Semanal completo',
+                      ].map((item, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: i < 4 ? 8 : 0 }}>
+                          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>☐</span>
+                          <span style={{ fontSize: 13, color: C.text }}>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ background: '#fef2f2', borderRadius: 10, padding: 14, marginTop: 16, borderLeft: `3px solid ${C.red}` }}>
+                      <div style={{ fontWeight: 700, color: '#991b1b', marginBottom: 4 }}>Recuerda</div>
+                      Todo lo que registras es evidencia oficial del proyecto. Sé precisa en las descripciones, toma fotos siempre que puedas, y no dejes pasar reuniones sin registrar. Tu trabajo en campo es lo que sostiene la trazabilidad de Caribe LNG.
+                    </div>
+                  </div>
+
+                  <button onClick={() => setShowGuia(false)}
+                    style={{ width: '100%', marginTop: 20, background: C.navy, color: 'white', border: 'none',
+                      borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+                    Entendido
+                  </button>
+                </div>
+              </div>
+            )}
             <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
               <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>⚠️ Actores que necesitan atención hoy</h3>
               {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => (
