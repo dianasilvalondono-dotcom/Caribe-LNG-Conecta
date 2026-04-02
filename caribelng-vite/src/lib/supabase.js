@@ -310,10 +310,10 @@ export async function uploadEvidenciaPhoto(file) {
   return data.publicUrl
 }
 
-export async function addEvidencia({ user_id, territorio, foto_url, latitud, longitud, precision_m, descripcion, capturada_at }) {
+export async function addEvidencia({ user_id, territorio, foto_url, latitud, longitud, precision_m, descripcion, capturada_at, lugar }) {
   const { data, error } = await supabase
     .from('evidencias')
-    .insert({ user_id, territorio, foto_url, latitud, longitud, precision_m, descripcion, capturada_at })
+    .insert({ user_id, territorio, foto_url, latitud, longitud, precision_m, descripcion, capturada_at, lugar })
     .select()
     .single()
   if (error) throw error

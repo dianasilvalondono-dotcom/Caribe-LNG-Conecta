@@ -3456,9 +3456,20 @@ export default function App() {
                 const [desc, setDesc] = useState('')
                 const [geo, setGeo] = useState(null)
                 const [geoError, setGeoError] = useState(null)
+                const [lugar, setLugar] = useState(null)
                 const [captureTime, setCaptureTime] = useState(null)
                 const [uploading, setUploading] = useState(false)
                 const fileRef = useRef(null)
+
+                const reverseGeocode = async (lat, lng) => {
+                  try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es&zoom=16`)
+                    const data = await res.json()
+                    const a = data.address || {}
+                    const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
+                    setLugar(parts.join(', ') || data.display_name || 'Ubicación desconocida')
+                  } catch { setLugar(null) }
+                }
 
                 const handleFile = (e) => {
                   const f = e.target.files?.[0]
@@ -3469,7 +3480,10 @@ export default function App() {
                   // Capturar GPS inmediatamente
                   if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
-                      (pos) => setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }),
+                      (pos) => {
+                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+                        reverseGeocode(pos.coords.latitude, pos.coords.longitude)
+                      },
                       (err) => setGeoError('No se pudo obtener ubicación: ' + err.message),
                       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
                     )
@@ -3491,7 +3505,8 @@ export default function App() {
                       longitud: geo.lng,
                       precision_m: geo.accuracy,
                       descripcion: desc.trim(),
-                      capturada_at: captureTime
+                      capturada_at: captureTime,
+                      lugar: lugar || null
                     })
                     await loadData()
                     setShowEvidenciaCapture(false)
@@ -3547,11 +3562,15 @@ export default function App() {
                                 <span style={{ fontWeight: 700, color: C.text }}>📍 GPS:</span>
                                 <span style={{ color: C.muted }}>{geo.lat.toFixed(6)}, {geo.lng.toFixed(6)}</span>
                               </div>
-                              <div style={{ display: 'flex', gap: 8 }}>
+                              <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
                                 <span style={{ fontWeight: 700, color: C.text }}>🎯 Precisión:</span>
                                 <span style={{ color: geo.accuracy > 50 ? C.orange : C.green, fontWeight: 600 }}>
                                   ±{Math.round(geo.accuracy)}m {geo.accuracy > 50 ? '(baja)' : '(buena)'}
                                 </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: 8 }}>
+                                <span style={{ fontWeight: 700, color: C.text }}>📌 Lugar:</span>
+                                <span style={{ color: C.muted }}>{lugar || '⏳ Resolviendo...'}</span>
                               </div>
                             </>
                           ) : geoError ? (
@@ -3604,7 +3623,10 @@ export default function App() {
                       <div style={{ fontSize: 12, color: C.subtle }}>
                         🕐 {new Date(ev.capturada_at).toLocaleString('es-CO')}
                       </div>
-                      <div style={{ fontSize: 12, color: C.subtle }}>
+                      {ev.lugar && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>
+                        📌 {ev.lugar}
+                      </div>}
+                      <div style={{ fontSize: 11, color: C.subtle }}>
                         📍 {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
                         {ev.precision_m && <span> · ±{Math.round(ev.precision_m)}m</span>}
                       </div>
