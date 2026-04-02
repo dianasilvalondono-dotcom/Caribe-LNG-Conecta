@@ -13,32 +13,47 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
     return () => window.removeEventListener('resize', h)
   }, [])
 
-  // ── DAC Director KPI definitions ──────────────────────────────────────────
-  const KPIS_DAC_DEF = [
-    { obj: 1, titulo: 'Desarrollar e implementar el Plan de Gestión Social (PGS) en territorios de influencia', pct: '20%', color: C.tolu, items: [
-      { id: 'pgs_ejecutado', name: 'PGS ejecutado en Puntos de Influencia', formula: 'Ejecución del PGS / Plan aprobado', meta: '>=80%', frecuencia: 'Mensual' },
-      { id: 'bloqueos_comunitarios', name: 'Bloqueos comunitarios', formula: 'N. bloqueos con impacto en cronograma', meta: '0', frecuencia: 'Semanal / Mensual', invert: true },
+  // ── DAC Director KPIs — auto-calculated from gestora data ────────────────
+  const dacMap = Object.fromEntries((kpisDac || []).map(k => [k.id, k]))
+  const totalAcuerdos = agreements.length
+  const acuerdosCumplidos = agreements.filter(a => a.estado_code === 'cumplido' || a.avance >= 100).length
+  const acuerdosAvgPct = totalAcuerdos ? Math.round(agreements.reduce((s, a) => s + (a.avance || 0), 0) / totalAcuerdos) : 0
+  const totalCompromisos = seguimiento.length
+  const compromisosCumplidosD = seguimiento.filter(s => s.estado === 'Cumplido').length
+  const compromisosVencidos = seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada && new Date(s.fecha_pactada) < new Date()).length
+  const compromisosPct = totalCompromisos ? Math.round((compromisosCumplidosD / totalCompromisos) * 100) : 0
+  const totalEventosD = reportes.reduce((s, r) => s + (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0), 0)
+  const totalIncidentesD = reportes.reduce((s, r) => s + (r.incidentes || 0), 0)
+  const totalPqrs = reportes.reduce((s, r) => s + (r.pqrs_recibidas || 0), 0)
+  const pqrsCerradas = reportes.reduce((s, r) => s + (r.pqrs_cerradas || 0), 0)
+  const pqrsPct = totalPqrs ? Math.round((pqrsCerradas / totalPqrs) * 100) : 0
+  const actoresGestionados = reportes.reduce((s, r) => s + (r.actores_gestionados || 0), 0)
+  const actoresVerdes = (reportes.length > 0 ? actors : []).filter(a => a.semaforo === 'verde').length
+  const actoresTotal = actors?.length || 0
+  const relacionamientoPct = actoresTotal ? Math.round((actoresVerdes / actoresTotal) * 100) : 0
+
+  const semColor = (pct, meta = 80) => pct >= meta ? '#10b981' : pct >= meta * 0.7 ? '#f59e0b' : '#ef4444'
+  const semColorInv = (val) => val === 0 ? '#10b981' : val <= 2 ? '#f59e0b' : '#ef4444'
+  const semLabel = (pct, meta = 80) => pct >= meta ? 'En meta' : pct >= meta * 0.7 ? 'Atención' : 'Crítico'
+
+  const DAC_KPIS = [
+    { obj: 1, titulo: 'Ejecución del Plan de Gestión Social (PGS)', color: C.tolu, items: [
+      { name: 'Avance promedio de acuerdos', value: `${acuerdosAvgPct}%`, pct: acuerdosAvgPct, meta: 80, sc: semColor(acuerdosAvgPct) },
+      { name: 'Eventos y socializaciones realizados', value: totalEventosD, pct: Math.min(Math.round((totalEventosD / 24) * 100), 100), meta: 24, sc: semColor(Math.round((totalEventosD / 24) * 100)) },
+      { name: 'Actores gestionados acumulado', value: actoresGestionados, pct: Math.min(Math.round((actoresGestionados / 100) * 100), 100), meta: 100, sc: semColor(Math.round((actoresGestionados / 100) * 100)) },
+      { name: 'Relacionamiento estable (% verde)', value: `${relacionamientoPct}%`, pct: relacionamientoPct, meta: 60, sc: semColor(relacionamientoPct, 60) },
     ]},
-    { obj: 2, titulo: 'Formalizar e implementar acuerdos sociales con comunidades en territorios clave', pct: '20%', color: C.barbosa, items: [
-      { id: 'compromisos_pactados_dac', name: 'Compromisos pactados cumplidos', formula: 'Compromisos ejecutados / suscritos', meta: '>=90%', frecuencia: 'Mensual' },
-      { id: 'acuerdos_antes_cod', name: 'Acuerdos formalizados antes de COD', formula: 'Fecha firma / fecha objetivo COD', meta: '100%', frecuencia: 'Mensual' },
-      { id: 'acuerdos_incumplidos_dac', name: 'Acuerdos incumplidos', formula: 'N. Acuerdos incumplidos', meta: '0', frecuencia: 'Mensual', invert: true },
+    { obj: 2, titulo: 'Acuerdos sociales con comunidades', color: C.barbosa, items: [
+      { name: 'Acuerdos formalizados', value: `${acuerdosCumplidos}/${totalAcuerdos}`, pct: totalAcuerdos ? Math.round((acuerdosCumplidos / totalAcuerdos) * 100) : 0, meta: totalAcuerdos, sc: semColor(totalAcuerdos ? Math.round((acuerdosCumplidos / totalAcuerdos) * 100) : 0) },
+      { name: 'Compromisos cumplidos', value: `${compromisosCumplidosD}/${totalCompromisos}`, pct: compromisosPct, meta: 90, sc: semColor(compromisosPct, 90) },
+      { name: 'Compromisos vencidos', value: compromisosVencidos, pct: 0, meta: 0, sc: semColorInv(compromisosVencidos), invert: true },
     ]},
-    { obj: 3, titulo: 'Gestionar conflictos y riesgos sociales/reputacionales para proteger la operación', pct: '20%', color: C.red, items: [
-      { id: 'incidentes_alta_dac', name: 'Incidentes de severidad alta', formula: 'N. incidentes de severidad alta', meta: '0', frecuencia: 'Mensual', invert: true },
-      { id: 'alertas_24h_dac', name: 'Alertas escaladas en <=24h', formula: 'Alertas escaladas / total alertas', meta: '>=90%', frecuencia: 'Semanal / Mensual' },
-    ]},
-    { obj: 4, titulo: 'Blindar reputacionalmente cada hito crítico y ejecutar el plan de comunicaciones', pct: '20%', color: C.orange, items: [
-      { id: 'hitos_material', name: 'Hitos con material aprobado', formula: 'Hitos con material / total hitos', meta: '>=85%', frecuencia: 'Mensual' },
-      { id: 'plan_comunicaciones', name: 'Plan de comunicaciones', formula: 'Avance / plan aprobado', meta: '100%', frecuencia: 'Trimestral' },
-    ]},
-    { obj: 5, titulo: 'Entregar y aprobar los informes ESG 2026 en plazos requeridos para financiamiento', pct: '20%', color: C.green, items: [
-      { id: 'esg_en_plazo', name: 'Informes ESG entregados en plazo', formula: 'Informes en fecha / calendario aprobado', meta: '100%', frecuencia: 'Mensual' },
-      { id: 'esg_aprobado', name: 'Informe ESG aprobado', formula: 'Fecha entrega / fecha objetivo', meta: '100%', frecuencia: 'Mensual' },
+    { obj: 3, titulo: 'Gestión de riesgos, PQRS e incidentes', color: '#ef4444', items: [
+      { name: 'PQRS cerradas', value: `${pqrsPct}%`, pct: pqrsPct, meta: 90, sc: semColor(pqrsPct, 90) },
+      { name: 'Incidentes acumulados', value: totalIncidentesD, pct: 0, meta: 0, sc: semColorInv(totalIncidentesD), invert: true },
+      { name: 'Reportes semanales entregados', value: reportes.length, pct: Math.min(Math.round((reportes.length / 48) * 100), 100), meta: 48, sc: semColor(Math.round((reportes.length / 48) * 100)) },
     ]},
   ]
-
-  const dacMap = Object.fromEntries((kpisDac || []).map(k => [k.id, k]))
 
   // ── Gestora KPI definitions (updated to match PDF) ────────────────────────
   const KPIS_BARBOSA = [
@@ -310,23 +325,37 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
         ))}
       </div>
 
-      {/* ── DAC Director tab ── */}
+      {/* ── DAC Director tab — auto-calculated ── */}
       {mainTab === 'dac' && (
         <div>
-          <div style={{ background: `${C.navy}08`, border: `1px solid ${C.navy}20`, borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: C.text, lineHeight: 1.6 }}>
-            <strong>Diana Silva</strong> · Nivel Estratégico · 5 Objetivos × 20% · Marzo 2026
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 14, padding: '14px 18px', marginBottom: 20, fontSize: 12, color: '#1e40af', lineHeight: 1.6 }}>
+            Estos indicadores se calculan automáticamente desde los reportes semanales, acuerdos y actores. Se actualizan en tiempo real.
           </div>
-          {KPIS_DAC_DEF.map(obj => (
-            <div key={obj.obj} style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12, borderLeft: `4px solid ${obj.color}` }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
-                <div>
-                  <span style={{ fontSize: 11, fontWeight: 800, background: obj.color, color: 'white', padding: '2px 8px', borderRadius: 5, marginRight: 6 }}>OBJ {obj.obj}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: C.muted }}>Peso: {obj.pct}</span>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginTop: 6, lineHeight: 1.4 }}>{obj.titulo}</div>
-                </div>
+          {DAC_KPIS.map(obj => (
+            <div key={obj.obj} style={{ background: 'white', borderRadius: 16, padding: '20px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 14, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: obj.color }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                <span style={{ fontSize: 10, fontWeight: 800, background: obj.color, color: 'white', padding: '3px 10px', borderRadius: 6, letterSpacing: '0.5px' }}>OBJ {obj.obj}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#2B2926' }}>{obj.titulo}</span>
               </div>
-              {obj.items.map(kpi => (
-                <DACKpiRow key={kpi.id} kpi={kpi} saved={dacMap[kpi.id]} isAdmin={isAdmin} onSaved={onKpiDacSaved} />
+              {obj.items.map((kpi, i) => (
+                <div key={i} style={{ padding: '12px 0', borderTop: i > 0 ? '1px solid #f1f5f9' : 'none' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: kpi.sc, flexShrink: 0, boxShadow: `0 0 6px ${kpi.sc}60` }} />
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#2B2926' }}>{kpi.name}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      <span style={{ fontSize: 18, fontWeight: 900, color: kpi.sc }}>{kpi.value}</span>
+                      {kpi.meta > 0 && <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>/ {kpi.meta}</span>}
+                    </div>
+                  </div>
+                  {!kpi.invert && kpi.meta > 0 && (
+                    <div style={{ height: 5, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.min(kpi.pct, 100)}%`, background: kpi.sc, borderRadius: 100, transition: 'width 0.6s' }} />
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           ))}
