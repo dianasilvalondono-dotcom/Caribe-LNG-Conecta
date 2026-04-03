@@ -1326,7 +1326,7 @@ export default function App() {
                 if (!ag) return null
                 const eje = ejes.find(e => ag.eje && ag.eje.split(',').includes(e.label))
                 const ejeColor = eje?.color || '#0D47A1'
-                const eventos = cronograma.filter(c => c.acuerdo_id === ag.id).sort((a, b) => a.numero - b.numero)
+                const eventos = cronograma.filter(c => c.acuerdo_id && c.acuerdo_id.split(',').includes(ag.id)).sort((a, b) => a.numero - b.numero)
                 const estadoIcon = { Cumplido: '✓', 'En proceso': '→', Pendiente: '○' }
                 const estadoColor = { Cumplido: '#22c55e', 'En proceso': '#1565C0', Pendiente: '#94a3b8' }
                 return (
@@ -1919,110 +1919,110 @@ export default function App() {
                 </div>
               </div>
             )}
-            {/* ── Acuerdos de mi territorio ── */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <div style={{ width: 3, height: 14, background: '#10b981', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos de mi territorio</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).map(ag => (
-                  <AgreementCard key={ag.id} ag={ag} canEdit={true} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
-                ))}
-                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).length === 0 && (
-                  <div style={{ padding: 16, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>Sin acuerdos en tu territorio</div>
-                )}
-              </div>
-            </div>
-
-            <div style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <div style={{ width: 3, height: 14, background: '#ef4444', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Requieren atención</span>
-              </div>
-              {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).slice(0, 6).map(a => {
-                const sc = a.semaforo === 'rojo' ? '#ef4444' : '#f97316'
+            {/* ── Contenido por territorio ── */}
+            {(() => {
+              const territorios = myTerritorio ? [myTerritorio] : ['Tolú', 'Barbosa']
+              const tColors = { 'Tolú': { accent: '#0ea5e9', border: '#bae6fd', bg: '#f0f9ff' }, 'Barbosa': { accent: '#8b5cf6', border: '#ddd6fe', bg: '#f5f3ff' } }
+              const renderTerritorioCol = (terr) => {
+                const tc = tColors[terr] || tColors['Tolú']
+                const terrAgreements = agreements.filter(ag => ag.territorio === terr)
+                const terrActors = actors.filter(a => a.territorio === terr)
+                const rojos = terrActors.filter(a => a.semaforo === 'rojo' || a.semaforo === 'naranja')
                 return (
-                  <div key={a.id} onClick={() => setSelectedActor(a)}
-                    style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 12px', marginBottom: 6,
-                      borderRadius: 10, cursor: 'pointer', background: '#f8fafc', border: '1px solid #e8ecf0', transition: 'all 0.15s' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.boxShadow = 'none' }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: sc, flexShrink: 0, boxShadow: `0 0 6px ${sc}60` }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>{a.tipo}</div>
+                  <div key={terr}>
+                    {/* Territory label */}
+                    <div style={{ background: tc.accent, borderRadius: 10, padding: '10px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.5)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 800, color: 'white', letterSpacing: 0.5 }}>{terr}</span>
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginLeft: 'auto' }}>{terr === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'}</span>
                     </div>
-                    <span style={{ fontSize: 14, color: '#cbd5e1' }}>›</span>
+                    {/* Acuerdos */}
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                        <div style={{ width: 3, height: 14, background: tc.accent, borderRadius: 2 }} />
+                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {terrAgreements.map(ag => (
+                          <AgreementCard key={ag.id} ag={ag} canEdit={true} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
+                        ))}
+                      </div>
+                    </div>
+                    {/* Requieren atención */}
+                    <div style={{ background: 'white', borderRadius: 14, padding: '14px 14px', border: '1px solid #e8ecf0', marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                        <div style={{ width: 3, height: 14, background: '#ef4444', borderRadius: 2 }} />
+                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Requieren atención</span>
+                      </div>
+                      {rojos.length === 0
+                        ? <div style={{ padding: 10, textAlign: 'center', color: '#94a3b8', fontSize: 11 }}>Sin actores en atención urgente</div>
+                        : rojos.slice(0, 5).map(a => (
+                          <div key={a.id} onClick={() => setSelectedActor(a)}
+                            style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 10px', marginBottom: 4, borderRadius: 8, cursor: 'pointer', background: '#f8fafc', border: '1px solid #e8ecf0' }}>
+                            <div style={{ width: 7, height: 7, borderRadius: '50%', background: a.semaforo === 'rojo' ? '#ef4444' : '#f97316', flexShrink: 0 }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
+                              <div style={{ fontSize: 10, color: '#94a3b8' }}>{a.tipo}</div>
+                            </div>
+                            <span style={{ fontSize: 13, color: '#cbd5e1' }}>›</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                    {/* Próximas fechas */}
+                    <div style={{ background: 'white', borderRadius: 14, padding: '14px 14px', border: '1px solid #e8ecf0', marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                        <div style={{ width: 3, height: 14, background: '#f59e0b', borderRadius: 2 }} />
+                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Próximas fechas</span>
+                      </div>
+                      {(() => {
+                        const today = new Date()
+                        const items = []
+                        terrActors.filter(a => a.cumpleanos).forEach(a => {
+                          const d = new Date(a.cumpleanos)
+                          const next = new Date(today.getFullYear(), d.getMonth(), d.getDate())
+                          if (next < today) next.setFullYear(today.getFullYear() + 1)
+                          const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
+                          if (diff <= 30) items.push({ actorId: a.id, actor: a, diff, descripcion: 'Cumpleaños', dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) })
+                        })
+                        terrActors.forEach(a => {
+                          if (!Array.isArray(a.fechas_importantes)) return
+                          a.fechas_importantes.forEach((fi, idx) => {
+                            if (!fi.fecha) return
+                            const [mm, dd] = fi.fecha.split('-').map(Number)
+                            if (!mm || !dd) return
+                            const next = new Date(today.getFullYear(), mm - 1, dd)
+                            if (next < today) next.setFullYear(today.getFullYear() + 1)
+                            const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
+                            const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+                            if (diff <= 30) items.push({ actorId: a.id + '-' + idx, actor: a, diff, descripcion: fi.descripcion, dateStr: `${dd} de ${meses[mm - 1]}` })
+                          })
+                        })
+                        items.sort((a, b) => a.diff - b.diff)
+                        if (!items.length) return <div style={{ fontSize: 12, color: C.subtle, fontStyle: 'italic' }}>Sin fechas en los próximos 30 días.</div>
+                        return items.slice(0, 5).map(item => (
+                          <div key={item.actorId} onClick={() => setSelectedActor(item.actor)}
+                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${C.border}`, cursor: 'pointer' }}>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.actor.nombre}</div>
+                              <div style={{ fontSize: 11, color: C.accent, fontWeight: 600 }}>{item.descripcion}</div>
+                            </div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: item.diff <= 7 ? C.red : C.orange, flexShrink: 0, marginLeft: 8 }}>
+                              {item.diff === 0 ? '¡Hoy!' : `${item.diff}d`}
+                            </div>
+                          </div>
+                        ))
+                      })()}
+                    </div>
                   </div>
                 )
-              })}
-              {actors.filter(a => (myTerritorio ? a.territorio === myTerritorio : true) && (a.semaforo === 'rojo' || a.semaforo === 'naranja')).length === 0 && (
-                <div style={{ padding: 16, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>Sin actores en atención urgente</div>
-              )}
-            </div>
-            <div style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <div style={{ width: 3, height: 14, background: '#f59e0b', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Próximas fechas</span>
-              </div>
-              {(() => {
-                const today = new Date()
-                const todayMM = today.getMonth()
-                const todayDD = today.getDate()
-                const items = []
-
-                const filteredActors = actors.filter(a => myTerritorio ? a.territorio === myTerritorio : true)
-
-                // Birthdays
-                filteredActors.filter(a => a.cumpleanos).forEach(a => {
-                  const d = new Date(a.cumpleanos)
-                  const next = new Date(today.getFullYear(), d.getMonth(), d.getDate())
-                  if (next < today) next.setFullYear(today.getFullYear() + 1)
-                  const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
-                  if (diff <= 30) items.push({
-                    actorId: a.id, actor: a, diff,
-                    descripcion: 'Cumpleaños',
-                    dateStr: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' })
-                  })
-                })
-
-                // Fechas importantes
-                filteredActors.forEach(a => {
-                  if (!Array.isArray(a.fechas_importantes)) return
-                  a.fechas_importantes.forEach((fi, idx) => {
-                    if (!fi.fecha) return
-                    const [mm, dd] = fi.fecha.split('-').map(Number)
-                    if (!mm || !dd) return
-                    const next = new Date(today.getFullYear(), mm - 1, dd)
-                    if (next < today) next.setFullYear(today.getFullYear() + 1)
-                    const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
-                    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
-                    if (diff <= 30) items.push({
-                      actorId: a.id + '-' + idx, actor: a, diff,
-                      descripcion: fi.descripcion,
-                      dateStr: `${dd} de ${meses[mm - 1]}`
-                    })
-                  })
-                })
-
-                items.sort((a, b) => a.diff - b.diff)
-
-                if (!items.length) return <div style={{ fontSize: 14, color: C.subtle, fontStyle: 'italic' }}>Sin fechas en los próximos 30 días.</div>
-                return items.map(item => (
-                  <div key={item.actorId} onClick={() => setSelectedActor(item.actor)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${C.border}`, cursor: 'pointer' }}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{item.actor.nombre}</div>
-                      <div style={{ fontSize: 13, color: C.accent, fontWeight: 600 }}>{item.descripcion}</div>
-                      <div style={{ fontSize: 12, color: C.subtle }}>{item.dateStr}</div>
-                    </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: item.diff <= 7 ? C.red : C.orange, textAlign: 'right', minWidth: 60 }}>
-                      {item.diff === 0 ? '¡Hoy! ' : `En ${item.diff}d`}
-                    </div>
-                  </div>
-                ))
-              })()}
-            </div>
+              }
+              return (
+                <div style={{ display: 'grid', gridTemplateColumns: !myTerritorio && !isMobile ? '1fr 1fr' : '1fr', gap: 16, marginBottom: 12 }}>
+                  {territorios.map(t => renderTerritorioCol(t))}
+                </div>
+              )
+            })()}
             {/* ── Captura de Evidencia ── */}
             {(() => {
               const isTolu = myTerritorio === 'Tolú'
