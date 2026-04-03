@@ -487,7 +487,7 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: <IconDashboard size={16} /> },
-    { id: 'campo', label: 'Gestión de Campo', icon: <IconPin size={16} />, children: [
+    { id: 'miterritorio', label: 'Mi Territorio', icon: <IconPin size={16} />, children: [
       { id: 'gestora', label: 'Vista General', icon: <IconPin size={16} /> },
       { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
     ]},
