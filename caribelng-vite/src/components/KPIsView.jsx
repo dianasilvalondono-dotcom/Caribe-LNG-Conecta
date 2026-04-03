@@ -3,7 +3,7 @@ import { C } from '../lib/constants'
 import { Bar, Tag, StatCard } from './ui'
 import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 
-export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors }) {
+export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [] }) {
   const [mainTab, setMainTab] = useState('dac')
   const [terrFilter, setTerrFilter] = useState('Todos')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
@@ -458,6 +458,84 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
       {/* ── Gestoras tab ── */}
       {mainTab === 'gestoras' && (
         <div>
+          {/* Actividad de campo — desde registros diarios + evidencias */}
+          {(() => {
+            const territorios = ['Tolú', 'Barbosa']
+            const now = new Date()
+            const mesActual = now.getMonth()
+            const anioActual = now.getFullYear()
+            return (
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <div style={{ width: 3, height: 14, background: C.navy, borderRadius: 2 }} />
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Actividad de campo — alimentado de registros diarios</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
+                  {territorios.map(terr => {
+                    const color = terr === 'Tolú' ? C.tolu : C.barbosa
+                    const rd = registrosDiarios.filter(r => r.territorio === terr)
+                    const rdMes = rd.filter(r => { const d = new Date(r.fecha); return d.getMonth() === mesActual && d.getFullYear() === anioActual })
+                    const ev = evidencias.filter(e => e.territorio === terr)
+                    const evMes = ev.filter(e => { const d = new Date(e.capturada_at); return d.getMonth() === mesActual && d.getFullYear() === anioActual })
+                    const tiposCount = {}
+                    rdMes.forEach(r => { tiposCount[r.tipo_reunion] = (tiposCount[r.tipo_reunion] || 0) + 1 })
+                    const asistentesTotal = rdMes.reduce((s, r) => s + (r.asistentes || 0), 0)
+                    const semanasConRegistro = new Set(rdMes.map(r => {
+                      const d = new Date(r.fecha); const oneJan = new Date(d.getFullYear(), 0, 1)
+                      return Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7)
+                    })).size
+                    const semanasDelMes = Math.ceil(new Date(anioActual, mesActual + 1, 0).getDate() / 7)
+                    const frecuenciaPct = semanasDelMes > 0 ? Math.round((semanasConRegistro / semanasDelMes) * 100) : 0
+                    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+                    return (
+                      <div key={terr} style={{ background: 'white', borderRadius: 16, border: '1px solid #e8ecf0', overflow: 'hidden' }}>
+                        <div style={{ background: color, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{terr}</span>
+                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>{meses[mesActual]} {anioActual}</span>
+                        </div>
+                        <div style={{ padding: '14px 16px' }}>
+                          {/* Stats row */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 14 }}>
+                            {[
+                              { label: 'Registros', value: rdMes.length, total: rd.length },
+                              { label: 'Asistentes', value: asistentesTotal },
+                              { label: 'Evidencias', value: evMes.length, total: ev.length },
+                              { label: 'Frecuencia', value: `${frecuenciaPct}%`, color: frecuenciaPct >= 80 ? C.green : frecuenciaPct >= 50 ? C.orange : C.red },
+                            ].map(s => (
+                              <div key={s.label} style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: 20, fontWeight: 900, color: s.color || '#2B2926' }}>{s.value}</div>
+                                <div style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>{s.label}</div>
+                                {s.total != null && <div style={{ fontSize: 9, color: '#cbd5e1' }}>({s.total} total)</div>}
+                              </div>
+                            ))}
+                          </div>
+                          {/* Breakdown by type */}
+                          {Object.keys(tiposCount).length > 0 && (
+                            <div>
+                              <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 6 }}>Por tipo de actividad</div>
+                              {Object.entries(tiposCount).sort((a, b) => b[1] - a[1]).map(([tipo, count]) => (
+                                <div key={tipo} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid #f8fafc' }}>
+                                  <span style={{ fontSize: 12, color: '#475569' }}>{tipo}</span>
+                                  <span style={{ fontSize: 12, fontWeight: 800, color: color }}>{count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {rdMes.length === 0 && <div style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: 10 }}>Sin registros este mes</div>}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* KPIs from weekly reports */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <div style={{ width: 3, height: 14, background: C.navy, borderRadius: 2 }} />
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>KPIs trimestrales — alimentado de reportes semanales</span>
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
             <div>{renderTerritory('Tolú', KPIS_TOLU)}</div>
             <div>{renderTerritory('Barbosa', KPIS_BARBOSA)}</div>
@@ -465,7 +543,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
           {totalReportes === 0 && (
             <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>
               <div style={{ fontSize: 14, marginBottom: 6 }}>No hay reportes semanales aún</div>
-              <div style={{ fontSize: 13 }}>Los KPIs se calculan automáticamente cuando las gestoras llenen sus reportes en Input Semanal.</div>
+              <div style={{ fontSize: 13 }}>Los KPIs se calculan automáticamente cuando las gestoras llenen sus reportes semanales.</div>
             </div>
           )}
         </div>

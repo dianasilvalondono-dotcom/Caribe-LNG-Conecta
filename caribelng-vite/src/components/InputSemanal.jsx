@@ -126,10 +126,10 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
   const myReportes = reportes.filter(r => r.territorio === myTerr)
 
-  const NumField = ({ label, value, onChange }) => (
+  const NumField = ({ label, value, onChange, max }) => (
     <div style={{ flex: 1, minWidth: 120 }}>
       <label style={{ fontSize: 16, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{label}</label>
-      <input type="number" min="0" value={value} onChange={e => onChange(parseInt(e.target.value) || 0)}
+      <input type="number" min="0" max={max} value={value} onChange={e => { const v = parseInt(e.target.value) || 0; onChange(max ? Math.min(v, max) : v) }}
         style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
           fontWeight: 700, color: C.text, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', textAlign: 'center' }} />
     </div>
@@ -210,7 +210,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
               <NumField label="Asistentes total" value={asistentes} onChange={setAsistentes} />
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-              <NumField label="% socializ. con >=10 asistentes" value={pctSocAsistentes} onChange={setPctSocAsistentes} />
+              <NumField label="% socializ. con >=10 asistentes" value={pctSocAsistentes} onChange={setPctSocAsistentes} max={100} />
             </div>
             <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>El % se calcula sobre AID+AII con al menos 10 asistentes</div>
           </div>
@@ -250,8 +250,8 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
               <NumField label="PQRS pendientes" value={pqrsPendientes} onChange={setPqrsPendientes} />
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-              <NumField label="% respondidas en tiempo" value={pctPqrsTiempo} onChange={setPctPqrsTiempo} />
-              <NumField label="% cerradas en plazo" value={pctPqrsCerradas} onChange={setPctPqrsCerradas} />
+              <NumField label="% respondidas en tiempo" value={pctPqrsTiempo} onChange={setPctPqrsTiempo} max={100} />
+              <NumField label="% cerradas en plazo" value={pctPqrsCerradas} onChange={setPctPqrsCerradas} max={100} />
             </div>
             <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>% respondidas: ≤10 días hábiles · % cerradas: ≤15 días hábiles · Meta: 100%</div>
           </div>

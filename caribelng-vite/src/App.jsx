@@ -1526,7 +1526,7 @@ export default function App() {
                           <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Tipo de reunión</label>
                           <select value={tipoReunion} onChange={e => setTipoReunion(e.target.value)}
                             style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
-                            {['Comunidad', 'Pescadores', 'JAC', 'Institucional', 'Socialización', 'Vecindad', 'Diagnóstico', 'Otro'].map(t => <option key={t} value={t}>{t}</option>)}
+                            {['Comunidad', 'Pescadores', 'JAC', 'Institucional', 'Socialización', 'Vecindad', 'Diagnóstico', 'Llamada', 'Visita', 'Otro'].map(t => <option key={t} value={t}>{t}</option>)}
                           </select>
                         </div>
                         <div>
@@ -1693,9 +1693,9 @@ export default function App() {
                               } catch (err) { alert('Error: ' + err.message) }
                               finally { setUploading(false) }
                             }}
-                              disabled={uploading || !desc.trim() || !geo}
-                              style={{ flex: 2, background: uploading || !desc.trim() || !geo ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
-                              {uploading ? 'Subiendo...' : 'Guardar'}
+                              disabled={uploading || !desc.trim()}
+                              style={{ flex: 2, background: uploading || !desc.trim() ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
+                              {uploading ? 'Subiendo...' : geo ? 'Guardar' : 'Guardar sin GPS'}
                             </button>
                           </div>
                         </div>
@@ -1733,7 +1733,8 @@ export default function App() {
         {view === 'kpis' && (
           <KPIsView reportes={reportes} seguimiento={seguimiento}
             isAdmin={isAdmin} onDeleted={loadData} agreements={agreements}
-            kpisDac={kpisDac} onKpiDacSaved={loadData} actors={actors} />
+            kpisDac={kpisDac} onKpiDacSaved={loadData} actors={actors}
+            registrosDiarios={registrosDiarios} evidencias={evidencias} />
         )}
 
         {view === 'riesgos' && (
