@@ -311,11 +311,11 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <TerritoryBar label="Barbosa" icon={<IconBuildingFactory2 size={14} />} count={stats.barbosa} total={stats.total} color={`linear-gradient(90deg,${C_barbosa},#34d399)`} desc="Planta regasificadora" onClick={() => { setView('actores'); setFilterT('Barbosa') }} />
               <TerritoryBar label="Nacional" icon={<IconBuilding size={14} />} count={stats.nacional} total={stats.total} color={`linear-gradient(90deg,${C_muted},#94a3b8)`} desc="Legislativo + Regulatorio" onClick={() => { setView('actores'); setFilterT('Nacional') }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <div style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', cursor: 'pointer' }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: C_navy }}>{stats.total}</div>
                   <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Total actores</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f0fdf4', border: '1px solid #a7f3d0' }}>
+                <div onClick={() => setView('huella')} style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f0fdf4', border: '1px solid #a7f3d0', cursor: 'pointer' }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#059669' }}>{pgsAvg}%</div>
                   <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Avance Plan Social</div>
                 </div>
