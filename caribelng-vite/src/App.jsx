@@ -316,6 +316,7 @@ export default function App() {
   const [filterR, setFilterR] = useState('Todos')
   const [cronograma, setCronograma] = useState([])
   const [huellaSocial, setHuellaSocial] = useState([])
+  const [expandedAcuerdo, setExpandedAcuerdo] = useState(null)
   const [cronoFilter, setCronoFilter] = useState('Todos')
   const [cronoEstadoFilter, setCronoEstadoFilter] = useState('Todos')
   const [riesgos, setRiesgos] = useState([])
@@ -378,7 +379,10 @@ export default function App() {
     if (!session) return
     try {
       if (v === 'cronograma' && !cronograma.length) setCronograma(await getCronograma() || [])
-      if (v === 'huella' && !huellaSocial.length) setHuellaSocial(await getHuellaSocial() || [])
+      if (v === 'huella') {
+        if (!huellaSocial.length) setHuellaSocial(await getHuellaSocial() || [])
+        if (!cronograma.length) setCronograma(await getCronograma() || [])
+      }
       if (v === 'riesgos' && !riesgosLeg.length) {
         const [rl, cleg] = await Promise.all([getRiesgosLegislativos(), getCronogramaLegislativo()])
         setRiesgosLeg(rl || []); setCronoLeg(cleg || [])
@@ -489,9 +493,7 @@ export default function App() {
     ]},
     { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
     { id: 'territorio', label: 'Territorio', icon: <IconGlobe size={16} />, children: [
-      { id: 'acuerdos', label: 'Acuerdos', icon: <IconHandshake size={16} /> },
       { id: 'huella', label: 'Huella Social', icon: <IconLeaf size={16} /> },
-      { id: 'cronograma', label: 'Cronograma', icon: <IconCalendar size={16} /> },
       { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
     ]},
     { id: 'riesgos', label: 'Riesgos DAC', icon: <IconAlert size={16} /> },
@@ -672,13 +674,13 @@ export default function App() {
                     .forEach(r => results.push({ icon: '', label: r.descripcion?.substring(0, 50), sub: `${r.tipo_reunion} · ${r.fecha}`, action: () => { setView('input'); setInputSubTab('diario') } }))
                   // Acuerdos
                   agreements.filter(a => a.nombre?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(a => results.push({ icon: '', label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('acuerdos') }))
+                    .forEach(a => results.push({ icon: '', label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('huella') }))
                   // Riesgos
                   riesgos.filter(r => r.riesgo?.toLowerCase().includes(q) || r.accion_inmediata?.toLowerCase().includes(q)).slice(0, 2)
                     .forEach(r => results.push({ icon: '', label: r.riesgo?.substring(0, 50), sub: r.semaforo, action: () => setView('riesgos') }))
                   // Seguimiento
                   seguimiento.filter(s => s.compromiso?.toLowerCase().includes(q) || s.actividad?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(s => results.push({ icon: '', label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('acuerdos') }))
+                    .forEach(s => results.push({ icon: '', label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('huella') }))
                   if (!results.length) results.push({ icon: '', label: 'Sin resultados', sub: '', action: () => {} })
                   return (
                     <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#1a2744',
@@ -1293,8 +1295,11 @@ export default function App() {
                           {acuerdosEje.map(ag => {
                             const pct = ag.avance || 0
                             const pctColor = pct >= 100 ? '#22c55e' : pct > 0 ? e.color : '#eab308'
+                            const isExpanded = expandedAcuerdo === ag.id
                             return (
-                              <div key={ag.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'white', borderRadius: 8, border: `1px solid ${e.border}`, marginBottom: 4 }}>
+                              <div key={ag.id} onClick={() => setExpandedAcuerdo(isExpanded ? null : ag.id)}
+                                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: isExpanded ? `${e.color}10` : 'white', borderRadius: 8, border: `1px solid ${isExpanded ? e.color : e.border}`, marginBottom: 4, cursor: 'pointer', transition: 'all 0.15s' }}>
+                                <div style={{ fontSize: 12, color: e.color, flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>›</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <div style={{ fontSize: 11, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
                                   <div style={{ fontSize: 9, color: '#94a3b8' }}>{ag.territorio}</div>
@@ -1314,6 +1319,54 @@ export default function App() {
                   </div>
                 ))}
               </div>
+
+              {/* ── Detalle expandido del acuerdo ── */}
+              {expandedAcuerdo && (() => {
+                const ag = agreements.find(a => a.id === expandedAcuerdo)
+                if (!ag) return null
+                const eje = ejes.find(e => ag.eje && ag.eje.split(',').includes(e.label))
+                const ejeColor = eje?.color || '#0D47A1'
+                const eventos = cronograma.filter(c => c.acuerdo_id === ag.id).sort((a, b) => a.numero - b.numero)
+                const estadoIcon = { Cumplido: '✓', 'En proceso': '→', Pendiente: '○' }
+                const estadoColor = { Cumplido: '#22c55e', 'En proceso': '#1565C0', Pendiente: '#94a3b8' }
+                return (
+                  <div style={{ marginBottom: 24 }}>
+                    {/* Connector arrow */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: -1 }}>
+                      <div style={{ width: 2, height: 16, background: ejeColor, opacity: 0.3 }} />
+                      <div style={{ width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: `7px solid ${ejeColor}`, opacity: 0.3 }} />
+                    </div>
+                    {/* AgreementCard con toda la funcionalidad */}
+                    <AgreementCard ag={ag} canEdit={true} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
+                    {/* Cronograma del acuerdo */}
+                    {eventos.length > 0 && (
+                      <div style={{ background: 'white', borderRadius: 14, border: `1px solid ${ejeColor}30`, padding: '16px 18px', marginTop: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                          <div style={{ width: 3, height: 14, background: ejeColor, borderRadius: 2 }} />
+                          <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cronograma</span>
+                          <span style={{ fontSize: 10, color: '#94a3b8' }}>({eventos.filter(ev => ev.estado === 'Cumplido').length}/{eventos.length} cumplidos)</span>
+                        </div>
+                        {eventos.map(ev => (
+                          <div key={ev.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                            <div style={{ width: 20, height: 20, borderRadius: 6, background: `${estadoColor[ev.estado]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: estadoColor[ev.estado], fontWeight: 700, flexShrink: 0, marginTop: 1 }}>
+                              {estadoIcon[ev.estado]}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', lineHeight: 1.3 }}>{ev.evento}</div>
+                              <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{ev.mes}{ev.producto ? ` · ${ev.producto}` : ''}</div>
+                            </div>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: estadoColor[ev.estado], flexShrink: 0, whiteSpace: 'nowrap' }}>{ev.estado}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button onClick={() => setExpandedAcuerdo(null)}
+                      style={{ marginTop: 8, width: '100%', background: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: 8, padding: '10px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                      ← Cerrar detalle
+                    </button>
+                  </div>
+                )
+              })()}
 
               {/* Lógica del modelo */}
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>

@@ -150,7 +150,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
         <KPICard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} icon="👥" color={C_navy} sparkValues={totalSpark} trend="up" trendLabel="12%" onClick={() => { setView('actores'); setFilterS('Todos') }} />
         <KPICard label="Relación estable" value={stats.verde} icon="🤝" color="#10b981" sparkValues={verdeSpark} trend="up" trendLabel="8%" onClick={() => { setView('actores'); setFilterS('verde') }} />
         <KPICard label="Riesgos inmediatos" value={riesgosAltos.length} sub="Acción esta semana" icon="⚠️" color="#ef4444" sparkValues={riesgoSpark} trend="down" onClick={() => setView('riesgos')} />
-        <KPICard label="Compromisos activos" value={compromisosPendientes.length} sub={`${compromisosVencidos.length} vencidos`} icon="📋" color="#f59e0b" onClick={() => setView('acuerdos')} />
+        <KPICard label="Compromisos activos" value={compromisosPendientes.length} sub={`${compromisosVencidos.length} vencidos`} icon="📋" color="#f59e0b" onClick={() => setView('huella')} />
       </div>
       <div style={{ background: 'white', borderRadius: 14, padding: 16, marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
         <STitle label="Semáforo de relacionamiento" />
@@ -206,7 +206,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <KPICard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} icon="👥" color={C_navy} sparkValues={totalSpark} trend="up" trendLabel="12%" onClick={() => { setView('actores'); setFilterS('Todos') }} />
               <KPICard label="Relación estable" value={stats.verde} sub="Semáforo verde" icon="🤝" color="#10b981" sparkValues={verdeSpark} trend="up" trendLabel="8%" onClick={() => { setView('actores'); setFilterS('verde') }} />
               <KPICard label="Riesgos inmediatos" value={riesgosAltos.length} sub="Acción esta semana" icon="⚠️" color="#ef4444" sparkValues={riesgoSpark} trend="down" onClick={() => setView('riesgos')} />
-              <KPICard label="Compromisos activos" value={compromisosPendientes.length} sub={`${compromisosVencidos.length} vencidos hoy`} icon="📋" color="#f59e0b" trend="neutral" onClick={() => setView('acuerdos')} />
+              <KPICard label="Compromisos activos" value={compromisosPendientes.length} sub={`${compromisosVencidos.length} vencidos hoy`} icon="📋" color="#f59e0b" trend="neutral" onClick={() => setView('huella')} />
             </div>
           </section>
 
@@ -283,7 +283,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           {/* Timeline */}
           {recentActivity.length > 0 && (
             <section style={card}>
-              <STitle label="Actividad reciente" action={() => setView('acuerdos')} actionLabel="Ver historial →" />
+              <STitle label="Actividad reciente" action={() => setView('huella')} actionLabel="Ver historial →" />
               {recentActivity.map((item, i) => (
                 <div key={i} style={{ display: 'flex', gap: 12, paddingBottom: i < recentActivity.length - 1 ? 14 : 0, position: 'relative' }}>
                   {i < recentActivity.length - 1 && <div style={{ position: 'absolute', left: 15, top: 30, bottom: 0, width: 1, background: '#e2e8f0' }} />}
@@ -334,7 +334,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               </div>
             </div>
             {agreements.slice(0, 5).map(ag => (
-              <div key={ag.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7, cursor: 'pointer' }}>
+              <div key={ag.id} onClick={() => setView('huella')} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7, cursor: 'pointer' }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', width: 20 }}>{ag.id}</span>
                 <div style={{ flex: 1 }}><Bar value={ag.avance} color={ag.avance >= 100 ? '#10b981' : ag.territorio === 'Tolú' ? C_tolu : C_barbosa} height={5} /></div>
                 <span style={{ fontSize: 11, fontWeight: 700, width: 30, textAlign: 'right', color: ag.avance >= 100 ? '#059669' : '#1565C0' }}>{ag.avance}%</span>
@@ -350,10 +350,10 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   <div style={{ width: 3, height: 14, background: '#f59e0b', borderRadius: 2 }} />
                   <span style={{ fontSize: 11, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '1.2px' }}>Próximos vencimientos</span>
                 </div>
-                <span onClick={() => setView('acuerdos')} style={{ fontSize: 11, fontWeight: 600, color: '#1565C0', cursor: 'pointer' }}>Ver todos →</span>
+                <span onClick={() => setView('huella')} style={{ fontSize: 11, fontWeight: 600, color: '#1565C0', cursor: 'pointer' }}>Ver todos →</span>
               </div>
               {compromisosVencidos.slice(0, 2).map(s => (
-                <div key={s.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: '1px solid #f8fafc', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <div key={s.id} onClick={() => setView('huella')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: '1px solid #f8fafc', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#dc2626', fontWeight: 700 }}>!</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: C_text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(s.compromiso || s.actividad || '').substring(0, 35)}</div>
@@ -363,7 +363,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                 </div>
               ))}
               {compromisosProximos.slice(0, 3).map(s => (
-                <div key={s.id} onClick={() => setView('acuerdos')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: '1px solid #f8fafc', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <div key={s.id} onClick={() => setView('huella')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: '1px solid #f8fafc', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#d97706', fontWeight: 700 }}>~</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: C_text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(s.compromiso || s.actividad || '').substring(0, 35)}</div>
@@ -415,8 +415,8 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   if (r.pqrs_pendientes > 0) alertas.push({ icon: '', text: `${r.territorio}: ${r.pqrs_pendientes} quejas sin resolver`, color: '#f97316', nav: () => setView('input') })
                   if (r.incidentes > 0) alertas.push({ icon: '', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: '#ef4444', nav: () => setView('input') })
                 })
-                compromisosVencidos.slice(0, 3).forEach(s => alertas.push({ icon: '', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 40)}`, color: '#ef4444', nav: () => setView('acuerdos') }))
-                cronograma.filter(c => c.estado === 'En proceso').slice(0, 3).forEach(c => alertas.push({ icon: '', text: `${c.territorio}: ${(c.evento || '').substring(0, 48)}`, color: C_navy, nav: () => setView('cronograma') }))
+                compromisosVencidos.slice(0, 3).forEach(s => alertas.push({ icon: '', text: `Compromiso vencido: ${(s.compromiso || '').substring(0, 40)}`, color: '#ef4444', nav: () => setView('huella') }))
+                cronograma.filter(c => c.estado === 'En proceso').slice(0, 3).forEach(c => alertas.push({ icon: '', text: `${c.territorio}: ${(c.evento || '').substring(0, 48)}`, color: C_navy, nav: () => setView('huella') }))
                 if (riesgosAltos.length > 0) alertas.push({ icon: '', text: `${riesgosAltos.length} riesgo(s) en acción inmediata`, color: '#ef4444', nav: () => setView('riesgos') })
                 if (!alertas.length) return <div style={{ padding: '20px 8px', textAlign: 'center', color: '#94a3b8', fontSize: 13 }}><div style={{ fontSize: 24, marginBottom: 6 }}>✅</div>Sin novedades por ahora</div>
                 return alertas.slice(0, 8).map((a, i) => (
