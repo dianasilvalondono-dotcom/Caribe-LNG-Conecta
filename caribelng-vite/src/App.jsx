@@ -1866,6 +1866,22 @@ export default function App() {
                 </div>
               </div>
             )}
+            {/* ── Acuerdos de mi territorio ── */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 14, background: '#10b981', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos de mi territorio</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).map(ag => (
+                  <AgreementCard key={ag.id} ag={ag} canEdit={true} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
+                ))}
+                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).length === 0 && (
+                  <div style={{ padding: 16, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>Sin acuerdos en tu territorio</div>
+                )}
+              </div>
+            </div>
+
             <div style={{ background: 'white', borderRadius: 16, padding: '18px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                 <div style={{ width: 3, height: 14, background: '#ef4444', borderRadius: 2 }} />
@@ -1953,21 +1969,6 @@ export default function App() {
                   </div>
                 ))
               })()}
-            </div>
-            {/* ── Acuerdos de mi territorio ── */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <div style={{ width: 3, height: 14, background: '#10b981', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos de mi territorio</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).map(ag => (
-                  <AgreementCard key={ag.id} ag={ag} canEdit={true} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={false} />
-                ))}
-                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).length === 0 && (
-                  <div style={{ padding: 16, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>Sin acuerdos en tu territorio</div>
-                )}
-              </div>
             </div>
             {/* ── Captura de Evidencia ── */}
             {(() => {
