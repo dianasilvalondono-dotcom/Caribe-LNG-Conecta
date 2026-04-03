@@ -329,6 +329,9 @@ export default function App() {
   const [knowledgeBase, setKnowledgeBase] = useState([])
   const [evidencias, setEvidencias] = useState([])
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
+  const [alertaMensaje, setAlertaMensaje] = useState('')
+  const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
+  const [alertaEnviada, setAlertaEnviada] = useState(false)
   const [actorEdits, setActorEdits] = useState([])
   const [editingActor, setEditingActor] = useState(null)
   const [registrosDiarios, setRegistrosDiarios] = useState([])
@@ -1421,6 +1424,7 @@ export default function App() {
                 { id: 'diario', label: 'Registro Diario' },
                 { id: 'semanal', label: 'Reporte Semanal' },
                 { id: 'evidencias', label: 'Evidencias' },
+                { id: 'alerta', label: 'Escalar Alerta' },
               ].map(t => (
                 <button key={t.id} onClick={() => setInputSubTab(t.id)}
                   style={{ flex: 1, background: inputSubTab === t.id ? 'white' : 'transparent',
@@ -1736,6 +1740,57 @@ export default function App() {
               }
               return <EvidenciasTab />
             })()}
+
+            {inputSubTab === 'alerta' && (
+              <div style={{ background: '#fff1f2', border: '1.5px solid #fecdd3', borderRadius: 12, padding: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Escalar alerta a Dirección</div>
+                <div style={{ fontSize: 14, color: C.muted, marginBottom: 16 }}>El mensaje llega directamente al correo de la Directora de Asuntos Corporativos.</div>
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Nivel de urgencia</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {['Alta', 'Media', 'Baja'].map(u => (
+                      <button key={u} onClick={() => setAlertaUrgencia(u)}
+                        style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1.5px solid',
+                          borderColor: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : '#e2e8f0',
+                          background: alertaUrgencia === u ? (u === 'Alta' ? '#fee2e2' : u === 'Media' ? '#fff7ed' : '#fefce8') : 'white',
+                          color: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : C.muted,
+                          fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                        ● {u}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Mensaje *</label>
+                  <textarea value={alertaMensaje} onChange={e => setAlertaMensaje(e.target.value)} rows={5}
+                    placeholder="Describe la situación: qué pasó, quiénes están involucrados, qué necesitas de dirección..."
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #fecdd3',
+                      fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }} />
+                </div>
+                {alertaEnviada && (
+                  <div style={{ background: '#dcfce7', borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 14, color: '#166534', fontWeight: 600 }}>
+                    Alerta enviada correctamente
+                  </div>
+                )}
+                <button onClick={async () => {
+                  if (!alertaMensaje.trim()) return
+                  try {
+                    await sendAlerta({ gestora: profile?.full_name || session?.user?.email, territorio: myTerritorio || 'Nacional', mensaje: alertaMensaje, urgencia: alertaUrgencia })
+                    setAlertaMensaje('')
+                    setAlertaEnviada(true)
+                    setTimeout(() => setAlertaEnviada(false), 4000)
+                    const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+                    if (admins?.length) sendPushNotification({ title: `Alerta ${alertaUrgencia} — ${myTerritorio || 'Nacional'}`, body: `${profile?.full_name || 'Gestora'}: ${alertaMensaje.substring(0, 100)}`, user_ids: admins.map(a => a.id) }).catch(() => {})
+                  } catch(e) { alert('Error enviando alerta: ' + e.message) }
+                }} disabled={!alertaMensaje.trim()}
+                  style={{ width: '100%', background: !alertaMensaje.trim() ? '#f1f5f9' : C.red,
+                    color: !alertaMensaje.trim() ? C.muted : 'white',
+                    border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
+                    cursor: !alertaMensaje.trim() ? 'not-allowed' : 'pointer' }}>
+                  Enviar alerta
+                </button>
+              </div>
+            )}
           </div>
         )}
 

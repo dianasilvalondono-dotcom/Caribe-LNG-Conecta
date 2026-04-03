@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { C } from '../lib/constants'
 import { Field } from './ui'
-import { supabase, addReporteSemanal, deleteReporteSemanal, sendAlerta, sendPushNotification, uploadReporteToOneDrive } from '../lib/supabase'
+import { supabase, addReporteSemanal, deleteReporteSemanal, sendPushNotification, uploadReporteToOneDrive } from '../lib/supabase'
 
 export default function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
@@ -50,9 +50,6 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
   const [escalamientos, setEscalamientos] = useState('')
   const [prioridades, setPrioridades] = useState('')
 
-  const [alertaMensaje, setAlertaMensaje] = useState('')
-  const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
-  const [alertaEnviada, setAlertaEnviada] = useState(false)
 
   async function handleSaveReporte() {
     if (!semana || !fechaCorte) return
@@ -97,32 +94,6 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
     } finally { setSaving(false) }
   }
 
-  async function handleSendAlerta() {
-    if (!alertaMensaje.trim()) return
-    setSaving(true)
-    try {
-      await sendAlerta({
-        gestora: profile?.full_name || session?.user?.email,
-        territorio: myTerr,
-        mensaje: alertaMensaje,
-        urgencia: alertaUrgencia
-      })
-      setAlertaMensaje('')
-      setAlertaEnviada(true)
-      setTimeout(() => setAlertaEnviada(false), 4000)
-      // Notificar a admins
-      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
-      if (admins?.length) {
-        sendPushNotification({
-          title: `Alerta ${alertaUrgencia} — ${myTerr}`,
-          body: `${profile?.full_name || 'Gestora'}: ${alertaMensaje.substring(0, 100)}`,
-          user_ids: admins.map(a => a.id)
-        }).catch(() => {})
-      }
-    } catch(e) {
-      alert('Error enviando alerta: ' + e.message)
-    } finally { setSaving(false) }
-  }
 
   const myReportes = reportes.filter(r => r.territorio === myTerr)
 
@@ -169,7 +140,6 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
         {[
           { id: 'reporte', label: 'Reporte Semanal' },
-          { id: 'alerta', label: 'Escalar alerta' },
           { id: 'historico', label: 'Histórico' },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
@@ -298,52 +268,6 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
         </div>
       )}
 
-      {tab === 'alerta' && (
-        <div>
-          <div style={{ background: '#fff1f2', border: '1.5px solid #fecdd3', borderRadius: 12, padding: 20, marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Escalar alerta a Diana Silva</div>
-            <div style={{ fontSize: 14, color: C.muted, marginBottom: 16 }}>El mensaje llega directamente al correo de la Directora de Asuntos Corporativos.</div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Nivel de urgencia</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {['Alta', 'Media', 'Baja'].map(u => (
-                  <button key={u} onClick={() => setAlertaUrgencia(u)}
-                    style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1.5px solid',
-                      borderColor: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : '#e2e8f0',
-                      background: alertaUrgencia === u ? (u === 'Alta' ? '#fee2e2' : u === 'Media' ? '#fff7ed' : '#fefce8') : 'white',
-                      color: alertaUrgencia === u ? (u === 'Alta' ? C.red : u === 'Media' ? C.orange : C.yellow) : C.muted,
-                      fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                    {u === 'Alta' ? '●' : u === 'Media' ? '●' : '●'} {u}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 13, fontWeight: 700, color: C.text, display: 'block', marginBottom: 5 }}>Mensaje *</label>
-              <textarea value={alertaMensaje} onChange={e => setAlertaMensaje(e.target.value)} rows={5}
-                placeholder="Describe la situación que necesitas escalar: qué pasó, quiénes están involucrados, qué necesitas de Diana..."
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #fecdd3',
-                  fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }} />
-            </div>
-
-            {alertaEnviada && (
-              <div style={{ background: '#dcfce7', borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 14, color: '#166534', fontWeight: 600 }}>
-                Alerta enviada a diana.silva@caribelng.com
-              </div>
-            )}
-
-            <button onClick={handleSendAlerta} disabled={saving || !alertaMensaje.trim()}
-              style={{ width: '100%', background: saving || !alertaMensaje.trim() ? '#f1f5f9' : C.red,
-                color: saving || !alertaMensaje.trim() ? C.muted : 'white',
-                border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
-                cursor: saving || !alertaMensaje.trim() ? 'not-allowed' : 'pointer' }}>
-              {saving ? 'Enviando...' : 'Enviar alerta'}
-            </button>
-          </div>
-        </div>
-      )}
 
       {tab === 'historico' && (
         <div>
