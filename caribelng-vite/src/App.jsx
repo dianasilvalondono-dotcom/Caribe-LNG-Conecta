@@ -1222,15 +1222,15 @@ export default function App() {
 
         {view === 'huella' && (() => {
           const ejes = [
-            { key: 'ft', label: '1', titulo: 'Formación para el Trabajo', ifc: 'Empleo formal para jóvenes', color: '#1565C0',
+            { key: 'ft', label: '1', matchKey: 'FT', titulo: 'Formación para el Trabajo', ifc: 'Empleo formal para jóvenes', color: '#1565C0',
               bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd',
               tagline: 'Jóvenes de 18-28 años en Tolú y comunidades aledañas con certificaciones que les abren puertas laborales',
               items: ['Licencias de conducción C2/C3', 'Certificaciones marítimas y portuarias', 'Formación técnica en energía y mantenimiento', 'Manejo de sustancias peligrosas', 'Orientado a empleo formal y certificable'] },
-            { key: 'jd', label: '2', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'Ocupación del tiempo libre', color: '#007A87',
+            { key: 'jd', label: '2', matchKey: 'JD', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'Ocupación del tiempo libre', color: '#007A87',
               bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7',
               tagline: 'Jóvenes con actividades deportivas, liderazgo y habilidades para la vida — no en riesgo',
               items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas: Fútbol con Corazón, Soccer for Peace'] },
-            { key: 'ec', label: '3', titulo: 'Economía Local y Medio Ambiente', ifc: 'Economías locales sostenibles', color: '#00BFB3',
+            { key: 'ec', label: '3', matchKey: 'EC', titulo: 'Economía Local y Medio Ambiente', ifc: 'Economías locales sostenibles', color: '#00BFB3',
               bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4',
               tagline: 'Comunidades con cadenas productivas fortalecidas y ecosistemas protegidos',
               items: ['Fortalecimiento productivo de pescadores artesanales', 'Protección y restauración de ecosistemas locales', 'Reciclaje comunitario y economía circular', 'Educación ambiental'] },
@@ -1291,7 +1291,7 @@ export default function App() {
                     </div>
                     {/* Acuerdos vinculados — conexión directa */}
                     {(() => {
-                      const acuerdosEje = agreements.filter(ag => ag.eje && ag.eje.split(',').includes(e.label))
+                      const acuerdosEje = agreements.filter(ag => ag.eje && ag.eje.split(',').includes(e.matchKey))
                       if (!acuerdosEje.length) return null
                       return (
                         <div style={{ marginTop: 14 }}>
@@ -1332,7 +1332,7 @@ export default function App() {
               {expandedAcuerdo && (() => {
                 const ag = agreements.find(a => a.id === expandedAcuerdo)
                 if (!ag) return null
-                const eje = ejes.find(e => ag.eje && ag.eje.split(',').includes(e.label))
+                const eje = ejes.find(e => ag.eje && ag.eje.split(',').includes(e.matchKey))
                 const ejeColor = eje?.color || '#0D47A1'
                 const eventos = cronograma.filter(c => c.acuerdo_id && c.acuerdo_id.split(',').includes(ag.id)).sort((a, b) => a.numero - b.numero)
                 const estadoIcon = { Cumplido: '✓', 'En proceso': '→', Pendiente: '○' }
