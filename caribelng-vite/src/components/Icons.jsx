@@ -63,3 +63,22 @@ export const IconDownload = (p) => <I {...p} d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0
 export const IconBook = (p) => <I {...p} d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
 
 export const IconTrash = (p) => <I {...p} d="M3 6h18 M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6 M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+
+export const IconAnchor = (p) => <I {...p} d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M12 8v14 M5 12H2a10 10 0 0 0 20 0h-3" />
+
+export const IconFactory = (p) => <I {...p} d={<>
+  <path d="M2 20V8l4-4v6l4-4v6l4-4v12H2z" />
+  <path d="M14 20V4l8 4v12H14z" />
+  <path d="M6 20v-4 M10 20v-4 M18 20v-4" />
+</>} />
+
+export const IconBuilding = (p) => <I {...p} d={<>
+  <rect x="4" y="2" width="16" height="20" rx="2" />
+  <path d="M9 22v-4h6v4 M8 6h.01 M16 6h.01 M12 6h.01 M12 10h.01 M12 14h.01 M16 10h.01 M16 14h.01 M8 10h.01 M8 14h.01" />
+</>} />
+
+export const IconClipboardCheck = (p) => <I {...p} d={<>
+  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+  <rect x="8" y="2" width="8" height="4" rx="1" />
+  <path d="M9 14l2 2 4-4" />
+</>} />

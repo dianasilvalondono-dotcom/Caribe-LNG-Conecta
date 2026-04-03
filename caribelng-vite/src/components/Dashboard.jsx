@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { C, getTipoColor, initials } from '../lib/constants'
 import { Avatar, Bar } from './ui'
 import { BarChart, Bar as RBar, XAxis, YAxis, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts'
-import { IconUsers, IconHandshake, IconAlertTriangle, IconClipboardCheck, IconAnchor, IconBuildingFactory2, IconDownload, IconBuilding } from '@tabler/icons-react'
+import { IconUsers, IconHandshake, IconAlert, IconClipboardCheck, IconAnchor, IconFactory, IconDownload, IconBuilding } from './Icons'
 
 function Sparkline({ values = [], color = '#0D47A1', height = 32 }) {
   const max = Math.max(...values, 1)
@@ -162,7 +162,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
         <KPICard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} icon={<IconUsers size={18} color={C_navy} />} color={C_navy} sparkValues={totalSpark} trend="up" trendLabel="12%" onClick={() => { setView('actores'); setFilterS('Todos') }} />
         <KPICard label="Relación estable" value={stats.verde} icon={<IconHandshake size={18} color="#10b981" />} color="#10b981" sparkValues={verdeSpark} trend="up" trendLabel="8%" onClick={() => { setView('actores'); setFilterS('verde') }} />
-        <KPICard label="Riesgos inmediatos" value={riesgosAltos.length} sub="Acción esta semana" icon={<IconAlertTriangle size={18} color="#ef4444" />} color="#ef4444" sparkValues={riesgoSpark} trend="down" onClick={() => setView('riesgos')} />
+        <KPICard label="Riesgos inmediatos" value={riesgosAltos.length} sub="Acción esta semana" icon={<IconAlert size={18} color="#ef4444" />} color="#ef4444" sparkValues={riesgoSpark} trend="down" onClick={() => setView('riesgos')} />
         <KPICard label="Compromisos activos" value={compromisosPendientes.length} sub={`${compromisosVencidos.length} vencidos`} icon={<IconClipboardCheck size={18} color="#f59e0b" />} color="#f59e0b" onClick={() => setView('huella')} />
       </div>
       <div style={{ background: 'white', borderRadius: 14, padding: 16, marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
@@ -198,7 +198,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button onClick={() => setView('gestora')} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)', padding: '7px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}><IconAnchor size={13} /> Tolú</button>
-            <button onClick={() => setView('gestora')} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)', padding: '7px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}><IconBuildingFactory2 size={13} /> Barbosa</button>
+            <button onClick={() => setView('gestora')} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)', padding: '7px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}><IconFactory size={13} /> Barbosa</button>
             <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)' }} />
             <button onClick={() => window.print()} style={{ background: 'linear-gradient(135deg,#00b4d8,#0096c7)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,180,216,0.4)', display: 'flex', alignItems: 'center', gap: 5 }}><IconDownload size={13} /> Exportar PDF</button>
             <button onClick={() => exportToExcel(actors.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Riesgo: a.riesgo })), 'Actores_CaribeLNG', 'Actores')} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Excel</button>
@@ -218,7 +218,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
               <KPICard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} icon={<IconUsers size={18} color={C_navy} />} color={C_navy} sparkValues={totalSpark} trend="up" trendLabel="12%" onClick={() => { setView('actores'); setFilterS('Todos') }} />
               <KPICard label="Relación estable" value={stats.verde} sub="Semáforo verde" icon={<IconHandshake size={18} color="#10b981" />} color="#10b981" sparkValues={verdeSpark} trend="up" trendLabel="8%" onClick={() => { setView('actores'); setFilterS('verde') }} />
-              <KPICard label="Riesgos inmediatos" value={riesgosAltos.length} sub="Acción esta semana" icon={<IconAlertTriangle size={18} color="#ef4444" />} color="#ef4444" sparkValues={riesgoSpark} trend="down" onClick={() => setView('riesgos')} />
+              <KPICard label="Riesgos inmediatos" value={riesgosAltos.length} sub="Acción esta semana" icon={<IconAlert size={18} color="#ef4444" />} color="#ef4444" sparkValues={riesgoSpark} trend="down" onClick={() => setView('riesgos')} />
               <KPICard label="Compromisos activos" value={compromisosPendientes.length} sub={`${compromisosVencidos.length} vencidos hoy`} icon={<IconClipboardCheck size={18} color="#f59e0b" />} color="#f59e0b" trend="neutral" onClick={() => setView('huella')} />
             </div>
           </section>
@@ -320,7 +320,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
             <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid #f1f5f9' }}><STitle label="Actores por territorio" /></div>
             <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <TerritoryBar label="Tolú" icon={<IconAnchor size={14} />} count={stats.tolu} total={stats.total} color={`linear-gradient(90deg,${C_tolu},#00b4d8)`} desc="Terminal marítima + Sucre" onClick={() => { setView('actores'); setFilterT('Tolú') }} />
-              <TerritoryBar label="Barbosa" icon={<IconBuildingFactory2 size={14} />} count={stats.barbosa} total={stats.total} color={`linear-gradient(90deg,${C_barbosa},#34d399)`} desc="Planta regasificadora" onClick={() => { setView('actores'); setFilterT('Barbosa') }} />
+              <TerritoryBar label="Barbosa" icon={<IconFactory size={14} />} count={stats.barbosa} total={stats.total} color={`linear-gradient(90deg,${C_barbosa},#34d399)`} desc="Planta regasificadora" onClick={() => { setView('actores'); setFilterT('Barbosa') }} />
               <TerritoryBar label="Nacional" icon={<IconBuilding size={14} />} count={stats.nacional} total={stats.total} color={`linear-gradient(90deg,${C_muted},#94a3b8)`} desc="Legislativo + Regulatorio" onClick={() => { setView('actores'); setFilterT('Nacional') }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', cursor: 'pointer' }}>
