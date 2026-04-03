@@ -1214,15 +1214,15 @@ export default function App() {
           const ejes = [
             { key: 'ft', label: 'FT', titulo: 'Formación para el Trabajo', ifc: 'IFC PS2', color: '#1565C0',
               bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd',
-              tagline: 'Futuro profesional para jóvenes — la mejor alternativa a economías ilegales',
-              items: ['Licencias de conducción C2/C3', 'Certificaciones marítimas y portuarias', 'Formación técnica en energía y mantenimiento', 'Manejo de sustancias peligrosas', 'Prioridad: jóvenes adultos (18-28 años) de Tolú y comunidades aledañas'] },
+              tagline: 'Población objetivo: jóvenes 18-28 años en Tolú y comunidades aledañas',
+              items: ['Licencias de conducción C2/C3', 'Certificaciones marítimas y portuarias', 'Formación técnica en energía y mantenimiento', 'Manejo de sustancias peligrosas', 'Orientado a empleo formal y certificable'] },
             { key: 'jd', label: 'JD', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'IFC PS4', color: '#007A87',
               bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7',
-              tagline: 'Deporte y liderazgo que transforman — jóvenes con propósito, no en riesgo',
+              tagline: 'Programas de ocupación del tiempo libre y formación de liderazgo juvenil',
               items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas: Fútbol con Corazón, Soccer for Peace'] },
             { key: 'ec', label: 'EC', titulo: 'Economía Local y Ecosistema Territorial', ifc: 'IFC PS6', color: '#00BFB3',
               bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4',
-              tagline: 'Comunidades prósperas — menos vulnerabilidad, más autonomía económica',
+              tagline: 'Fortalecimiento de cadenas productivas locales y gestión ambiental',
               items: ['Fortalecimiento productivo de pescadores artesanales', 'Protección y restauración de ecosistemas locales', 'Reciclaje comunitario y economía circular', 'Educación ambiental'] },
           ]
           const contexto = [
@@ -1242,12 +1242,12 @@ export default function App() {
                   <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes · Estándares IFC</span>
                 </div>
                 <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Huella Social Territorial</h1>
-                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Construyendo paz y desarrollo desde Tolú y Barbosa</p>
+                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Guía de referencia interna — ejes, programas y contexto territorial</p>
               </div>
 
               {/* Intro */}
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
-                Caribe LNG opera la cadena de gas natural licuado que conecta mar, puerto y carreteras con los puntos de regasificación en Colombia: <strong style={{ color: '#2B2926' }}>Tolú (Sucre)</strong> y <strong style={{ color: '#2B2926' }}>Barbosa (Antioquia)</strong>. 100% inversión privada, sin costo para los municipios. A través de <strong style={{ color: '#1565C0' }}>Caribe LNG Conecta</strong>, invertimos en el crecimiento de las comunidades donde operamos: formamos jóvenes (18-28 años) para el empleo formal, abrimos espacios de deporte y liderazgo, y fortalecemos economías locales. No es caridad: es un modelo de corresponsabilidad que deja capacidad instalada y transforma territorios.
+                La inversión social de Caribe LNG se ejecuta en dos territorios: <strong style={{ color: '#2B2926' }}>Tolú (Sucre)</strong> — terminal marítima — y <strong style={{ color: '#2B2926' }}>Barbosa (Antioquia)</strong> — planta de regasificación. La estrategia se organiza en tres ejes alineados con los Performance Standards de la IFC. Cada eje tiene programas específicos, aliados y poblaciones objetivo definidas. Modelo: 100% inversión privada, sin costo para los municipios. Enfoque de corresponsabilidad — se busca dejar capacidad instalada, no dependencia.
               </div>
 
               {/* Section title */}
@@ -1287,14 +1287,14 @@ export default function App() {
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: '#0D47A1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 900, flexShrink: 0 }}>+</div>
                 <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
-                  <strong style={{ color: '#2B2926' }}>Desarrollo que construye paz.</strong> Cada programa genera crecimiento visible — empleo, deporte, economías locales — y al mismo tiempo cierra brechas de vulnerabilidad en los territorios. Cuando un joven tiene oficio, hace deporte y lidera proyectos en su comunidad, el entorno cambia. Invertir en oportunidades es la forma más efectiva de transformar un territorio.
+                  <strong style={{ color: '#2B2926' }}>Lógica del modelo.</strong> Los tres ejes se refuerzan entre sí: FT genera empleo formal, JD ocupa el tiempo libre de jóvenes y desarrolla liderazgo, EC fortalece las economías locales existentes. En conjunto, reducen las brechas de vulnerabilidad que el contexto territorial presenta. Esta es la narrativa que las gestoras territoriales deben poder explicar a comunidades, autoridades y aliados.
                 </div>
               </div>
 
               {/* Contexto */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                 <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>El contexto que queremos transformar</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Datos de contexto territorial</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: 10, marginBottom: 28 }}>
                 {contexto.map((c, i) => (
@@ -1308,8 +1308,8 @@ export default function App() {
 
               {/* Bottom banner */}
               <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #007A87 100%)', borderRadius: 16, padding: '28px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>Construyendo paz y desarrollo desde Tolú y Barbosa</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Huella Social Territorial · Caribe LNG 2026</div>
+                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>Referencia interna — Huella Social 2026</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Dirección de Asuntos Corporativos · Caribe LNG</div>
               </div>
             </div>
           )
