@@ -1922,7 +1922,7 @@ export default function App() {
             {/* ── Contenido por territorio ── */}
             {(() => {
               const territorios = myTerritorio ? [myTerritorio] : ['Tolú', 'Barbosa']
-              const tColors = { 'Tolú': { accent: '#0ea5e9', border: '#bae6fd', bg: '#f0f9ff' }, 'Barbosa': { accent: '#8b5cf6', border: '#ddd6fe', bg: '#f5f3ff' } }
+              const tColors = { 'Tolú': { accent: '#007A87', border: '#99d5db', bg: '#f0fafa' }, 'Barbosa': { accent: '#00BFB3', border: '#99e6e0', bg: '#f0fdfb' } }
               const renderTerritorioCol = (terr) => {
                 const tc = tColors[terr] || tColors['Tolú']
                 const terrAgreements = agreements.filter(ag => ag.territorio === terr)
