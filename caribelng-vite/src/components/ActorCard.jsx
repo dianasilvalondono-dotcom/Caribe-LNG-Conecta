@@ -5,6 +5,8 @@ export default function ActorCard({ actor, onClick }) {
   const [hovered, setHovered] = useState(false)
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
   const tc = getTipoColor(actor.tipo)
+  const diasSinContacto = actor.fecha_accion ? Math.floor((new Date() - new Date(actor.fecha_accion)) / (1000 * 60 * 60 * 24)) : null
+  const diasColor = diasSinContacto === null ? '#94a3b8' : diasSinContacto <= 15 ? '#22c55e' : diasSinContacto <= 30 ? '#f59e0b' : '#ef4444'
   return (
     <div onClick={() => onClick(actor)}
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
@@ -42,6 +44,13 @@ export default function ActorCard({ actor, onClick }) {
             <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 100,
               background: '#fef3c7', color: '#92400e' }}>Prioridad A</span>
           )}
+        </div>
+        {/* Último contacto */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: diasColor, flexShrink: 0 }} />
+          <span style={{ color: diasColor, fontWeight: 600 }}>
+            {diasSinContacto === null ? 'Sin contacto registrado' : diasSinContacto === 0 ? 'Hoy' : `Hace ${diasSinContacto} días`}
+          </span>
         </div>
       </div>
     </div>

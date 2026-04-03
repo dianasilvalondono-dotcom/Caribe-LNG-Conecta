@@ -790,6 +790,46 @@ export default function App() {
             </div>
             </div>
 
+            {/* ── Resumen de impacto ── */}
+            {(() => {
+              const now = new Date()
+              const hace30 = new Date(now - 30 * 24 * 60 * 60 * 1000)
+              const contactadosReciente = actors.filter(a => a.fecha_accion && new Date(a.fecha_accion) >= hace30).length
+              const sinContacto30 = actors.filter(a => !a.fecha_accion || new Date(a.fecha_accion) < hace30).length
+              const prioA = actors.filter(a => a.prioridad === 'A' || a.prioridad === 1)
+              const prioAContactados = prioA.filter(a => a.fecha_accion && new Date(a.fecha_accion) >= hace30).length
+              const verdes = actors.filter(a => a.semaforo === 'verde').length
+              const relPct = actors.length ? Math.round((verdes / actors.length) * 100) : 0
+              return (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: '#22c55e' }} />
+                    <div style={{ fontSize: 24, fontWeight: 900, color: '#22c55e' }}>{contactadosReciente}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Contactados este mes</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>de {actors.length} actores</div>
+                  </div>
+                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: sinContacto30 > 100 ? '#ef4444' : '#f59e0b' }} />
+                    <div style={{ fontSize: 24, fontWeight: 900, color: sinContacto30 > 100 ? '#ef4444' : '#f59e0b' }}>{sinContacto30}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Sin contacto (30+ días)</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>requieren atención</div>
+                  </div>
+                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: C.navy }} />
+                    <div style={{ fontSize: 24, fontWeight: 900, color: C.navy }}>{prioAContactados}/{prioA.length}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Prioridad A activos</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>contactados este mes</div>
+                  </div>
+                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: relPct >= 50 ? '#22c55e' : '#f59e0b' }} />
+                    <div style={{ fontSize: 24, fontWeight: 900, color: relPct >= 50 ? '#22c55e' : '#f59e0b' }}>{relPct}%</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Relación estable</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{verdes} actores en verde</div>
+                  </div>
+                </div>
+              )
+            })()}
+
             {/* ── Formulario nuevo actor ── */}
             {showNewActor && (
               <div style={{ background: C.card, borderRadius: 12, padding: 20, marginBottom: 16,
