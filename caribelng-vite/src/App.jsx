@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx'
 import { BarChart, Bar as RBar, XAxis, YAxis, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts'
 
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
-         getActors, addActor, getAgreements, getInteractions, addInteraction, updateActor, updateAgreementAvance,
+         getActors, addActor, getAgreements, getInteractions, getAllInteractions, addInteraction, updateActor, updateAgreementAvance,
          getCronograma, getHuellaSocial, updateCronogramaEstado,
          getReportesSemanales, addReporteSemanal, deleteReporteSemanal, deleteKpiEntry, deleteCronogramaEvent, deleteRiesgo,
          getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
@@ -325,6 +325,7 @@ export default function App() {
   const [reportes, setReportes] = useState([])
   const [seguimiento, setSeguimiento] = useState([])
   const [kpisDac, setKpisDac] = useState([])
+  const [allInteractions, setAllInteractions] = useState([])
   const [knowledgeBase, setKnowledgeBase] = useState([])
   const [evidencias, setEvidencias] = useState([])
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
@@ -387,7 +388,11 @@ export default function App() {
         const [rl, cleg] = await Promise.all([getRiesgosLegislativos(), getCronogramaLegislativo()])
         setRiesgosLeg(rl || []); setCronoLeg(cleg || [])
       }
-      if (v === 'kpis' && !kpisDac.length) setKpisDac(await getKpisDac() || [])
+      if (v === 'kpis') {
+        if (!kpisDac.length) setKpisDac(await getKpisDac() || [])
+        if (!allInteractions.length) setAllInteractions(await getAllInteractions() || [])
+        if (!cronograma.length) setCronograma(await getCronograma() || [])
+      }
       if (v === 'knowledge' && !knowledgeBase.length) setKnowledgeBase(await getKnowledgeBase() || [])
       if (v === 'input') {
         const [ev, rd] = await Promise.all([getEvidencias(), getRegistrosDiarios()])
@@ -1734,7 +1739,8 @@ export default function App() {
           <KPIsView reportes={reportes} seguimiento={seguimiento}
             isAdmin={isAdmin} onDeleted={loadData} agreements={agreements}
             kpisDac={kpisDac} onKpiDacSaved={loadData} actors={actors}
-            registrosDiarios={registrosDiarios} evidencias={evidencias} />
+            registrosDiarios={registrosDiarios} evidencias={evidencias}
+            allInteractions={allInteractions} cronograma={cronograma} />
         )}
 
         {view === 'riesgos' && (

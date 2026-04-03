@@ -3,7 +3,7 @@ import { C } from '../lib/constants'
 import { Bar, Tag, StatCard } from './ui'
 import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 
-export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [] }) {
+export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [], allInteractions = [], cronograma = [] }) {
   const [mainTab, setMainTab] = useState('dac')
   const [terrFilter, setTerrFilter] = useState('Todos')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
@@ -458,6 +458,77 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
       {/* ── Gestoras tab ── */}
       {mainTab === 'gestoras' && (
         <div>
+          {/* ── Indicadores predictivos — blindaje de KPIs DAC ── */}
+          {(() => {
+            const now = new Date()
+            const qActual = Math.floor(now.getMonth() / 3) + 1
+            const qMeses = qActual === 1 ? [0,1,2] : qActual === 2 ? [3,4,5] : qActual === 3 ? [6,7,8] : [9,10,11]
+            const anio = now.getFullYear()
+
+            // 1. Cobertura de actores prioritarios (prioridad A contactados este trimestre)
+            const actoresA = (actors || []).filter(a => a.prioridad === 'A' || a.prioridad === 1)
+            const interaccionesQ = allInteractions.filter(i => {
+              const d = new Date(i.created_at)
+              return d.getFullYear() === anio && qMeses.includes(d.getMonth())
+            })
+            const actoresContactadosQ = new Set(interaccionesQ.map(i => i.actor_id))
+            const actoresAContactados = actoresA.filter(a => actoresContactadosQ.has(a.id)).length
+            const coberturaPct = actoresA.length > 0 ? Math.round((actoresAContactados / actoresA.length) * 100) : 0
+
+            // 2. Salud del relacionamiento (% actores verde+amarillo)
+            const actoresOk = (actors || []).filter(a => a.semaforo === 'verde' || a.semaforo === 'amarillo').length
+            const saludPct = actoresTotal > 0 ? Math.round((actoresOk / actoresTotal) * 100) : 0
+
+            // 3. Cumplimiento del cronograma (% eventos cumplidos)
+            const eventosTotal = cronograma.length
+            const eventosCumplidos = cronograma.filter(c => c.estado === 'Cumplido').length
+            const cronoPct = eventosTotal > 0 ? Math.round((eventosCumplidos / eventosTotal) * 100) : 0
+
+            // 4. Trazabilidad (% semanas con reporte semanal entregado)
+            const semanasTranscurridas = Math.max(1, Math.ceil((now - new Date(anio, 0, 1)) / (7 * 24 * 60 * 60 * 1000)))
+            const semanasConReporte = new Set(reportes.map(r => r.semana)).size
+            const trazPct = Math.min(100, Math.round((semanasConReporte / semanasTranscurridas) * 100))
+
+            const indicadores = [
+              { titulo: 'Cobertura actores prioritarios', valor: `${actoresAContactados}/${actoresA.length}`, pct: coberturaPct, meta: 80,
+                sub: `Prioridad A contactados en Q${qActual}`, blindaKpi: 'KPI 1 (Acuerdos) + KPI 3 (Riesgos)' },
+              { titulo: 'Salud del relacionamiento', valor: `${actoresOk}/${actoresTotal}`, pct: saludPct, meta: 85,
+                sub: 'Actores en verde o amarillo', blindaKpi: 'KPI 3 (Riesgos)' },
+              { titulo: 'Cumplimiento del cronograma', valor: `${eventosCumplidos}/${eventosTotal}`, pct: cronoPct, meta: 70,
+                sub: 'Eventos ejecutados vs programados', blindaKpi: 'KPI 2 (PGS)' },
+              { titulo: 'Trazabilidad', valor: `${semanasConReporte}/${semanasTranscurridas} sem`, pct: trazPct, meta: 80,
+                sub: 'Semanas con reporte semanal entregado', blindaKpi: 'KPI 2 (PGS)' },
+            ]
+            const semColor = (pct, meta) => pct >= meta ? '#10b981' : pct >= meta * 0.7 ? '#f59e0b' : '#ef4444'
+
+            return (
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <div style={{ width: 3, height: 14, background: C.navy, borderRadius: 2 }} />
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Indicadores predictivos — blindaje de KPIs DAC</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 12 }}>
+                  {indicadores.map(ind => {
+                    const sc = semColor(ind.pct, ind.meta)
+                    return (
+                      <div key={ind.titulo} style={{ background: 'white', borderRadius: 14, border: '1px solid #e8ecf0', padding: '16px 14px', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: sc }} />
+                        <div style={{ fontSize: 28, fontWeight: 900, color: sc, letterSpacing: -1, lineHeight: 1 }}>{ind.pct}%</div>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', marginTop: 8, lineHeight: 1.3 }}>{ind.titulo}</div>
+                        <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 4 }}>{ind.sub}</div>
+                        <div style={{ fontSize: 10, color: '#94a3b8' }}>{ind.valor} · Meta: ≥{ind.meta}%</div>
+                        <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, marginTop: 8, overflow: 'hidden' }}>
+                          <div style={{ width: `${Math.min(ind.pct, 100)}%`, height: '100%', background: sc, borderRadius: 100 }} />
+                        </div>
+                        <div style={{ fontSize: 9, color: sc, fontWeight: 700, marginTop: 6 }}>Soporta: {ind.blindaKpi}</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
+
           {/* Actividad de campo — desde registros diarios + evidencias */}
           {(() => {
             const territorios = ['Tolú', 'Barbosa']

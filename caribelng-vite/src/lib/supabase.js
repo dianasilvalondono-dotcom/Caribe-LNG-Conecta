@@ -86,6 +86,11 @@ export async function getInteractions(actorId) {
   return data
 }
 
+export async function getAllInteractions() {
+  const { data } = await supabase.from('interactions').select('actor_id, created_at, tipo').order('created_at', { ascending: false })
+  return data || []
+}
+
 export async function addInteraction({ actorId, tipo, resumen, semaforo_nuevo, userId, accion_tomada, fecha_accion }) {
   const { data, error } = await supabase
     .from('interactions')
