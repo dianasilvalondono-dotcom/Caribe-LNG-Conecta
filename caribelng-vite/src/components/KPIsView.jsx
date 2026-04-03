@@ -352,9 +352,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>KPIs 2026</h1>
-        <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Caribe LNG · Dirección de Asuntos Corporativos · Enero–Diciembre 2026</p>
+      <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+        <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Indicadores 2026</h1>
+        <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Caribe LNG · Dirección de Asuntos Corporativos · Enero–Diciembre 2026</p>
       </div>
 
       {/* Summary cards */}

@@ -759,16 +759,18 @@ export default function App() {
         {/* ━━ ACTORES ━━ */}
         {view === 'actores' && (
           <div>
-            {/* Header */}
-            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-              <div>
-                <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Base de Actores</h1>
-                <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>{filtered.length} de {actors.length} actores</p>
-              </div>
+            {/* Hero */}
+            <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, position: 'relative', zIndex: 1 }}>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Base de Actores</h1>
+                  <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{filtered.length} de {actors.length} actores · Tolú, Barbosa y Nacional</p>
+                </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {(isAdmin || profile?.role === 'gestora') && (
                   <button onClick={() => setShowNewActor(!showNewActor)}
-                    style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10,
+                    style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10,
                       padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s' }}>
                     + Nuevo Actor
                   </button>
@@ -777,11 +779,12 @@ export default function App() {
                   filtered.map(a => ({ Nombre: a.nombre, Tipo: a.tipo, Territorio: a.territorio, Semáforo: a.semaforo, Posición: a.posicion, Riesgo: a.riesgo, Poder: a.poder, Interés: a.interes, Prioridad: a.prioridad, Responsable: a.owner, Contacto: a.contacto, 'Última acción': a.accion_tomada, 'Fecha acción': a.fecha_accion })),
                   'Actores_CaribeLNG', 'Actores'
                 )}
-                  style={{ background: 'white', color: '#64748b', border: '1px solid #e8ecf0', borderRadius: 10,
+                  style={{ background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10,
                     padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
                   <IconDownload size={14} /> Excel
                 </button>
               </div>
+            </div>
             </div>
 
             {/* ── Formulario nuevo actor ── */}
@@ -1407,9 +1410,10 @@ export default function App() {
 
         {view === 'input' && (
           <div>
-            <div style={{ marginBottom: 18 }}>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#2B2926', letterSpacing: -0.5 }}>Registro de Campo</h1>
-              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 13 }}>Registros diarios, reportes semanales y evidencias</p>
+            <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+              <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Registro de Campo</h1>
+              <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Registros diarios, reportes semanales y evidencias</p>
             </div>
             {/* Sub-tabs */}
             <div style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
