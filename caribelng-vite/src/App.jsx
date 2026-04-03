@@ -1220,10 +1220,10 @@ export default function App() {
               bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7',
               tagline: 'Deporte y liderazgo que transforman — jóvenes con propósito, no en riesgo',
               items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas: Fútbol con Corazón, Soccer for Peace'] },
-            { key: 'ec', label: 'EC', titulo: 'Economía Local y Ecosistema Costero', ifc: 'IFC PS6', color: '#00BFB3',
+            { key: 'ec', label: 'EC', titulo: 'Economía Local y Ecosistema Territorial', ifc: 'IFC PS6', color: '#00BFB3',
               bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4',
               tagline: 'Comunidades prósperas — menos vulnerabilidad, más autonomía económica',
-              items: ['Fortalecimiento productivo de pescadores artesanales', 'Protección y restauración de ecosistemas marinos', 'Reciclaje comunitario y economía circular', 'Educación ambiental'] },
+              items: ['Fortalecimiento productivo de pescadores artesanales', 'Protección y restauración de ecosistemas locales', 'Reciclaje comunitario y economía circular', 'Educación ambiental'] },
           ]
           const contexto = [
             { value: '21.8%', label: 'Pobreza multidimensional en Sucre' },
