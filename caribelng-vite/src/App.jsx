@@ -483,18 +483,18 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: <IconDashboard size={16} /> },
-    { id: 'gestora', label: 'Mi territorio', icon: <IconPin size={16} /> },
+    { id: 'miterritorio', label: 'Mi Territorio', icon: <IconPin size={16} />, children: [
+      { id: 'gestora', label: 'Vista General', icon: <IconPin size={16} /> },
+      { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
+    ]},
     { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
     { id: 'territorio', label: 'Territorio', icon: <IconGlobe size={16} />, children: [
       { id: 'acuerdos', label: 'Acuerdos', icon: <IconHandshake size={16} /> },
       { id: 'huella', label: 'Huella Social', icon: <IconLeaf size={16} /> },
       { id: 'cronograma', label: 'Cronograma', icon: <IconCalendar size={16} /> },
-    ]},
-    { id: 'riesgos', label: 'Riesgos DAC', icon: <IconAlert size={16} /> },
-    { id: 'gestion', label: 'Gestión', icon: <IconClipboard size={16} />, children: [
-      { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
       { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
     ]},
+    { id: 'riesgos', label: 'Riesgos DAC', icon: <IconAlert size={16} /> },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
   ]
   // helper: check if a view belongs to a dropdown group
