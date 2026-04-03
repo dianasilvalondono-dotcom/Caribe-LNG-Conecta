@@ -68,9 +68,9 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
       sc: hitosPct >= 75 ? '#10b981' : hitosPct >= 50 ? '#f59e0b' : '#ef4444',
       sub: `Tolú: ${agreements.filter(a => a.territorio === 'Tolú').reduce((s, a) => s + (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0), 0)}/4 · Barbosa: ${agreements.filter(a => a.territorio === 'Barbosa').reduce((s, a) => s + (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0), 0)}/4`
     },
-    { num: 2, titulo: 'Ejecución del Plan de Gestión Social (PGS)', peso: '5%', color: C.barbosa,
-      fecha: '31 dic 2026', medicion: '% PGS ejecutado',
-      meta: 'PGS ≥80% ejecutado', alertaRoja: '<60% en cualquier territorio o bloqueo sin protocolo',
+    { num: 2, titulo: 'Ejecución del Plan de Gestión Social', peso: '5%', color: C.barbosa,
+      fecha: '31 dic 2026', medicion: '% del plan ejecutado',
+      meta: '≥80% ejecutado', alertaRoja: '<60% en cualquier territorio o bloqueo sin protocolo',
       value: `${pgsEjecutado}%`, pct: pgsEjecutado, metaNum: 80,
       reconocimiento: reconocer(pgsEjecutado, 80),
       sc: pgsEjecutado >= 80 ? '#10b981' : pgsEjecutado >= 60 ? '#f59e0b' : '#ef4444',
@@ -91,65 +91,65 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
   // ── Gestora KPI definitions (updated to match PDF) ────────────────────────
   const KPIS_BARBOSA = [
-    { cat: 'OBJ.1 — PGS: SOCIALIZACIONES Y EVENTOS', items: [
-      { name: 'Socializaciones AID', field: 'eventos_aid', meta: 12, base: '1/mes' },
-      { name: 'Socializaciones AII', field: 'eventos_aii', meta: 4, base: '1/trim' },
-      { name: 'Reuniones institucionales clave', field: 'eventos_institucional', meta: 4, base: '1/trim' },
-      { name: '% socializ. con >=10 asistentes', field: 'pct_socializaciones_asistentes', meta: 100, base: '>=10 asist.' },
+    { cat: 'SOCIALIZACIONES Y EVENTOS', items: [
+      { name: 'Reuniones con comunidades directas', field: 'eventos_aid', meta: 12, base: '1 por mes' },
+      { name: 'Reuniones con comunidades indirectas', field: 'eventos_aii', meta: 4, base: '1 por trimestre' },
+      { name: 'Reuniones institucionales clave', field: 'eventos_institucional', meta: 4, base: '1 por trimestre' },
+      { name: '% reuniones con 10+ asistentes', field: 'pct_socializaciones_asistentes', meta: 100, base: '10 o más asistentes' },
     ]},
-    { cat: 'OBJ.1 — DIAGNÓSTICO SOCIOFAMILIAR (53 viviendas)', items: [
-      { name: 'Diagnóstico sociofamiliar – % avance', field: 'diagnosticos', meta: 53, base: '53 viv/sem' },
-      { name: 'Diagnóstico sociofamiliar – ciclos', field: 'ciclos_diagnostico', meta: 2, base: '2 ciclos/año' },
+    { cat: 'DIAGNÓSTICO SOCIAL (53 viviendas)', items: [
+      { name: 'Visitas a familias — avance', field: 'diagnosticos', meta: 53, base: '53 viviendas por semestre' },
+      { name: 'Ciclos de diagnóstico completados', field: 'ciclos_diagnostico', meta: 2, base: '2 ciclos al año' },
     ]},
-    { cat: 'OBJ.3 — GESTIÓN DE PQRS', items: [
-      { name: '% PQRS respondidas en tiempo', field: 'pct_pqrs_tiempo', meta: 100, base: '<=10 días háb.' },
-      { name: '% PQRS cerradas', field: 'pct_pqrs_cerradas', meta: 100, base: '<=15 días háb.' },
-      { name: 'PQRS pendientes (fin de mes)', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
+    { cat: 'QUEJAS Y PETICIONES', items: [
+      { name: '% respondidas en tiempo (≤10 días)', field: 'pct_pqrs_tiempo', meta: 100, base: '10 días hábiles máximo' },
+      { name: '% cerradas en plazo (≤15 días)', field: 'pct_pqrs_cerradas', meta: 100, base: '15 días hábiles máximo' },
+      { name: 'Quejas pendientes (fin de mes)', field: 'pqrs_pendientes', meta: 0, base: 'Objetivo: 0 al mes', invert: true },
     ]},
-    { cat: 'OBJ.1 — GESTIÓN DE CONTRATISTAS (PGS)', items: [
-      { name: 'Inducciones PGS a contratistas', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
+    { cat: 'GESTIÓN DE CONTRATISTAS', items: [
+      { name: 'Inducciones sociales a contratistas', field: 'inducciones_pgs', meta: 8, base: '2 por trimestre' },
       { name: 'Actas de vecindad', field: 'actas_vecindad', meta: 0, base: 'Según obra' },
     ]},
-    { cat: 'OBJ.3 — RIESGO E INCIDENTES', items: [
-      { name: 'Incidentes / rumores críticos', field: 'incidentes', meta: 0, base: '0/mes', invert: true },
-      { name: 'Alertas riesgo escaladas <=24h', field: 'alertas_escaladas_dac', meta: 90, base: '>=90% alertas' },
+    { cat: 'RIESGO E INCIDENTES', items: [
+      { name: 'Incidentes o rumores críticos', field: 'incidentes', meta: 0, base: 'Objetivo: 0 al mes', invert: true },
+      { name: 'Alertas escaladas en menos de 24h', field: 'alertas_escaladas_dac', meta: 90, base: '90% o más' },
     ]},
-    { cat: 'OBJ.2 — ACUERDOS SOCIALES (BARBOSA)', items: [
-      { name: 'Acuerdos comunitarios firmados', field: 'acuerdos_firmados', meta: 3, base: 'Firma antes COD' },
-      { name: 'Compromisos pactados cumplidos', field: 'compromisos_cumplidos', meta: 90, base: '>=90%' },
-      { name: 'Incumplimientos con impacto', field: 'incumplimientos_acuerdos', meta: 0, base: '0/mes', invert: true },
+    { cat: 'ACUERDOS SOCIALES — BARBOSA', items: [
+      { name: 'Acuerdos comunitarios firmados', field: 'acuerdos_firmados', meta: 3, base: 'Antes de inicio de operación' },
+      { name: 'Compromisos cumplidos', field: 'compromisos_cumplidos', meta: 90, base: '90% o más' },
+      { name: 'Incumplimientos con impacto', field: 'incumplimientos_acuerdos', meta: 0, base: 'Objetivo: 0 al mes', invert: true },
     ]},
   ]
 
   const KPIS_TOLU = [
-    { cat: 'OBJ.1 — PGS: SOCIALIZACIONES Y EVENTOS', items: [
-      { name: 'Socializaciones AID', field: 'eventos_aid', meta: 12, base: '1/mes' },
-      { name: 'Socializaciones AII', field: 'eventos_aii', meta: 4, base: '1/trim' },
-      { name: 'Reuniones institucionales clave', field: 'eventos_institucional', meta: 4, base: '1/trim' },
-      { name: '% socializ. con >=10 asistentes', field: 'pct_socializaciones_asistentes', meta: 100, base: '>=10 asist.' },
+    { cat: 'SOCIALIZACIONES Y EVENTOS', items: [
+      { name: 'Reuniones con comunidades directas', field: 'eventos_aid', meta: 12, base: '1 por mes' },
+      { name: 'Reuniones con comunidades indirectas', field: 'eventos_aii', meta: 4, base: '1 por trimestre' },
+      { name: 'Reuniones institucionales clave', field: 'eventos_institucional', meta: 4, base: '1 por trimestre' },
+      { name: '% reuniones con 10+ asistentes', field: 'pct_socializaciones_asistentes', meta: 100, base: '10 o más asistentes' },
     ]},
-    { cat: 'OBJ.1 — DIAGNÓSTICO SOCIAL (asociaciones y actores)', items: [
-      { name: 'Asociaciones mapeadas y caracterizadas', field: 'asociaciones_mapeadas', meta: 0, base: 'Acumulativo' },
+    { cat: 'DIAGNÓSTICO SOCIAL (asociaciones y actores)', items: [
+      { name: 'Asociaciones mapeadas', field: 'asociaciones_mapeadas', meta: 0, base: 'Acumulativo' },
       { name: 'Personas obstaculizadoras identificadas', field: 'personas_obstaculizadoras', meta: 0, base: 'Acumulativo' },
       { name: 'Aliados potenciales identificados', field: 'aliados_identificados', meta: 0, base: 'Acumulativo' },
-      { name: 'Visitas a comunidades AID', field: 'visitas_aid', meta: 0, base: 'Semanal' },
+      { name: 'Visitas a comunidades directas', field: 'visitas_aid', meta: 0, base: 'Semanal' },
     ]},
-    { cat: 'OBJ.3 — GESTIÓN DE PQRS', items: [
-      { name: '% PQRS respondidas en tiempo', field: 'pct_pqrs_tiempo', meta: 100, base: '<=10 días háb.' },
-      { name: '% PQRS cerradas', field: 'pct_pqrs_cerradas', meta: 100, base: '<=15 días háb.' },
-      { name: 'PQRS pendientes (fin de mes)', field: 'pqrs_pendientes', meta: 0, base: '0/mes', invert: true },
+    { cat: 'QUEJAS Y PETICIONES', items: [
+      { name: '% respondidas en tiempo (≤10 días)', field: 'pct_pqrs_tiempo', meta: 100, base: '10 días hábiles máximo' },
+      { name: '% cerradas en plazo (≤15 días)', field: 'pct_pqrs_cerradas', meta: 100, base: '15 días hábiles máximo' },
+      { name: 'Quejas pendientes (fin de mes)', field: 'pqrs_pendientes', meta: 0, base: 'Objetivo: 0 al mes', invert: true },
     ]},
-    { cat: 'OBJ.1 — GESTIÓN DE CONTRATISTAS (PGS)', items: [
-      { name: 'Inducciones PGS a contratistas', field: 'inducciones_pgs', meta: 8, base: '2/trim' },
+    { cat: 'GESTIÓN DE CONTRATISTAS', items: [
+      { name: 'Inducciones sociales a contratistas', field: 'inducciones_pgs', meta: 8, base: '2 por trimestre' },
     ]},
-    { cat: 'OBJ.3 — RIESGO E INCIDENTES', items: [
-      { name: 'Incidentes / rumores críticos', field: 'incidentes', meta: 0, base: '0/mes', invert: true },
-      { name: 'Alertas riesgo escaladas <=24h', field: 'alertas_escaladas_dac', meta: 90, base: '>=90% alertas' },
+    { cat: 'RIESGO E INCIDENTES', items: [
+      { name: 'Incidentes o rumores críticos', field: 'incidentes', meta: 0, base: 'Objetivo: 0 al mes', invert: true },
+      { name: 'Alertas escaladas en menos de 24h', field: 'alertas_escaladas_dac', meta: 90, base: '90% o más' },
     ]},
-    { cat: 'OBJ.2 — ACUERDOS SOCIALES (TOLÚ)', items: [
-      { name: 'Acuerdos sociales firmados (T1+T2+T3)', field: 'acuerdos_firmados', meta: 3, base: 'Firma antes COD' },
-      { name: 'Compromisos pactados cumplidos', field: 'compromisos_cumplidos', meta: 90, base: '>=90%' },
-      { name: 'Incumplimientos con impacto', field: 'incumplimientos_acuerdos', meta: 0, base: '0/mes', invert: true },
+    { cat: 'ACUERDOS SOCIALES — TOLÚ', items: [
+      { name: 'Acuerdos sociales firmados', field: 'acuerdos_firmados', meta: 3, base: 'Antes de inicio de operación' },
+      { name: 'Compromisos cumplidos', field: 'compromisos_cumplidos', meta: 90, base: '90% o más' },
+      { name: 'Incumplimientos con impacto', field: 'incumplimientos_acuerdos', meta: 0, base: 'Objetivo: 0 al mes', invert: true },
     ]},
   ]
 
@@ -375,7 +375,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
       {/* Main tabs */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 20, background: '#f8fafc', borderRadius: 12, padding: 4, border: '1px solid #e8ecf0' }}>
-        {[{ id: 'dac', label: 'Director DAC' }, { id: 'gestoras', label: 'Gestoras Territoriales' }].map(t => (
+        {[{ id: 'dac', label: 'Dirección Asuntos Corporativos' }, { id: 'gestoras', label: 'Gestoras Territoriales' }].map(t => (
           <button key={t.id} onClick={() => setMainTab(t.id)}
             style={{ flex: 1, background: mainTab === t.id ? 'white' : 'transparent', color: mainTab === t.id ? C.navy : '#94a3b8',
               border: 'none', borderRadius: 8, padding: '10px 8px', fontSize: isMobile ? 12 : 13, fontWeight: 700, cursor: 'pointer',

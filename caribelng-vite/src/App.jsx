@@ -499,9 +499,9 @@ export default function App() {
     { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
     { id: 'estrategia', label: 'Estrategia Social', icon: <IconGlobe size={16} />, children: [
       { id: 'huella', label: 'Huella Social', icon: <IconLeaf size={16} /> },
-      { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
+      { id: 'kpis', label: 'Indicadores', icon: <IconTarget size={16} /> },
     ]},
-    { id: 'riesgos', label: 'Riesgos DAC', icon: <IconAlert size={16} /> },
+    { id: 'riesgos', label: 'Riesgos Sociales', icon: <IconAlert size={16} /> },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
   ]
   // helper: check if a view belongs to a dropdown group

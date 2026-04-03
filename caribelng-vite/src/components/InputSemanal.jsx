@@ -202,40 +202,40 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
           {/* OBJ.1 — PGS: Socializaciones y Eventos */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.1 — PGS: Socializaciones y Eventos</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Socializaciones y Eventos</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="Socializaciones AID" value={eventosAid} onChange={setEventosAid} />
-              <NumField label="Socializaciones AII" value={eventosAii} onChange={setEventosAii} />
+              <NumField label="Reuniones comunidades directas" value={eventosAid} onChange={setEventosAid} />
+              <NumField label="Reuniones comunidades indirectas" value={eventosAii} onChange={setEventosAii} />
               <NumField label="Reuniones institucionales" value={eventosInst} onChange={setEventosInst} />
               <NumField label="Asistentes total" value={asistentes} onChange={setAsistentes} />
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-              <NumField label="% socializ. con >=10 asistentes" value={pctSocAsistentes} onChange={setPctSocAsistentes} max={100} />
+              <NumField label="% reuniones con 10+ asistentes" value={pctSocAsistentes} onChange={setPctSocAsistentes} max={100} />
             </div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>El % se calcula sobre AID+AII con al menos 10 asistentes</div>
+            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>El % se calcula sobre reuniones comunitarias con al menos 10 asistentes</div>
           </div>
 
           {/* OBJ.1 — Diagnóstico (territory-specific) */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
             {myTerr === 'Barbosa' ? (
               <>
-                <div style={{ fontSize: 12, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.1 — Diagnóstico Sociofamiliar (53 viviendas)</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: C.barbosa, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Diagnóstico Social (53 viviendas)</div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <NumField label="Visitas a familias (diag.)" value={diagnosticos} onChange={setDiagnosticos} />
-                  <NumField label="Ciclos diagnóstico" value={ciclosDiag} onChange={setCiclosDiag} />
+                  <NumField label="Visitas a familias" value={diagnosticos} onChange={setDiagnosticos} />
+                  <NumField label="Ciclos de diagnóstico" value={ciclosDiag} onChange={setCiclosDiag} />
                   <NumField label="Actas de vecindad" value={actasVecindad} onChange={setActasVecindad} />
-                  <NumField label="Inducciones PGS contratistas" value={induccionesPgs} onChange={setInduccionesPgs} />
+                  <NumField label="Inducciones sociales contratistas" value={induccionesPgs} onChange={setInduccionesPgs} />
                 </div>
               </>
             ) : (
               <>
-                <div style={{ fontSize: 12, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.1 — Diagnóstico Social (asociaciones y actores)</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: C.tolu, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Diagnóstico Social (asociaciones y actores)</div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <NumField label="Asociaciones mapeadas" value={asociacionesMapeadas} onChange={setAsociacionesMapeadas} />
                   <NumField label="Personas obstaculizadoras" value={personasObstaculizadoras} onChange={setPersonasObstaculizadoras} />
                   <NumField label="Aliados identificados" value={aliadosIdentificados} onChange={setAliadosIdentificados} />
-                  <NumField label="Visitas a comunidades AID" value={visitasAid} onChange={setVisitasAid} />
-                  <NumField label="Inducciones PGS contratistas" value={induccionesPgs} onChange={setInduccionesPgs} />
+                  <NumField label="Visitas a comunidades directas" value={visitasAid} onChange={setVisitasAid} />
+                  <NumField label="Inducciones sociales contratistas" value={induccionesPgs} onChange={setInduccionesPgs} />
                 </div>
               </>
             )}
@@ -243,11 +243,11 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
           {/* OBJ.3 — PQRS */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.3 — Gestión de PQRS</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.orange, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Quejas y Peticiones</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="PQRS recibidas" value={pqrsRecibidas} onChange={setPqrsRecibidas} />
-              <NumField label="PQRS cerradas" value={pqrsCerradas} onChange={setPqrsCerradas} />
-              <NumField label="PQRS pendientes" value={pqrsPendientes} onChange={setPqrsPendientes} />
+              <NumField label="Quejas recibidas" value={pqrsRecibidas} onChange={setPqrsRecibidas} />
+              <NumField label="Quejas cerradas" value={pqrsCerradas} onChange={setPqrsCerradas} />
+              <NumField label="Quejas pendientes" value={pqrsPendientes} onChange={setPqrsPendientes} />
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
               <NumField label="% respondidas en tiempo" value={pctPqrsTiempo} onChange={setPctPqrsTiempo} max={100} />
@@ -258,10 +258,10 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
           {/* OBJ.3 — Riesgo e incidentes */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.3 — Riesgo e Incidentes</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.red, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Riesgo e Incidentes</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <NumField label="Incidentes / rumores críticos" value={incidentes} onChange={setIncidentes} />
-              <NumField label="Alertas escaladas a DAC" value={alertasDac} onChange={setAlertasDac} />
+              <NumField label="Incidentes o rumores críticos" value={incidentes} onChange={setIncidentes} />
+              <NumField label="Alertas escaladas a dirección" value={alertasDac} onChange={setAlertasDac} />
               <NumField label="Personas contactadas" value={actoresGest} onChange={setActoresGest} />
             </div>
             <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>Meta incidentes: 0 · Alertas escaladas en ≤24h: ≥90%</div>
@@ -269,14 +269,14 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
           {/* OBJ.2 — Acuerdos */}
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>OBJ.2 — Acuerdos Sociales</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Acuerdos Sociales</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <NumField label="Acuerdos firmados" value={acuerdosFirmados} onChange={setAcuerdosFirmados} />
               <NumField label="Compromisos nuevos" value={compromisosNuevos} onChange={setCompromisosNuevos} />
               <NumField label="Compromisos cumplidos" value={compromisosCumplidos} onChange={setCompromisosCumplidos} />
               <NumField label="Incumplimientos con impacto" value={incumplimientos} onChange={setIncumplimientos} />
             </div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>Meta acuerdos: {myTerr === 'Barbosa' ? '3' : '3 (T1+T2+T3)'} antes COD · Compromisos cumplidos: ≥90% · Incumplimientos: 0</div>
+            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>Meta: 3 acuerdos firmados antes de inicio de operación · Compromisos cumplidos: ≥90% · Incumplimientos: 0</div>
           </div>
 
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>

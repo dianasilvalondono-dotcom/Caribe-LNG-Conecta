@@ -316,7 +316,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                 </div>
                 <div style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f0fdf4', border: '1px solid #a7f3d0' }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#059669' }}>{pgsAvg}%</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Avance PGS</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Avance Plan Social</div>
                 </div>
               </div>
             </div>
@@ -324,7 +324,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
 
           {/* PGS Gauge */}
           <div style={card}>
-            <STitle label="Cobertura PGS" color="#10b981" />
+            <STitle label="Cobertura Plan Social" color="#10b981" />
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
               <GaugeSVG pct={pgsAvg} color={pgsAvg >= 70 ? '#10b981' : pgsAvg >= 40 ? '#f59e0b' : '#ef4444'} />
               <div>

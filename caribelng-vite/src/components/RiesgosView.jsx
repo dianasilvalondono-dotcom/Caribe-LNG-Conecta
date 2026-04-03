@@ -70,7 +70,7 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
             <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{rojos.length + legAlto.length > 0 ? `${rojos.length + legAlto.length} requieren acción` : 'Bajo control'}</span>
           </div>
           <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Gestión de Riesgos</h1>
-          <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>DAC · Dirección de Asuntos Corporativos</p>
+          <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Dirección de Asuntos Corporativos</p>
 
           {/* Quick stats */}
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
