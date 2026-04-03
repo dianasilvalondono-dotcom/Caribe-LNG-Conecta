@@ -111,9 +111,18 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
     ...reportes.slice().sort((a, b) => (b.semana || '').localeCompare(a.semana || '')).slice(0, 2).map(r => ({ icon: '', text: `Reporte semanal <span style="color:#1565C0;font-weight:700">${r.territorio}</span> — Sem. ${r.semana}`, time: r.semana || '' })),
   ].slice(0, 5)
 
-  const ownerMap = {}
-  actors.forEach(a => { if (!a.owner) return; if (!ownerMap[a.owner]) ownerMap[a.owner] = { name: a.owner, total: 0, verde: 0, territories: new Set() }; ownerMap[a.owner].total++; if (a.semaforo === 'verde') ownerMap[a.owner].verde++; if (a.territorio) ownerMap[a.owner].territories.add(a.territorio) })
-  const gestoras = Object.values(ownerMap).sort((a, b) => b.total - a.total).slice(0, 5)
+  const territorioGestora = {
+    'Tolú': { gestora: 'Ana Leonor Pérez', rol: 'Gestora Territorial' },
+    'Barbosa': { gestora: 'Alexandra Acevedo', rol: 'Gestora Territorial' },
+    'Nacional': { gestora: 'Diana Silva / Camilo Blanco', rol: 'Dirección y Gerencia' },
+  }
+  const territorioStats = ['Tolú', 'Barbosa', 'Nacional'].map(t => {
+    const ta = actors.filter(a => a.territorio === t)
+    const verde = ta.filter(a => a.semaforo === 'verde').length
+    const amarillo = ta.filter(a => a.semaforo === 'amarillo').length
+    const rojo = ta.filter(a => a.semaforo === 'rojo' || a.semaforo === 'naranja').length
+    return { territorio: t, ...territorioGestora[t], total: ta.length, verde, amarillo, rojo, pct: ta.length ? Math.round((verde / ta.length) * 100) : 0 }
+  })
   const avatarColors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#f093fb,#f5576c)', 'linear-gradient(135deg,#4facfe,#00f2fe)', 'linear-gradient(135deg,#43e97b,#38f9d7)', 'linear-gradient(135deg,#fa709a,#fee140)']
 
   const totalAcuerdos = agreements.length
@@ -376,30 +385,39 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
             </div>
           )}
 
-          {/* Gestoras */}
-          {gestoras.length > 0 && (
-            <div style={card}>
-              <STitle label="Gestoras sociales" action={() => setView('gestora')} actionLabel="Tablero →" />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {gestoras.map((g, i) => {
-                  const pct = g.total ? Math.round((g.verde / g.total) * 100) : 0
-                  return (
-                    <div key={g.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: avatarColors[i % avatarColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: 'white', flexShrink: 0 }}>{initials(g.name)}</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: C_text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</div>
-                        <div style={{ fontSize: 10, color: '#94a3b8' }}>{[...g.territories].join(', ')} · {g.total} actores</div>
+          {/* Gestión por territorio */}
+          <div style={card}>
+            <STitle label="Gestión por territorio" action={() => setView('gestora')} actionLabel="Ver detalle →" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {territorioStats.map(t => {
+                const color = t.territorio === 'Tolú' ? C_tolu : t.territorio === 'Barbosa' ? C_barbosa : C_muted
+                const semColor = t.pct >= 60 ? '#22c55e' : t.pct >= 30 ? '#f59e0b' : '#ef4444'
+                return (
+                  <div key={t.territorio} onClick={() => { setView('actores'); setFilterT(t.territorio) }} style={{ cursor: 'pointer', padding: '10px 12px', borderRadius: 10, border: '1px solid #e8ecf0', background: '#fafbfc' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: color }}>{t.territorio}</div>
+                        <div style={{ fontSize: 10, color: '#94a3b8' }}>{t.gestora} · {t.rol}</div>
                       </div>
-                      <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: C_text }}>{pct}%</div>
-                        <div style={{ width: 52, height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', marginTop: 3 }}><div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg,${C_navy},#00b4d8)`, borderRadius: 100 }} /></div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: semColor }}>{t.pct}%</div>
+                        <div style={{ fontSize: 9, color: '#94a3b8' }}>estables</div>
                       </div>
                     </div>
-                  )
-                })}
-              </div>
+                    <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', marginBottom: 6 }}>
+                      <div style={{ height: '100%', width: `${t.pct}%`, background: color, borderRadius: 100 }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, fontSize: 10 }}>
+                      <span style={{ color: '#94a3b8' }}>{t.total} actores</span>
+                      <span style={{ color: '#22c55e', fontWeight: 700 }}>{t.verde} verdes</span>
+                      <span style={{ color: '#f59e0b', fontWeight: 700 }}>{t.amarillo} amarillos</span>
+                      <span style={{ color: '#ef4444', fontWeight: 700 }}>{t.rojo} rojos</span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-          )}
+          </div>
 
           {/* Novedades */}
           <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
