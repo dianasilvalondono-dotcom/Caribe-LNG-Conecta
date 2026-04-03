@@ -1219,17 +1219,17 @@ export default function App() {
 
         {view === 'huella' && (() => {
           const ejes = [
-            { key: 'ft', label: 'FT', titulo: 'Formación para el Trabajo', ifc: 'IFC PS2', color: '#1565C0',
+            { key: 'ft', label: '1', titulo: 'Formación para el Trabajo', ifc: 'Empleo formal para jóvenes', color: '#1565C0',
               bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd',
-              tagline: 'Población objetivo: jóvenes 18-28 años en Tolú y comunidades aledañas',
+              tagline: 'Jóvenes de 18-28 años en Tolú y comunidades aledañas con certificaciones que les abren puertas laborales',
               items: ['Licencias de conducción C2/C3', 'Certificaciones marítimas y portuarias', 'Formación técnica en energía y mantenimiento', 'Manejo de sustancias peligrosas', 'Orientado a empleo formal y certificable'] },
-            { key: 'jd', label: 'JD', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'IFC PS4', color: '#007A87',
+            { key: 'jd', label: '2', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'Ocupación del tiempo libre', color: '#007A87',
               bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7',
-              tagline: 'Programas de ocupación del tiempo libre y formación de liderazgo juvenil',
+              tagline: 'Jóvenes con actividades deportivas, liderazgo y habilidades para la vida — no en riesgo',
               items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas: Fútbol con Corazón, Soccer for Peace'] },
-            { key: 'ec', label: 'EC', titulo: 'Economía Local y Ecosistema Territorial', ifc: 'IFC PS6', color: '#00BFB3',
+            { key: 'ec', label: '3', titulo: 'Economía Local y Medio Ambiente', ifc: 'Economías locales sostenibles', color: '#00BFB3',
               bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4',
-              tagline: 'Fortalecimiento de cadenas productivas locales y gestión ambiental',
+              tagline: 'Comunidades con cadenas productivas fortalecidas y ecosistemas protegidos',
               items: ['Fortalecimiento productivo de pescadores artesanales', 'Protección y restauración de ecosistemas locales', 'Reciclaje comunitario y economía circular', 'Educación ambiental'] },
           ]
           const contexto = [
@@ -1246,7 +1246,7 @@ export default function App() {
                 <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes · Estándares IFC</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes de inversión social</span>
                 </div>
                 <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Huella Social Territorial</h1>
                 <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Guía de referencia interna — ejes, programas y contexto territorial</p>
@@ -1254,13 +1254,13 @@ export default function App() {
 
               {/* Intro */}
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
-                La inversión social de Caribe LNG se ejecuta en dos territorios: <strong style={{ color: '#2B2926' }}>Tolú (Sucre)</strong> — terminal marítima — y <strong style={{ color: '#2B2926' }}>Barbosa (Antioquia)</strong> — planta de regasificación. La estrategia se organiza en tres ejes alineados con los Performance Standards de la IFC. Cada eje tiene programas específicos, aliados y poblaciones objetivo definidas. Modelo: 100% inversión privada, sin costo para los municipios. Enfoque de corresponsabilidad — se busca dejar capacidad instalada, no dependencia.
+                La inversión social de Caribe LNG se ejecuta en dos territorios: <strong style={{ color: '#2B2926' }}>Tolú (Sucre)</strong> — terminal marítima — y <strong style={{ color: '#2B2926' }}>Barbosa (Antioquia)</strong> — planta de regasificación. La estrategia se organiza en tres ejes: empleo, juventud y economía local. Cada eje tiene programas, aliados y poblaciones objetivo definidas. 100% inversión privada, sin costo para los municipios. El objetivo es dejar capacidad instalada en los territorios, no dependencia.
               </div>
 
               {/* Section title */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                 <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tres ejes de inversión alineados con estándares IFC</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tres ejes de inversión social</span>
               </div>
 
               {/* 3 Ejes */}
@@ -1377,7 +1377,7 @@ export default function App() {
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: '#0D47A1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 900, flexShrink: 0 }}>+</div>
                 <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
-                  <strong style={{ color: '#2B2926' }}>Lógica del modelo.</strong> Los tres ejes se refuerzan entre sí: FT genera empleo formal, JD ocupa el tiempo libre de jóvenes y desarrolla liderazgo, EC fortalece las economías locales existentes. En conjunto, reducen las brechas de vulnerabilidad que el contexto territorial presenta. Esta es la narrativa que las gestoras territoriales deben poder explicar a comunidades, autoridades y aliados.
+                  <strong style={{ color: '#2B2926' }}>Cómo se conectan los tres ejes.</strong> Eje 1 genera empleo formal para jóvenes. Eje 2 ocupa su tiempo libre con deporte y liderazgo. Eje 3 fortalece las economías locales y protege el medio ambiente. Juntos, reducen la vulnerabilidad de los territorios donde operamos. Esta es la narrativa que las gestoras territoriales deben poder explicar a comunidades, autoridades y aliados.
                 </div>
               </div>
 
