@@ -18,7 +18,10 @@ export async function signInWithGoogle() {
 export async function signInWithMicrosoft() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
-    options: { redirectTo: window.location.origin }
+    options: {
+      redirectTo: window.location.origin,
+      scopes: 'email openid profile',
+    }
   })
   if (error) throw error
 }
@@ -145,11 +148,31 @@ export async function getProfile(userId) {
   return data
 }
 
-export async function upsertProfile(userId, { full_name, avatar_url, email, role }) {
-  const { error } = await supabase
-    .from('profiles')
-    .upsert({ id: userId, full_name, avatar_url, email, role, updated_at: new Date().toISOString() })
-  if (error) throw error
+const ADMIN_EMAILS = [
+  'diana.silva@caribelng.com', 'felipe.rodriguez@caribelng.com',
+  'pablo.tribin@caribelng.com', 'pablo.tribin@course2.energy',
+  'camilo.blanco@caribelng.com', 'berend.vandenberg@caribelng.com',
+]
+const GESTORA_CONFIG = {
+  'ana.perez@caribelng.com': 'Tolú',
+  'alexandra.acevedo@caribelng.com': 'Barbosa',
+}
+
+export async function upsertProfile(userId, { full_name, avatar_url, email }) {
+  const { data: existing } = await supabase.from('profiles').select('id, role').eq('id', userId).single()
+  if (existing) {
+    const { error } = await supabase.from('profiles')
+      .update({ full_name, avatar_url, email, updated_at: new Date().toISOString() })
+      .eq('id', userId)
+    if (error) throw error
+  } else {
+    const emailLower = (email || '').toLowerCase()
+    const role = ADMIN_EMAILS.includes(emailLower) ? 'admin' : GESTORA_CONFIG[emailLower] ? 'gestora' : 'viewer'
+    const territorio = GESTORA_CONFIG[emailLower] || null
+    const { error } = await supabase.from('profiles')
+      .insert({ id: userId, full_name, avatar_url, email, role, territorio, updated_at: new Date().toISOString() })
+    if (error) throw error
+  }
 }
 export async function getCronograma() {
   const { data } = await supabase.from('cronograma').select('*').order('territorio').order('numero')
