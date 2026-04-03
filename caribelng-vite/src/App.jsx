@@ -1310,7 +1310,7 @@ export default function App() {
                                 <div style={{ fontSize: 12, color: e.color, flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>›</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <div style={{ fontSize: 11, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
-                                  <div style={{ fontSize: 9, color: '#94a3b8' }}>{ag.territorio}</div>
+                                  <div style={{ fontSize: 9, color: '#94a3b8' }}>{ag.territorio} · Acuerdo {ag.id.slice(1)}</div>
                                 </div>
                                 <div style={{ width: 40 }}>
                                   <div style={{ height: 3, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
