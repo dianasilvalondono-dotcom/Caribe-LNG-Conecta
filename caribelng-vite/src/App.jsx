@@ -487,12 +487,12 @@ export default function App() {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: <IconDashboard size={16} /> },
-    { id: 'miterritorio', label: 'Mi Territorio', icon: <IconPin size={16} />, children: [
+    { id: 'campo', label: 'Gestión de Campo', icon: <IconPin size={16} />, children: [
       { id: 'gestora', label: 'Vista General', icon: <IconPin size={16} /> },
       { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
     ]},
     { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
-    { id: 'territorio', label: 'Territorio', icon: <IconGlobe size={16} />, children: [
+    { id: 'estrategia', label: 'Estrategia Social', icon: <IconGlobe size={16} />, children: [
       { id: 'huella', label: 'Huella Social', icon: <IconLeaf size={16} /> },
       { id: 'kpis', label: 'KPIs', icon: <IconTarget size={16} /> },
     ]},
