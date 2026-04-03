@@ -172,7 +172,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
   return (
     <div>
       {/* HERO */}
-      <div style={{ background: `linear-gradient(160deg,${C_navy} 0%,#1a3d7a 45%,#1565C0 100%)`, borderRadius: 20, padding: '28px 32px 24px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: `linear-gradient(160deg,${C_navy} 0%,#1a3d7a 45%,#1565C0 100%)`, borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-40%', right: '-5%', width: 400, height: 400, background: 'radial-gradient(circle,rgba(0,180,216,0.15) 0%,transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
           <div>
@@ -180,7 +180,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00b4d8', display: 'inline-block' }} />
               <span style={{ fontSize: 10, fontWeight: 700, color: '#90e0ef', letterSpacing: 1, textTransform: 'uppercase' }}>En vivo · {weekLabel}</span>
             </div>
-            <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: 'white', letterSpacing: -0.5, lineHeight: 1.1 }}>Estado del <span style={{ color: '#00b4d8' }}>Territorio</span></h1>
+            <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white', letterSpacing: -0.5, lineHeight: 1.1 }}>Estado del <span style={{ color: '#00b4d8' }}>Territorio</span></h1>
             <p style={{ margin: '8px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Resumen de relacionamiento &nbsp;·&nbsp; <span style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>Caribe LNG 2026</span> &nbsp;·&nbsp; {dateStr}</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

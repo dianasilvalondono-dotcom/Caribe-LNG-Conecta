@@ -1245,7 +1245,7 @@ export default function App() {
           return (
             <div>
               {/* Hero */}
-              <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #00BFB3 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #00BFB3 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
