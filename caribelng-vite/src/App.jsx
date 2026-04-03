@@ -575,7 +575,7 @@ export default function App() {
                     whiteSpace: 'nowrap' }}>
                   {n.icon}
                   <span>{n.label}</span>
-                  <span style={{ fontSize: 9, marginLeft: 2 }}>▼</span>
+                  <span style={{ fontSize: 12, marginLeft: 2 }}>▼</span>
                 </button>
               </div>
             ) : (
@@ -595,7 +595,7 @@ export default function App() {
               paddingLeft: 10, marginLeft: 4, borderLeft: '1px solid rgba(255,255,255,0.12)' }}>
               {profile?.avatar_url
                 ? <img src={profile.avatar_url} alt="" style={{ width: 24, height: 24, borderRadius: '50%' }} />
-                : <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'white', flexShrink: 0 }}>{initials(profile?.full_name || session.user.email)}</div>
+                : <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'white', flexShrink: 0 }}>{initials(profile?.full_name || session.user.email)}</div>
               }
               <button onClick={signOut}
                 style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
@@ -635,7 +635,7 @@ export default function App() {
                       border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
                       fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                     {n.icon}<span>{n.label}</span>
-                    <span style={{ fontSize: 10, marginLeft: 2 }}>▼</span>
+                    <span style={{ fontSize: 12, marginLeft: 2 }}>▼</span>
                   </button>
                   {navOpen === n.id && (
                     <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#1a2744',
@@ -703,7 +703,7 @@ export default function App() {
                           <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>{r.icon}</span>
                           <div style={{ minWidth: 0 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
-                            {r.sub && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{r.sub}</div>}
+                            {r.sub && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{r.sub}</div>}
                           </div>
                         </div>
                       ))}
@@ -1053,22 +1053,22 @@ export default function App() {
               <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{agreements.filter(a => a.estado_code === 'cumplido').length} cumplidos de {agreements.length}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{agreements.filter(a => a.estado_code === 'cumplido').length} cumplidos de {agreements.length}</span>
               </div>
               <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Acuerdos Territoriales</h1>
               <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Co-responsabilidad comunitaria · {agreements.filter(a => a.territorio === 'Tolú').length} Tolú · {agreements.filter(a => a.territorio === 'Barbosa').length} Barbosa</p>
               <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
                 <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color: 'white' }}>{agreements.length ? Math.round(agreements.reduce((s, a) => s + (a.avance || 0), 0) / agreements.length) : 0}%</div>
-                  <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Avance prom.</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Avance prom.</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color: '#34d399' }}>{agreements.filter(a => a.estado_code === 'cumplido').length}</div>
-                  <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color: '#fbbf24' }}>{seguimiento.filter(s => s.estado === 'Pendiente').length}</div>
-                  <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
                 </div>
               </div>
             </div>
@@ -1107,22 +1107,22 @@ export default function App() {
                   <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: enProceso > 0 ? '#fbbf24' : '#34d399' }} />
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{enProceso} en proceso</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{enProceso} en proceso</span>
                   </div>
                   <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Cronograma 2026</h1>
                   <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Gestión Social Territorial · Nov 2025 – Dic 2026</p>
                   <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
                     <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
                       <div style={{ fontSize: 20, fontWeight: 900, color: '#34d399' }}>{cumplido}</div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
                     </div>
                     <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
                       <div style={{ fontSize: 20, fontWeight: 900, color: '#fbbf24' }}>{enProceso}</div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>En proceso</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>En proceso</div>
                     </div>
                     <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
                       <div style={{ fontSize: 20, fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>{pendiente}</div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
                     </div>
                   </div>
                 </div>
@@ -1252,7 +1252,7 @@ export default function App() {
                 <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes de inversión social</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes de inversión social</span>
                 </div>
                 <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Huella Social Territorial</h1>
                 <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Guía de referencia interna — ejes, programas y contexto territorial</p>
@@ -1266,7 +1266,7 @@ export default function App() {
               {/* Section title */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                 <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tres ejes de inversión social</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tres ejes de inversión social</span>
               </div>
 
               {/* 3 Ejes */}
@@ -1278,7 +1278,7 @@ export default function App() {
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: e.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 13, fontWeight: 900, flexShrink: 0 }}>{e.label}</div>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: '#2B2926', lineHeight: 1.2 }}>{e.titulo}</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: e.color, marginTop: 2 }}>{e.ifc}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: e.color, marginTop: 2 }}>{e.ifc}</div>
                       </div>
                     </div>
                     <div style={{ flex: 1, marginTop: 10 }}>
@@ -1290,7 +1290,7 @@ export default function App() {
                       ))}
                     </div>
                     <div style={{ marginTop: 12, padding: '10px 12px', background: `${e.color}10`, borderRadius: 10, border: `1px solid ${e.color}20` }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: e.color, lineHeight: 1.4 }}>→ {e.tagline}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: e.color, lineHeight: 1.4 }}>→ {e.tagline}</span>
                     </div>
                     {/* Acuerdos vinculados — conexión directa */}
                     {(() => {
@@ -1302,7 +1302,7 @@ export default function App() {
                             <div style={{ width: 2, height: 12, background: e.color, opacity: 0.4 }} />
                             <div style={{ width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: `5px solid ${e.color}`, opacity: 0.4 }} />
                           </div>
-                          <div style={{ fontSize: 9, fontWeight: 800, color: e.color, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Acuerdos vinculados</div>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: e.color, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Acuerdos vinculados</div>
                           {acuerdosEje.map(ag => {
                             const pct = ag.avance || 0
                             const pctColor = pct >= 100 ? '#22c55e' : pct > 0 ? e.color : '#eab308'
@@ -1312,8 +1312,8 @@ export default function App() {
                                 style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: isExpanded ? `${e.color}10` : 'white', borderRadius: 8, border: `1px solid ${isExpanded ? e.color : e.border}`, marginBottom: 4, cursor: 'pointer', transition: 'all 0.15s' }}>
                                 <div style={{ fontSize: 12, color: e.color, flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>›</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 11, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
-                                  <div style={{ fontSize: 9, color: '#94a3b8' }}>{ag.territorio} · Acuerdo {ag.id.slice(1)}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
+                                  <div style={{ fontSize: 12, color: '#94a3b8' }}>{ag.territorio} · Acuerdo {ag.id.slice(1)}</div>
                                 </div>
                                 <div style={{ width: 40 }}>
                                   <div style={{ height: 3, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
@@ -1354,19 +1354,19 @@ export default function App() {
                       <div style={{ background: 'white', borderRadius: 14, border: `1px solid ${ejeColor}30`, padding: '16px 18px', marginTop: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                           <div style={{ width: 3, height: 14, background: ejeColor, borderRadius: 2 }} />
-                          <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cronograma</span>
-                          <span style={{ fontSize: 10, color: '#94a3b8' }}>({eventos.filter(ev => ev.estado === 'Cumplido').length}/{eventos.length} cumplidos)</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cronograma</span>
+                          <span style={{ fontSize: 12, color: '#94a3b8' }}>({eventos.filter(ev => ev.estado === 'Cumplido').length}/{eventos.length} cumplidos)</span>
                         </div>
                         {eventos.map(ev => (
                           <div key={ev.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
-                            <div style={{ width: 20, height: 20, borderRadius: 6, background: `${estadoColor[ev.estado]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: estadoColor[ev.estado], fontWeight: 700, flexShrink: 0, marginTop: 1 }}>
+                            <div style={{ width: 20, height: 20, borderRadius: 6, background: `${estadoColor[ev.estado]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: estadoColor[ev.estado], fontWeight: 700, flexShrink: 0, marginTop: 1 }}>
                               {estadoIcon[ev.estado]}
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', lineHeight: 1.3 }}>{ev.evento}</div>
-                              <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{ev.mes}{ev.producto ? ` · ${ev.producto}` : ''}</div>
+                              <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{ev.mes}{ev.producto ? ` · ${ev.producto}` : ''}</div>
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: estadoColor[ev.estado], flexShrink: 0, whiteSpace: 'nowrap' }}>{ev.estado}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: estadoColor[ev.estado], flexShrink: 0, whiteSpace: 'nowrap' }}>{ev.estado}</span>
                           </div>
                         ))}
                       </div>
@@ -1390,14 +1390,14 @@ export default function App() {
               {/* Contexto */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                 <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Datos de contexto territorial</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Datos de contexto territorial</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: 10, marginBottom: 28 }}>
                 {contexto.map((c, i) => (
                   <div key={i} style={{ background: 'white', borderRadius: 14, padding: '16px 14px', border: '1px solid #e8ecf0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: i === 4 ? '#10b981' : '#0D47A1' }} />
                     <div style={{ fontSize: 28, fontWeight: 900, color: '#2B2926', letterSpacing: -1, lineHeight: 1 }}>{c.value}</div>
-                    <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 6, lineHeight: 1.4 }}>{c.label}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 6, lineHeight: 1.4 }}>{c.label}</div>
                   </div>
                 ))}
               </div>
@@ -1570,7 +1570,7 @@ export default function App() {
                             <span style={{ fontSize: 20 }}></span>
                             <div style={{ textAlign: 'left' }}>
                               <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
-                              <div style={{ fontSize: 11, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
+                              <div style={{ fontSize: 12, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
                             </div>
                           </button>
                         ) : (
@@ -1605,12 +1605,12 @@ export default function App() {
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' }}>
                                 <span style={{ fontSize: 12, fontWeight: 800, color: r.territorio === 'Tolú' ? C.tolu : C.barbosa }}>{r.territorio}</span>
-                                <span style={{ fontSize: 11, color: C.subtle }}>·</span>
+                                <span style={{ fontSize: 12, color: C.subtle }}>·</span>
                                 <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{r.tipo_reunion}</span>
-                                {r.asistentes > 0 && <span style={{ fontSize: 11, color: C.subtle }}>· {r.asistentes} asistentes</span>}
+                                {r.asistentes > 0 && <span style={{ fontSize: 12, color: C.subtle }}>· {r.asistentes} asistentes</span>}
                               </div>
                               <div style={{ fontSize: 13, color: C.text, marginBottom: 3, lineHeight: 1.4 }}>{r.descripcion}</div>
-                              <div style={{ fontSize: 11, color: C.subtle }}>
+                              <div style={{ fontSize: 12, color: C.subtle }}>
                                 {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
                                 {r.lugar && <span> · · {r.lugar}</span>}
                                 {r.geo_lugar && !r.lugar && <span> · · {r.geo_lugar}</span>}
@@ -1724,11 +1724,11 @@ export default function App() {
                               <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
                               <div style={{ padding: '10px 12px' }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
-                                <div style={{ fontSize: 11, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
-                                {ev.lugar && <div style={{ fontSize: 11, color: C.accent }}>· {ev.lugar}</div>}
-                                <div style={{ fontSize: 10, color: C.subtle }}>GPS {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
+                                <div style={{ fontSize: 12, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
+                                {ev.lugar && <div style={{ fontSize: 12, color: C.accent }}>· {ev.lugar}</div>}
+                                <div style={{ fontSize: 12, color: C.subtle }}>GPS {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
                                 {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
-                                  style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
+                                  style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
                               </div>
                             </div>
                           ))}
@@ -1838,7 +1838,7 @@ export default function App() {
                       <div>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                           <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
-                          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>En campo</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>En campo</span>
                         </div>
                         <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>
                           {myTerritorio || 'Mi Territorio'}
@@ -1871,15 +1871,15 @@ export default function App() {
                     <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
                       <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', flex: 1 }}>
                         <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{actoresT.length}</div>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actores</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actores</div>
                       </div>
                       <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', flex: 1 }}>
                         <div style={{ fontSize: 22, fontWeight: 900, color: rojos > 0 ? '#fbbf24' : '#34d399' }}>{rojos}</div>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Atención hoy</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Atención hoy</div>
                       </div>
                       <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', flex: 1 }}>
                         <div style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>{verdes}</div>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Estables</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Estables</div>
                       </div>
                     </div>
                   </div>
@@ -2000,13 +2000,13 @@ export default function App() {
                     <div style={{ background: tc.accent, borderRadius: 10, padding: '10px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.5)' }} />
                       <span style={{ fontSize: 13, fontWeight: 800, color: 'white', letterSpacing: 0.5 }}>{terr}</span>
-                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginLeft: 'auto' }}>{terr === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'}</span>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginLeft: 'auto' }}>{terr === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'}</span>
                     </div>
                     {/* Acuerdos */}
                     <div style={{ marginBottom: 12 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                         <div style={{ width: 3, height: 14, background: tc.accent, borderRadius: 2 }} />
-                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos</span>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {terrAgreements.map(ag => (
@@ -2018,7 +2018,7 @@ export default function App() {
                     <div style={{ background: 'white', borderRadius: 14, padding: '14px 14px', border: '1px solid #e8ecf0', marginBottom: 12 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                         <div style={{ width: 3, height: 14, background: '#ef4444', borderRadius: 2 }} />
-                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Requieren atención</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Requieren atención</span>
                       </div>
                       {rojos.length === 0
                         ? <div style={{ padding: 10, textAlign: 'center', color: '#94a3b8', fontSize: 11 }}>Sin actores en atención urgente</div>
@@ -2028,7 +2028,7 @@ export default function App() {
                             <div style={{ width: 7, height: 7, borderRadius: '50%', background: a.semaforo === 'rojo' ? '#ef4444' : '#f97316', flexShrink: 0 }} />
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
-                              <div style={{ fontSize: 10, color: '#94a3b8' }}>{a.tipo}</div>
+                              <div style={{ fontSize: 12, color: '#94a3b8' }}>{a.tipo}</div>
                             </div>
                             <span style={{ fontSize: 13, color: '#cbd5e1' }}>›</span>
                           </div>
@@ -2039,7 +2039,7 @@ export default function App() {
                     <div style={{ background: 'white', borderRadius: 14, padding: '14px 14px', border: '1px solid #e8ecf0', marginBottom: 12 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                         <div style={{ width: 3, height: 14, background: '#f59e0b', borderRadius: 2 }} />
-                        <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Próximas fechas</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Próximas fechas</span>
                       </div>
                       {(() => {
                         const today = new Date()
@@ -2071,9 +2071,9 @@ export default function App() {
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${C.border}`, cursor: 'pointer' }}>
                             <div style={{ minWidth: 0 }}>
                               <div style={{ fontSize: 12, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.actor.nombre}</div>
-                              <div style={{ fontSize: 11, color: C.accent, fontWeight: 600 }}>{item.descripcion}</div>
+                              <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>{item.descripcion}</div>
                             </div>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: item.diff <= 7 ? C.red : C.orange, flexShrink: 0, marginLeft: 8 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: item.diff <= 7 ? C.red : C.orange, flexShrink: 0, marginLeft: 8 }}>
                               {item.diff === 0 ? '¡Hoy!' : `${item.diff}d`}
                             </div>
                           </div>
@@ -2106,7 +2106,7 @@ export default function App() {
                   </div>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'white' }}>Capturar Evidencia</div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Foto con GPS y hora exacta</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Foto con GPS y hora exacta</div>
                   </div>
                 </div>
               )
@@ -2291,8 +2291,8 @@ export default function App() {
                         · {ev.lugar}
                       </div>}
                       {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
-                        style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
-                      <div style={{ fontSize: 11, color: C.subtle }}>
+                        style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
+                      <div style={{ fontSize: 12, color: C.subtle }}>
                         GPS {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
                         {ev.precision_m && <span> · ±{Math.round(ev.precision_m)}m</span>}
                       </div>
@@ -2320,7 +2320,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 28 }} />
           </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
         </div>
       </div>
 
@@ -2352,7 +2352,7 @@ export default function App() {
                       {log.accion === 'insert' ? '➕ Creado' : log.accion === 'delete' ? '🗑️ Eliminado' : ' Editado'}
                     </span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{actorName}</span>
-                    <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>
+                    <span style={{ fontSize: 12, color: C.subtle, marginLeft: 'auto' }}>
                       {new Date(log.created_at).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>

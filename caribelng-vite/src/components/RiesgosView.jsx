@@ -67,7 +67,7 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: rojos.length > 0 ? '#fbbf24' : '#34d399', animation: rojos.length > 0 ? 'none' : 'none' }} />
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{rojos.length + legAlto.length > 0 ? `${rojos.length + legAlto.length} requieren acción` : 'Bajo control'}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{rojos.length + legAlto.length > 0 ? `${rojos.length + legAlto.length} requieren acción` : 'Bajo control'}</span>
           </div>
           <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Gestión de Riesgos</h1>
           <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Dirección de Asuntos Corporativos</p>
@@ -76,19 +76,19 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{total}</div>
-              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sociales</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sociales</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{totalLeg}</div>
-              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Legislativos</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Legislativos</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24' }}>{rojos.length}</div>
-              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Críticos</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Críticos</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>{verdes.length}</div>
-              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Controlados</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Controlados</div>
             </div>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
                 transform: isActive ? 'translateY(-2px)' : 'none', transition: 'all 0.2s' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: isActive ? 'white' : s.color, marginBottom: 8, boxShadow: `0 0 8px ${isActive ? 'rgba(255,255,255,0.5)' : s.color + '60'}` }} />
               <div style={{ fontSize: 28, fontWeight: 900, color: isActive ? 'white' : '#2B2926', lineHeight: 1 }}>{s.count}</div>
-              <div style={{ fontSize: 10, fontWeight: 800, color: isActive ? 'rgba(255,255,255,0.9)' : s.color, textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{s.label}</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: isActive ? 'rgba(255,255,255,0.9)' : s.color, textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{s.label}</div>
               {total > 0 && <div style={{ marginTop: 8, height: 4, borderRadius: 100, background: isActive ? 'rgba(255,255,255,0.3)' : `${s.color}20`, overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${s.pct}%`, background: isActive ? 'white' : s.color, borderRadius: 100, transition: 'width 0.6s' }} />
               </div>}
@@ -135,7 +135,7 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
               boxShadow: tab === t.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <span>{t.label}</span>
-            {t.count > 0 && <span style={{ fontSize: 9, fontWeight: 600, color: tab === t.id ? '#94a3b8' : '#cbd5e1' }}>{t.count}</span>}
+            {t.count > 0 && <span style={{ fontSize: 12, fontWeight: 600, color: tab === t.id ? '#94a3b8' : '#cbd5e1' }}>{t.count}</span>}
           </button>
         ))}
       </div>
@@ -192,26 +192,26 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
                     {isExp && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
                         <div style={{ paddingTop: 12 }}>
-                          {r.descripcion && <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6, marginBottom: 10, background: 'linear-gradient(135deg,#fff7ed,#fffbeb)', padding: '12px 14px', borderRadius: 10, border: '1px solid #fde68a' }}><span style={{ fontWeight: 700, color: '#9a3412', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qué puede pasar</span><br/>{r.descripcion}</div>}
-                          {r.quien_detona && <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8, lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}><div style={{ width: 3, height: 14, background: C.red, borderRadius: 2, flexShrink: 0, marginTop: 2 }} /><div><span style={{ fontWeight: 700, color: '#dc2626', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actores clave</span><br/>{r.quien_detona}</div></div>}
-                          {r.quien_mitiga && <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8, lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}><div style={{ width: 3, height: 14, background: C.green, borderRadius: 2, flexShrink: 0, marginTop: 2 }} /><div><span style={{ fontWeight: 700, color: '#059669', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quién nos ayuda</span><br/>{r.quien_mitiga}</div></div>}
-                          {r.que_hacemos && <div style={{ fontSize: 12, color: '#166534', background: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', padding: '12px 14px', borderRadius: 10, lineHeight: 1.6, marginBottom: 10, border: '1px solid #a7f3d0' }}><span style={{ fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qué estamos haciendo</span><br/>{r.que_hacemos}</div>}
+                          {r.descripcion && <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6, marginBottom: 10, background: 'linear-gradient(135deg,#fff7ed,#fffbeb)', padding: '12px 14px', borderRadius: 10, border: '1px solid #fde68a' }}><span style={{ fontWeight: 700, color: '#9a3412', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qué puede pasar</span><br/>{r.descripcion}</div>}
+                          {r.quien_detona && <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8, lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}><div style={{ width: 3, height: 14, background: C.red, borderRadius: 2, flexShrink: 0, marginTop: 2 }} /><div><span style={{ fontWeight: 700, color: '#dc2626', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actores clave</span><br/>{r.quien_detona}</div></div>}
+                          {r.quien_mitiga && <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8, lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}><div style={{ width: 3, height: 14, background: C.green, borderRadius: 2, flexShrink: 0, marginTop: 2 }} /><div><span style={{ fontWeight: 700, color: '#059669', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quién nos ayuda</span><br/>{r.quien_mitiga}</div></div>}
+                          {r.que_hacemos && <div style={{ fontSize: 12, color: '#166534', background: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', padding: '12px 14px', borderRadius: 10, lineHeight: 1.6, marginBottom: 10, border: '1px solid #a7f3d0' }}><span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qué estamos haciendo</span><br/>{r.que_hacemos}</div>}
                           {bt.length > 0 && (
                             <div style={{ marginTop: 12 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                                 <div style={{ width: 3, height: 14, background: C.accent, borderRadius: 2 }} />
-                                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Causa y efecto</span>
+                                <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Causa y efecto</span>
                               </div>
                               {bt.map((b, idx) => (
                                 <div key={idx} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr auto 1fr', gap: 8, marginBottom: 10, fontSize: 12, lineHeight: 1.5 }}>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {b.causa && <div style={{ background: 'linear-gradient(135deg,#fff1f2,#fee2e2)', padding: '10px 12px', borderRadius: 10, color: '#991b1b', border: '1px solid #fecaca' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Causa</span><br/>{b.causa}</div>}
-                                    {b.control_preventivo && <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', padding: '10px 12px', borderRadius: 10, color: '#1e40af', border: '1px solid #93c5fd' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Prevención</span><br/>{b.control_preventivo}</div>}
+                                    {b.causa && <div style={{ background: 'linear-gradient(135deg,#fff1f2,#fee2e2)', padding: '10px 12px', borderRadius: 10, color: '#991b1b', border: '1px solid #fecaca' }}><span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Causa</span><br/>{b.causa}</div>}
+                                    {b.control_preventivo && <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', padding: '10px 12px', borderRadius: 10, color: '#1e40af', border: '1px solid #93c5fd' }}><span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Prevención</span><br/>{b.control_preventivo}</div>}
                                   </div>
                                   {!isMobile && <div style={{ display: 'flex', alignItems: 'center', color: '#cbd5e1', fontSize: 18, padding: '0 4px' }}>&rarr;</div>}
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {b.control_detectivo && <div style={{ background: 'linear-gradient(135deg,#fffbeb,#fef3c7)', padding: '10px 12px', borderRadius: 10, color: '#854d0e', border: '1px solid #fde68a' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Detección</span><br/>{b.control_detectivo}</div>}
-                                    {b.consecuencia && <div style={{ background: 'linear-gradient(135deg,#fdf2f8,#fce7f3)', padding: '10px 12px', borderRadius: 10, color: '#9d174d', border: '1px solid #fbcfe8' }}><span style={{ fontWeight: 700, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Consecuencia</span><br/>{b.consecuencia}</div>}
+                                    {b.control_detectivo && <div style={{ background: 'linear-gradient(135deg,#fffbeb,#fef3c7)', padding: '10px 12px', borderRadius: 10, color: '#854d0e', border: '1px solid #fde68a' }}><span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Detección</span><br/>{b.control_detectivo}</div>}
+                                    {b.consecuencia && <div style={{ background: 'linear-gradient(135deg,#fdf2f8,#fce7f3)', padding: '10px 12px', borderRadius: 10, color: '#9d174d', border: '1px solid #fbcfe8' }}><span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Consecuencia</span><br/>{b.consecuencia}</div>}
                                   </div>
                                 </div>
                               ))}

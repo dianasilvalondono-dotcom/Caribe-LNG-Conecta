@@ -24,14 +24,14 @@ function KPICard({ label, value, sub, icon, color, sparkValues, trend, trendLabe
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, background: `${color}15` }}>{icon}</div>
         {trendLabel && (
-          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 100, background: trend === 'up' ? '#dcfce7' : trend === 'down' ? '#fee2e2' : '#f1f5f9', color: trend === 'up' ? '#059669' : trend === 'down' ? '#dc2626' : '#64748b' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 8px', borderRadius: 100, background: trend === 'up' ? '#dcfce7' : trend === 'down' ? '#fee2e2' : '#f1f5f9', color: trend === 'up' ? '#059669' : trend === 'down' ? '#dc2626' : '#64748b' }}>
             {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {trendLabel}
           </span>
         )}
       </div>
       <div style={{ fontSize: 34, fontWeight: 900, color: '#2B2926', letterSpacing: -1, lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', marginTop: 8, paddingTop: 8, borderTop: '1px solid #f1f5f9' }}>{sub}</div>}
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{label}</div>
+      {sub && <div style={{ fontSize: 12, fontWeight: 500, color: '#64748b', marginTop: 8, paddingTop: 8, borderTop: '1px solid #f1f5f9' }}>{sub}</div>}
       {sparkValues && <div style={{ marginTop: 8 }}><Sparkline values={sparkValues} color={color} /></div>}
     </div>
   )
@@ -43,8 +43,8 @@ function SemaforoCard({ count, label, desc, variant }) {
     <div style={{ borderRadius: 12, padding: '16px 14px', background: s.bg, border: `1px solid ${s.border}` }}>
       <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.dot, marginBottom: 8, boxShadow: `0 0 8px ${s.dot}80` }} />
       <div style={{ fontSize: 30, fontWeight: 900, color: s.num, lineHeight: 1, marginBottom: 2 }}>{count}</div>
-      <div style={{ fontSize: 11, fontWeight: 800, color: s.tag, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 3 }}>{label}</div>
-      <div style={{ fontSize: 10, fontWeight: 500, color: '#64748b' }}>{desc}</div>
+      <div style={{ fontSize: 12, fontWeight: 800, color: s.tag, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 3 }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>{desc}</div>
     </div>
   )
 }
@@ -59,9 +59,9 @@ function RiesgoRow({ riesgo, onClick }) {
       <div style={{ width: 8, height: 8, borderRadius: '50%', background: ls.dot, flexShrink: 0, boxShadow: (lvl === 'alto' || lvl === 'muy_alto') ? `0 0 6px ${ls.dot}80` : 'none' }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{riesgo.riesgo || riesgo.nombre || 'Riesgo'}</div>
-        <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 1 }}>{riesgo.territorio || ''}{riesgo.accion_inmediata ? ` · ${riesgo.accion_inmediata.substring(0, 55)}` : ''}</div>
+        <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 1 }}>{riesgo.territorio || ''}{riesgo.accion_inmediata ? ` · ${riesgo.accion_inmediata.substring(0, 55)}` : ''}</div>
       </div>
-      <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', padding: '3px 8px', borderRadius: 100, background: ls.bg, color: ls.c, flexShrink: 0 }}>{ls.t}</span>
+      <span style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', padding: '3px 8px', borderRadius: 100, background: ls.bg, color: ls.c, flexShrink: 0 }}>{ls.t}</span>
     </div>
   )
 }
@@ -77,7 +77,7 @@ function TerritoryBar({ label, icon, count, total, color, desc, onClick }) {
       <div style={{ height: 7, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', marginBottom: 4 }}>
         <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 100, transition: 'width 0.8s' }} />
       </div>
-      <div style={{ fontSize: 10, color: '#94a3b8' }}>{pct}% del total · {desc}</div>
+      <div style={{ fontSize: 12, color: '#94a3b8' }}>{pct}% del total · {desc}</div>
     </div>
   )
 }
@@ -142,9 +142,9 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 3, height: 16, background: color, borderRadius: 2 }} />
-        <span style={{ fontSize: 11, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '1.5px' }}>{label}</span>
+        <span style={{ fontSize: 12, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '1.5px' }}>{label}</span>
       </div>
-      {action && <span onClick={action} style={{ fontSize: 11, fontWeight: 600, color: '#1565C0', cursor: 'pointer' }}>{actionLabel || 'Ver →'}</span>}
+      {action && <span onClick={action} style={{ fontSize: 12, fontWeight: 600, color: '#1565C0', cursor: 'pointer' }}>{actionLabel || 'Ver →'}</span>}
     </div>
   )
 
@@ -154,10 +154,10 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
       <div style={{ background: `linear-gradient(135deg,${C_navy} 0%,#1a3d7a 60%,#1565C0 100%)`, borderRadius: '0 0 20px 20px', padding: 16, marginBottom: 16, marginLeft: -10, marginRight: -10 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(0,180,216,0.15)', border: '1px solid rgba(0,180,216,0.3)', padding: '3px 10px', borderRadius: 100, marginBottom: 8 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00b4d8', display: 'inline-block' }} />
-          <span style={{ fontSize: 9, fontWeight: 700, color: '#90e0ef', letterSpacing: 1, textTransform: 'uppercase' }}>En vivo · {weekLabel}</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#90e0ef', letterSpacing: 1, textTransform: 'uppercase' }}>En vivo · {weekLabel}</span>
         </div>
         <div style={{ fontSize: 20, fontWeight: 900, color: 'white' }}>Estado del <span style={{ color: '#00b4d8' }}>Territorio</span></div>
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>Caribe LNG 2026 · Tiempo real</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>Caribe LNG 2026 · Tiempo real</div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
         <KPICard label="Actores totales" value={stats.total} sub={`${stats.prioA} prioridad A`} icon={<IconUsers size={18} color={C_navy} />} color={C_navy} sparkValues={totalSpark} trend="up" trendLabel="12%" onClick={() => { setView('actores'); setFilterS('Todos') }} />
@@ -191,7 +191,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(0,180,216,0.15)', border: '1px solid rgba(0,180,216,0.3)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00b4d8', display: 'inline-block' }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#90e0ef', letterSpacing: 1, textTransform: 'uppercase' }}>En vivo · {weekLabel}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#90e0ef', letterSpacing: 1, textTransform: 'uppercase' }}>En vivo · {weekLabel}</span>
             </div>
             <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white', letterSpacing: -0.5, lineHeight: 1.1 }}>Estado del <span style={{ color: '#00b4d8' }}>Territorio</span></h1>
             <p style={{ margin: '8px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Resumen de relacionamiento &nbsp;·&nbsp; <span style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>Caribe LNG 2026</span> &nbsp;·&nbsp; {dateStr}</p>
@@ -244,7 +244,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
           {/* Charts */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div style={card}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>Progreso de Acuerdos</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>Progreso de Acuerdos</div>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart layout="vertical" data={agreements.map(ag => ({ nombre: `${ag.id}. ${(ag.nombre || '').substring(0, 22)}`, avance: ag.avance || 0, territorio: ag.territorio }))} margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
                   <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} tickFormatter={v => `${v}%`} />
@@ -257,7 +257,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               </ResponsiveContainer>
             </div>
             <div style={card}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>Relaciones por Territorio</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>Relaciones por Territorio</div>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={['Tolú', 'Barbosa', 'Nacional'].map(t => { const ta = actors.filter(a => a.territorio === t); return { territorio: t, Verde: ta.filter(a => a.semaforo === 'verde').length, Amarillo: ta.filter(a => a.semaforo === 'amarillo').length, Naranja: ta.filter(a => a.semaforo === 'naranja').length, Rojo: ta.filter(a => a.semaforo === 'rojo').length } })} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                   <XAxis dataKey="territorio" tick={{ fontSize: 12, fontWeight: 700 }} />
@@ -285,7 +285,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   <Avatar name={a.nombre} size={32} color={getTipoColor(a.tipo)} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#991b1b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.nombre}</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>{a.territorio} · {a.tipo}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 1 }}>{a.territorio} · {a.tipo}</div>
                   </div>
                 </div>
               ))}
@@ -303,7 +303,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0, border: '2px solid white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>{item.icon}</div>
                   <div style={{ paddingTop: 4, flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: C_text, lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: item.text }} />
-                    <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{item.time}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{item.time}</div>
                   </div>
                 </div>
               ))}
@@ -325,11 +325,11 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div onClick={() => { setView('actores'); setFilterS('Todos') }} style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', cursor: 'pointer' }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: C_navy }}>{stats.total}</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Total actores</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Total actores</div>
                 </div>
                 <div onClick={() => setView('huella')} style={{ textAlign: 'center', padding: 8, borderRadius: 8, background: '#f0fdf4', border: '1px solid #a7f3d0', cursor: 'pointer' }}>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#059669' }}>{pgsAvg}%</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Avance Plan Social</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Avance Plan Social</div>
                 </div>
               </div>
             </div>
@@ -342,15 +342,15 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <GaugeSVG pct={pgsAvg} color={pgsAvg >= 70 ? '#10b981' : pgsAvg >= 40 ? '#f59e0b' : '#ef4444'} />
               <div>
                 <div style={{ fontSize: 28, fontWeight: 900, color: C_text, letterSpacing: -1, lineHeight: 1 }}>{pgsAvg}%</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginTop: 2 }}>Promedio acuerdos</div>
-                <div style={{ fontSize: 11, color: '#64748b', marginTop: 6 }}>{acuerdosCumplidos} de {totalAcuerdos} completos</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginTop: 2 }}>Promedio acuerdos</div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 6 }}>{acuerdosCumplidos} de {totalAcuerdos} completos</div>
               </div>
             </div>
             {agreements.slice(0, 5).map(ag => (
               <div key={ag.id} onClick={() => setView('huella')} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7, cursor: 'pointer' }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', width: 20 }}>{ag.id}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', width: 20 }}>{ag.id}</span>
                 <div style={{ flex: 1 }}><Bar value={ag.avance} color={ag.avance >= 100 ? '#10b981' : ag.territorio === 'Tolú' ? C_tolu : C_barbosa} height={5} /></div>
-                <span style={{ fontSize: 11, fontWeight: 700, width: 30, textAlign: 'right', color: ag.avance >= 100 ? '#059669' : '#1565C0' }}>{ag.avance}%</span>
+                <span style={{ fontSize: 12, fontWeight: 700, width: 30, textAlign: 'right', color: ag.avance >= 100 ? '#059669' : '#1565C0' }}>{ag.avance}%</span>
               </div>
             ))}
           </div>
@@ -361,28 +361,28 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <div style={{ padding: '14px 18px 10px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div style={{ width: 3, height: 14, background: '#f59e0b', borderRadius: 2 }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '1.2px' }}>Próximos vencimientos</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: C_text, textTransform: 'uppercase', letterSpacing: '1.2px' }}>Próximos vencimientos</span>
                 </div>
-                <span onClick={() => setView('huella')} style={{ fontSize: 11, fontWeight: 600, color: '#1565C0', cursor: 'pointer' }}>Ver todos →</span>
+                <span onClick={() => setView('huella')} style={{ fontSize: 12, fontWeight: 600, color: '#1565C0', cursor: 'pointer' }}>Ver todos →</span>
               </div>
               {compromisosVencidos.slice(0, 2).map(s => (
                 <div key={s.id} onClick={() => setView('huella')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: '1px solid #f8fafc', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#dc2626', fontWeight: 700 }}>!</div>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#dc2626', fontWeight: 700 }}>!</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: C_text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(s.compromiso || s.actividad || '').substring(0, 35)}</div>
-                    <div style={{ fontSize: 10, color: '#94a3b8' }}>{s.acuerdo}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{s.acuerdo}</div>
                   </div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#dc2626' }}>Vencido</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#dc2626' }}>Vencido</span>
                 </div>
               ))}
               {compromisosProximos.slice(0, 3).map(s => (
                 <div key={s.id} onClick={() => setView('huella')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: '1px solid #f8fafc', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#d97706', fontWeight: 700 }}>~</div>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#d97706', fontWeight: 700 }}>~</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: C_text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(s.compromiso || s.actividad || '').substring(0, 35)}</div>
-                    <div style={{ fontSize: 10, color: '#94a3b8' }}>{s.acuerdo}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{s.acuerdo}</div>
                   </div>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8' }}>{new Date(s.fecha_pactada).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' })}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8' }}>{new Date(s.fecha_pactada).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' })}</span>
                 </div>
               ))}
             </div>
@@ -400,17 +400,17 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 800, color: color }}>{t.territorio}</div>
-                        <div style={{ fontSize: 10, color: '#94a3b8' }}>{t.gestora} · {t.rol}</div>
+                        <div style={{ fontSize: 12, color: '#94a3b8' }}>{t.gestora} · {t.rol}</div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: 16, fontWeight: 900, color: color }}>{t.activados}/{t.total}</div>
-                        <div style={{ fontSize: 9, color: '#94a3b8' }}>activados</div>
+                        <div style={{ fontSize: 12, color: '#94a3b8' }}>activados</div>
                       </div>
                     </div>
                     <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', marginBottom: 8 }}>
                       <div style={{ height: '100%', width: `${t.pct}%`, background: color, borderRadius: 100 }} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, fontSize: 10, textAlign: 'center' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, fontSize: 12, textAlign: 'center' }}>
                       <div style={{ background: '#f0fdf4', borderRadius: 6, padding: '4px 0' }}>
                         <div style={{ fontWeight: 800, color: '#22c55e' }}>{t.verde}</div>
                         <div style={{ color: '#94a3b8', fontSize: 8 }}>Estable</div>
@@ -469,7 +469,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               <div style={{ background: '#f59e0b', padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span></span>
                 <span style={{ fontSize: 12, fontWeight: 800, color: 'white', textTransform: 'uppercase' }}>Ediciones Pendientes</span>
-                <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.3)', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 800, color: 'white' }}>{actorEdits.length}</span>
+                <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.3)', borderRadius: 10, padding: '2px 8px', fontSize: 12, fontWeight: 800, color: 'white' }}>{actorEdits.length}</span>
               </div>
               <div style={{ padding: 12 }}>
                 {actorEdits.map(edit => {
@@ -477,7 +477,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   return (
                     <div key={edit.id} style={{ padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: C_text }}>{actorName}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 6 }}>Por: {edit.user_name} · {new Date(edit.created_at).toLocaleDateString('es-CO')}</div>
+                      <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 6 }}>Por: {edit.user_name} · {new Date(edit.created_at).toLocaleDateString('es-CO')}</div>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button onClick={async () => { await approveActorEdit(edit.id, edit.actor_id, edit.campos, session.user.id); sendPushNotification({ title: 'Edición aprobada', body: `Tu edición de ${actorName} fue aprobada`, user_ids: [edit.user_id] }).catch(() => {}); await loadData() }} style={{ flex: 1, background: '#10b981', color: 'white', border: 'none', borderRadius: 6, padding: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Aprobar</button>
                         <button onClick={async () => { await rejectActorEdit(edit.id, session.user.id); sendPushNotification({ title: 'Edición rechazada', body: `Tu edición de ${actorName} fue rechazada`, user_ids: [edit.user_id] }).catch(() => {}); await loadData() }} style={{ flex: 1, background: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: 6, padding: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Rechazar</button>

@@ -182,7 +182,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
               <NumField label="% reuniones con 10+ asistentes" value={pctSocAsistentes} onChange={setPctSocAsistentes} max={100} />
             </div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>El % se calcula sobre reuniones comunitarias con al menos 10 asistentes</div>
+            <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>El % se calcula sobre reuniones comunitarias con al menos 10 asistentes</div>
           </div>
 
           {/* OBJ.1 — Diagnóstico (territory-specific) */}
@@ -223,7 +223,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
               <NumField label="% respondidas en tiempo" value={pctPqrsTiempo} onChange={setPctPqrsTiempo} max={100} />
               <NumField label="% cerradas en plazo" value={pctPqrsCerradas} onChange={setPctPqrsCerradas} max={100} />
             </div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>% respondidas: ≤10 días hábiles · % cerradas: ≤15 días hábiles · Meta: 100%</div>
+            <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>% respondidas: ≤10 días hábiles · % cerradas: ≤15 días hábiles · Meta: 100%</div>
           </div>
 
           {/* OBJ.3 — Riesgo e incidentes */}
@@ -234,7 +234,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
               <NumField label="Alertas escaladas a dirección" value={alertasDac} onChange={setAlertasDac} />
               <NumField label="Personas contactadas" value={actoresGest} onChange={setActoresGest} />
             </div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>Meta incidentes: 0 · Alertas escaladas en ≤24h: ≥90%</div>
+            <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Meta incidentes: 0 · Alertas escaladas en ≤24h: ≥90%</div>
           </div>
 
           {/* OBJ.2 — Acuerdos */}
@@ -246,7 +246,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
               <NumField label="Compromisos cumplidos" value={compromisosCumplidos} onChange={setCompromisosCumplidos} />
               <NumField label="Incumplimientos con impacto" value={incumplimientos} onChange={setIncumplimientos} />
             </div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 4 }}>Meta: 3 acuerdos firmados antes de inicio de operación · Compromisos cumplidos: ≥90% · Incumplimientos: 0</div>
+            <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Meta: 3 acuerdos firmados antes de inicio de operación · Compromisos cumplidos: ≥90% · Incumplimientos: 0</div>
           </div>
 
           <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 14 }}>

@@ -199,7 +199,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                 ].map(s => (
                   <div key={s.label} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 12px', flex: 1, textAlign: 'center' }}>
                     <div style={{ fontSize: 18, fontWeight: 900, color: s.color || 'white' }}>{s.value}</div>
-                    <div style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -211,12 +211,12 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <div style={{ width: 3, height: 14, background: color, borderRadius: 2 }} />
-              <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.2px' }}>{cat.cat}</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.2px' }}>{cat.cat}</span>
             </div>
             <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr repeat(4,1fr) 60px 56px', gap: 4, marginBottom: 6, minWidth: 420 }}>
                 {['KPI','Q1','Q2','Q3','Q4','Total','Meta'].map(h => (
-                  <div key={h} style={{ fontSize: 11, color: C.subtle, fontWeight: 700, textAlign: h === 'KPI' ? 'left' : 'center', textTransform: 'uppercase' }}>{h}</div>
+                  <div key={h} style={{ fontSize: 12, color: C.subtle, fontWeight: 700, textAlign: h === 'KPI' ? 'left' : 'center', textTransform: 'uppercase' }}>{h}</div>
                 ))}
               </div>
               {cat.items.map(kpi => {
@@ -233,7 +233,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                         <div style={{ width: 7, height: 7, borderRadius: '50%', background: sc, flexShrink: 0, boxShadow: `0 0 5px ${sc}60` }} />
                         <span style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>{kpi.name}</span>
                       </div>
-                      <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2, paddingLeft: 13 }}>{kpi.base}</div>
+                      <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2, paddingLeft: 13 }}>{kpi.base}</div>
                       {kpi.meta > 0 && <div style={{ marginTop: 4, paddingLeft: 13 }}>
                         <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', width: '80%' }}>
                           <div style={{ height: '100%', width: `${pct}%`, background: sc, borderRadius: 100, transition: 'width 0.6s' }} />
@@ -246,9 +246,9 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                     })}
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: 16, fontWeight: 900, color: sc }}>{total || '—'}</div>
-                      {semLabel && <div style={{ fontSize: 8, fontWeight: 700, color: sc, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{semLabel}</div>}
+                      {semLabel && <div style={{ fontSize: 12, fontWeight: 700, color: sc, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{semLabel}</div>}
                     </div>
-                    <div style={{ textAlign: 'center', fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{kpi.meta || '—'}</div>
+                    <div style={{ textAlign: 'center', fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>{kpi.meta || '—'}</div>
                   </div>
                 )
               })}
@@ -265,10 +265,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: color }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <div style={{ width: 3, height: 14, background: color, borderRadius: 2 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Acuerdos Territoriales</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Acuerdos Territoriales</span>
               </div>
               <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 12 }}>
-                <div><div style={{ fontSize: 26, fontWeight: 900, color: ac }}>{avg}%</div><div style={{ fontSize: 11, color: C.muted }}>avance prom.</div></div>
+                <div><div style={{ fontSize: 26, fontWeight: 900, color: ac }}>{avg}%</div><div style={{ fontSize: 12, color: C.muted }}>avance prom.</div></div>
                 <div style={{ flex: 1 }}><Bar value={avg} color={ac} height={7} /></div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.muted }}>{agT.length} acuerdos</div>
               </div>
@@ -312,10 +312,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{kpi.name}</div>
-            <div style={{ fontSize: 11, color: C.subtle, marginTop: 2 }}>{kpi.formula} · {kpi.frecuencia}</div>
+            <div style={{ fontSize: 12, color: C.subtle, marginTop: 2 }}>{kpi.formula} · {kpi.frecuencia}</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: C.muted }}>Meta:</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.muted }}>Meta:</span>
             <span style={{ fontSize: 12, fontWeight: 800, color: C.text, background: '#f1f5f9', padding: '2px 7px', borderRadius: 5 }}>{kpi.meta}</span>
           </div>
         </div>
@@ -337,7 +337,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
         ) : (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             {saved?.valor && <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{saved.valor}</span>}
-            <span style={{ fontSize: 11, fontWeight: 700, color: estadoColor, background: estadoColor + '18', padding: '2px 8px', borderRadius: 10 }}>{estado}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: estadoColor, background: estadoColor + '18', padding: '2px 8px', borderRadius: 10 }}>{estado}</span>
             {saved?.notas && <span style={{ fontSize: 12, color: C.muted }}>{saved.notas}</span>}
           </div>
         )}
@@ -369,7 +369,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
           <div key={c.label} style={{ background: 'white', borderRadius: 14, padding: '16px 14px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: c.color }} />
             <div style={{ fontSize: 28, fontWeight: 900, color: '#2B2926', letterSpacing: -1, lineHeight: 1 }}>{c.value}</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{c.label}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', marginTop: 4 }}>{c.label}</div>
           </div>
         ))}
       </div>
@@ -392,7 +392,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
           {/* Scorecard summary */}
           <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1a3d7a 60%, #1565C0 100%)', borderRadius: 16, padding: '20px 22px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Reconocimiento proporcional</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Reconocimiento proporcional</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontSize: 36, fontWeight: 900, color: 'white' }}>{totalReconocimiento.toFixed(1)}%</span>
               <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>de {maxReconocimiento}% posible</span>
@@ -400,10 +400,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
             <div style={{ height: 6, background: 'rgba(255,255,255,0.15)', borderRadius: 100, marginTop: 12, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${Math.min((totalReconocimiento / maxReconocimiento) * 100, 100)}%`, background: 'white', borderRadius: 100, transition: 'width 0.8s' }} />
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>{DAC_KPIS.length} indicadores × 5% · Alimentados desde gestión territorial · Tiempo real</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>{DAC_KPIS.length} indicadores × 5% · Alimentados desde gestión territorial · Tiempo real</div>
           </div>
 
-          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 12, padding: '10px 14px', marginBottom: 16, fontSize: 11, color: '#1e40af', lineHeight: 1.5 }}>
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 12, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#1e40af', lineHeight: 1.5 }}>
             Estos indicadores se calculan automáticamente desde los datos de las gestoras territoriales. Se actualizan en tiempo real.
           </div>
 
@@ -414,15 +414,15 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 10, fontWeight: 800, background: kpi.color, color: 'white', padding: '3px 10px', borderRadius: 6 }}>{kpi.peso}</span>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: '#94a3b8' }}>{kpi.fecha}</span>
-                    {kpi.manual && <span style={{ fontSize: 9, fontWeight: 700, background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: 4 }}>Manual</span>}
+                    <span style={{ fontSize: 12, fontWeight: 800, background: kpi.color, color: 'white', padding: '3px 10px', borderRadius: 6 }}>{kpi.peso}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8' }}>{kpi.fecha}</span>
+                    {kpi.manual && <span style={{ fontSize: 12, fontWeight: 700, background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: 4 }}>Manual</span>}
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#2B2926', lineHeight: 1.3 }}>{kpi.num}. {kpi.titulo}</div>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div style={{ fontSize: 24, fontWeight: 900, color: kpi.sc }}>{kpi.value}</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: kpi.sc, textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: kpi.sc, textTransform: 'uppercase' }}>
                     {kpi.pct >= kpi.metaNum ? 'En meta' : kpi.pct >= kpi.metaNum * 0.7 ? 'Atención' : kpi.pct > 0 ? 'Crítico' : '—'}
                   </div>
                 </div>
@@ -434,15 +434,15 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                     <div style={{ height: '100%', width: `${Math.min(kpi.pct, 100)}%`, background: kpi.sc, borderRadius: 100, transition: 'width 0.6s' }} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                    <span style={{ fontSize: 10, color: '#94a3b8' }}>Meta: {kpi.meta}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: kpi.sc }}>Reconocimiento: {kpi.reconocimiento.toFixed(2)}%</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8' }}>Meta: {kpi.meta}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: kpi.sc }}>Reconocimiento: {kpi.reconocimiento.toFixed(2)}%</span>
                   </div>
                 </div>
               )}
               {/* Sub details */}
-              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>{kpi.sub}</div>
+              <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>{kpi.sub}</div>
               {/* Alerta roja */}
-              <div style={{ fontSize: 10, color: '#dc2626', marginTop: 6, padding: '4px 8px', background: '#fef2f2', borderRadius: 6, display: 'inline-block' }}>
+              <div style={{ fontSize: 12, color: '#dc2626', marginTop: 6, padding: '4px 8px', background: '#fef2f2', borderRadius: 6, display: 'inline-block' }}>
                 Alerta roja: {kpi.alertaRoja}
               </div>
               {/* Manual input for KPIs 4 & 5 */}
@@ -506,7 +506,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
               <div style={{ marginBottom: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 3, height: 14, background: C.navy, borderRadius: 2 }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Indicadores predictivos — blindaje de KPIs DAC</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Indicadores predictivos — blindaje de KPIs DAC</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 12 }}>
                   {indicadores.map(ind => {
@@ -516,12 +516,12 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: sc }} />
                         <div style={{ fontSize: 28, fontWeight: 900, color: sc, letterSpacing: -1, lineHeight: 1 }}>{ind.pct}%</div>
                         <div style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', marginTop: 8, lineHeight: 1.3 }}>{ind.titulo}</div>
-                        <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 4 }}>{ind.sub}</div>
-                        <div style={{ fontSize: 10, color: '#94a3b8' }}>{ind.valor} · Meta: ≥{ind.meta}%</div>
+                        <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>{ind.sub}</div>
+                        <div style={{ fontSize: 12, color: '#94a3b8' }}>{ind.valor} · Meta: ≥{ind.meta}%</div>
                         <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, marginTop: 8, overflow: 'hidden' }}>
                           <div style={{ width: `${Math.min(ind.pct, 100)}%`, height: '100%', background: sc, borderRadius: 100 }} />
                         </div>
-                        <div style={{ fontSize: 9, color: sc, fontWeight: 700, marginTop: 6 }}>Soporta: {ind.blindaKpi}</div>
+                        <div style={{ fontSize: 12, color: sc, fontWeight: 700, marginTop: 6 }}>Soporta: {ind.blindaKpi}</div>
                       </div>
                     )
                   })}
@@ -540,7 +540,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
               <div style={{ marginBottom: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 3, height: 14, background: C.navy, borderRadius: 2 }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Actividad de campo — alimentado de registros diarios</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Actividad de campo — alimentado de registros diarios</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
                   {territorios.map(terr => {
@@ -563,7 +563,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                       <div key={terr} style={{ background: 'white', borderRadius: 16, border: '1px solid #e8ecf0', overflow: 'hidden' }}>
                         <div style={{ background: color, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{terr}</span>
-                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>{meses[mesActual]} {anioActual}</span>
+                          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{meses[mesActual]} {anioActual}</span>
                         </div>
                         <div style={{ padding: '14px 16px' }}>
                           {/* Stats row */}
@@ -576,15 +576,15 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                             ].map(s => (
                               <div key={s.label} style={{ textAlign: 'center' }}>
                                 <div style={{ fontSize: 20, fontWeight: 900, color: s.color || '#2B2926' }}>{s.value}</div>
-                                <div style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>{s.label}</div>
-                                {s.total != null && <div style={{ fontSize: 9, color: '#cbd5e1' }}>({s.total} total)</div>}
+                                <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>{s.label}</div>
+                                {s.total != null && <div style={{ fontSize: 12, color: '#cbd5e1' }}>({s.total} total)</div>}
                               </div>
                             ))}
                           </div>
                           {/* Breakdown by type */}
                           {Object.keys(tiposCount).length > 0 && (
                             <div>
-                              <div style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 6 }}>Por tipo de actividad</div>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 6 }}>Por tipo de actividad</div>
                               {Object.entries(tiposCount).sort((a, b) => b[1] - a[1]).map(([tipo, count]) => (
                                 <div key={tipo} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid #f8fafc' }}>
                                   <span style={{ fontSize: 12, color: '#475569' }}>{tipo}</span>
@@ -606,7 +606,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
           {/* KPIs from weekly reports */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <div style={{ width: 3, height: 14, background: C.navy, borderRadius: 2 }} />
-            <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>KPIs trimestrales — alimentado de reportes semanales</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>KPIs trimestrales — alimentado de reportes semanales</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
             <div>{renderTerritory('Tolú', KPIS_TOLU)}</div>
