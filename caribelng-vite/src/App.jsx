@@ -1279,45 +1279,41 @@ export default function App() {
                     <div style={{ marginTop: 12, padding: '10px 12px', background: `${e.color}10`, borderRadius: 10, border: `1px solid ${e.color}20` }}>
                       <span style={{ fontSize: 11, fontWeight: 700, color: e.color, lineHeight: 1.4 }}>→ {e.tagline}</span>
                     </div>
+                    {/* Acuerdos vinculados — conexión directa */}
+                    {(() => {
+                      const acuerdosEje = agreements.filter(ag => ag.eje && ag.eje.split(',').includes(e.label))
+                      if (!acuerdosEje.length) return null
+                      return (
+                        <div style={{ marginTop: 14 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 8 }}>
+                            <div style={{ width: 2, height: 12, background: e.color, opacity: 0.4 }} />
+                            <div style={{ width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: `5px solid ${e.color}`, opacity: 0.4 }} />
+                          </div>
+                          <div style={{ fontSize: 9, fontWeight: 800, color: e.color, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Acuerdos vinculados</div>
+                          {acuerdosEje.map(ag => {
+                            const pct = ag.avance || 0
+                            const pctColor = pct >= 100 ? '#22c55e' : pct > 0 ? e.color : '#eab308'
+                            return (
+                              <div key={ag.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'white', borderRadius: 8, border: `1px solid ${e.border}`, marginBottom: 4 }}>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 11, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
+                                  <div style={{ fontSize: 9, color: '#94a3b8' }}>{ag.territorio}</div>
+                                </div>
+                                <div style={{ width: 40 }}>
+                                  <div style={{ height: 3, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
+                                    <div style={{ width: `${pct}%`, height: '100%', background: pctColor, borderRadius: 2 }} />
+                                  </div>
+                                </div>
+                                <div style={{ fontSize: 13, fontWeight: 900, color: pctColor, minWidth: 35, textAlign: 'right' }}>{pct}%</div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    })()}
                   </div>
                 ))}
               </div>
-
-              {/* Acuerdos vinculados por eje */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Avance por eje</span>
-              </div>
-              {ejes.map(eje => {
-                const acuerdosEje = agreements.filter(ag => ag.huella && ag.huella.toUpperCase().includes(eje.label))
-                if (!acuerdosEje.length) return null
-                return (
-                  <div key={eje.key + '-av'} style={{ marginBottom: 14 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                      <div style={{ width: 24, height: 24, borderRadius: 7, background: eje.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 10, fontWeight: 900 }}>{eje.label}</div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>{eje.titulo}</span>
-                    </div>
-                    {acuerdosEje.map(ag => {
-                      const pct = ag.avance || 0
-                      const pctColor = pct >= 100 ? '#22c55e' : pct > 0 ? eje.color : '#eab308'
-                      return (
-                        <div key={ag.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'white', borderRadius: 10, border: '1px solid #e8ecf0', marginBottom: 6 }}>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
-                            <div style={{ fontSize: 10, color: '#94a3b8' }}>{ag.territorio} · {ag.id}</div>
-                          </div>
-                          <div style={{ width: 60 }}>
-                            <div style={{ height: 4, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
-                              <div style={{ width: `${pct}%`, height: '100%', background: pctColor, borderRadius: 2 }} />
-                            </div>
-                          </div>
-                          <div style={{ fontSize: 16, fontWeight: 900, color: pctColor, minWidth: 40, textAlign: 'right' }}>{pct}%</div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })}
 
               {/* Lógica del modelo */}
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
