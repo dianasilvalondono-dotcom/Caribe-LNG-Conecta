@@ -120,8 +120,11 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
     const ta = actors.filter(a => a.territorio === t)
     const verde = ta.filter(a => a.semaforo === 'verde').length
     const amarillo = ta.filter(a => a.semaforo === 'amarillo').length
-    const rojo = ta.filter(a => a.semaforo === 'rojo' || a.semaforo === 'naranja').length
-    return { territorio: t, ...territorioGestora[t], total: ta.length, verde, amarillo, rojo, pct: ta.length ? Math.round((verde / ta.length) * 100) : 0 }
+    const naranja = ta.filter(a => a.semaforo === 'naranja').length
+    const rojo = ta.filter(a => a.semaforo === 'rojo').length
+    const activados = verde + amarillo + naranja
+    const porIniciar = rojo
+    return { territorio: t, ...territorioGestora[t], total: ta.length, verde, amarillo, naranja, rojo, activados, porIniciar, pct: ta.length ? Math.round((activados / ta.length) * 100) : 0 }
   })
   const avatarColors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#f093fb,#f5576c)', 'linear-gradient(135deg,#4facfe,#00f2fe)', 'linear-gradient(135deg,#43e97b,#38f9d7)', 'linear-gradient(135deg,#fa709a,#fee140)']
 
@@ -394,24 +397,36 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                 const semColor = t.pct >= 60 ? '#22c55e' : t.pct >= 30 ? '#f59e0b' : '#ef4444'
                 return (
                   <div key={t.territorio} onClick={() => { setView('actores'); setFilterT(t.territorio) }} style={{ cursor: 'pointer', padding: '10px 12px', borderRadius: 10, border: '1px solid #e8ecf0', background: '#fafbfc' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 800, color: color }}>{t.territorio}</div>
                         <div style={{ fontSize: 10, color: '#94a3b8' }}>{t.gestora} · {t.rol}</div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: semColor }}>{t.pct}%</div>
-                        <div style={{ fontSize: 9, color: '#94a3b8' }}>estables</div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: color }}>{t.activados}/{t.total}</div>
+                        <div style={{ fontSize: 9, color: '#94a3b8' }}>activados</div>
                       </div>
                     </div>
-                    <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', marginBottom: 6 }}>
+                    <div style={{ height: 4, background: '#f1f5f9', borderRadius: 100, overflow: 'hidden', marginBottom: 8 }}>
                       <div style={{ height: '100%', width: `${t.pct}%`, background: color, borderRadius: 100 }} />
                     </div>
-                    <div style={{ display: 'flex', gap: 8, fontSize: 10 }}>
-                      <span style={{ color: '#94a3b8' }}>{t.total} actores</span>
-                      <span style={{ color: '#22c55e', fontWeight: 700 }}>{t.verde} verdes</span>
-                      <span style={{ color: '#f59e0b', fontWeight: 700 }}>{t.amarillo} amarillos</span>
-                      <span style={{ color: '#ef4444', fontWeight: 700 }}>{t.rojo} rojos</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, fontSize: 10, textAlign: 'center' }}>
+                      <div style={{ background: '#f0fdf4', borderRadius: 6, padding: '4px 0' }}>
+                        <div style={{ fontWeight: 800, color: '#22c55e' }}>{t.verde}</div>
+                        <div style={{ color: '#94a3b8', fontSize: 8 }}>Estable</div>
+                      </div>
+                      <div style={{ background: '#fffbeb', borderRadius: 6, padding: '4px 0' }}>
+                        <div style={{ fontWeight: 800, color: '#f59e0b' }}>{t.amarillo}</div>
+                        <div style={{ color: '#94a3b8', fontSize: 8 }}>Atención</div>
+                      </div>
+                      <div style={{ background: '#fff7ed', borderRadius: 6, padding: '4px 0' }}>
+                        <div style={{ fontWeight: 800, color: '#f97316' }}>{t.naranja}</div>
+                        <div style={{ color: '#94a3b8', fontSize: 8 }}>Riesgo</div>
+                      </div>
+                      <div style={{ background: '#fef2f2', borderRadius: 6, padding: '4px 0' }}>
+                        <div style={{ fontWeight: 800, color: '#ef4444' }}>{t.porIniciar}</div>
+                        <div style={{ color: '#94a3b8', fontSize: 8 }}>Por iniciar</div>
+                      </div>
                     </div>
                   </div>
                 )
