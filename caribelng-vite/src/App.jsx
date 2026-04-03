@@ -1283,7 +1283,43 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Desarrollo que construye paz */}
+              {/* Acuerdos vinculados por eje */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Avance por eje</span>
+              </div>
+              {ejes.map(eje => {
+                const acuerdosEje = agreements.filter(ag => ag.huella && ag.huella.toUpperCase().includes(eje.label))
+                if (!acuerdosEje.length) return null
+                return (
+                  <div key={eje.key + '-av'} style={{ marginBottom: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 7, background: eje.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 10, fontWeight: 900 }}>{eje.label}</div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>{eje.titulo}</span>
+                    </div>
+                    {acuerdosEje.map(ag => {
+                      const pct = ag.avance || 0
+                      const pctColor = pct >= 100 ? '#22c55e' : pct > 0 ? eje.color : '#eab308'
+                      return (
+                        <div key={ag.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'white', borderRadius: 10, border: '1px solid #e8ecf0', marginBottom: 6 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ag.nombre}</div>
+                            <div style={{ fontSize: 10, color: '#94a3b8' }}>{ag.territorio} · {ag.id}</div>
+                          </div>
+                          <div style={{ width: 60 }}>
+                            <div style={{ height: 4, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
+                              <div style={{ width: `${pct}%`, height: '100%', background: pctColor, borderRadius: 2 }} />
+                            </div>
+                          </div>
+                          <div style={{ fontSize: 16, fontWeight: 900, color: pctColor, minWidth: 40, textAlign: 'right' }}>{pct}%</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })}
+
+              {/* Lógica del modelo */}
               <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: '#0D47A1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 900, flexShrink: 0 }}>+</div>
                 <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
@@ -1921,6 +1957,21 @@ export default function App() {
                   </div>
                 ))
               })()}
+            </div>
+            {/* ── Acuerdos de mi territorio ── */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 14, background: '#10b981', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Acuerdos de mi territorio</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).map(ag => (
+                  <AgreementCard key={ag.id} ag={ag} canEdit={true} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={false} />
+                ))}
+                {agreements.filter(ag => myTerritorio ? ag.territorio === myTerritorio : true).length === 0 && (
+                  <div style={{ padding: 16, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>Sin acuerdos en tu territorio</div>
+                )}
+              </div>
             </div>
             {/* ── Captura de Evidencia ── */}
             {(() => {
