@@ -1211,88 +1211,105 @@ export default function App() {
         )}
 
         {view === 'huella' && (() => {
-          const pilares = [
-            { key: 'c3', label: 'C3', desc: 'Gente Capacitada', color: '#1565C0', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd' },
-            { key: 'hub', label: 'HUB', desc: 'Infraestructura', color: '#007A87', bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7' },
-            { key: 'eco', label: 'ECO', desc: 'Programa Ambiental', color: '#00BFB3', bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4' },
+          const ejes = [
+            { key: 'ft', label: 'FT', titulo: 'Formación para el Trabajo', ifc: 'IFC PS2', color: '#1565C0',
+              bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '#93c5fd',
+              tagline: 'Futuro profesional para jóvenes — la mejor alternativa a economías ilegales',
+              items: ['Licencias de conducción C2/C3', 'Certificaciones marítimas y portuarias', 'Formación técnica en energía y mantenimiento', 'Manejo de sustancias peligrosas', 'Prioridad: jóvenes adultos (18-28 años) de Tolú y comunidades aledañas'] },
+            { key: 'jd', label: 'JD', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'IFC PS4', color: '#007A87',
+              bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7',
+              tagline: 'Deporte y liderazgo que transforman — jóvenes con propósito, no en riesgo',
+              items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas: Fútbol con Corazón, Soccer for Peace'] },
+            { key: 'ec', label: 'EC', titulo: 'Economía Local y Ecosistema Costero', ifc: 'IFC PS6', color: '#00BFB3',
+              bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4',
+              tagline: 'Comunidades prósperas — menos vulnerabilidad, más autonomía económica',
+              items: ['Fortalecimiento productivo de pescadores artesanales', 'Protección y restauración de ecosistemas marinos', 'Reciclaje comunitario y economía circular', 'Educación ambiental'] },
           ]
-          const territorios = [
-            { nombre: 'Tolú', sub: 'Terminal marítima · Sucre', color: C.tolu,
-              c3: { titulo: 'Licencia C3', items: ['Enfoque de género', 'Autoescuela habilitada', 'Infraestructura vía Cargovolco y Suragas', 'Certificación sustancias peligrosas', 'Empleabilidad local a mediano plazo'] },
-              hub: { titulo: 'Muelle Astivik', items: ['Hub operativo reformado', 'Deportes acuáticos para jóvenes', 'Certificaciones marítimas y portuarias', 'Mercado de pescadores'] },
-              eco: { titulo: 'Ambiental Marino', items: ['Estudio impacto ambiental con pescadores', 'Programa costero co-construido', 'Restauración de arrecifes', 'Nace del mar, con su gente'] },
-            },
-            { nombre: 'Barbosa', sub: 'Planta regasificación · Antioquia', color: C.barbosa,
-              c3: { titulo: 'Licencia C3', items: ['Formación técnica', 'Enfoque de género', 'Certificación sustancias peligrosas', 'Empleabilidad local a mediano plazo'] },
-              hub: { titulo: 'Cancha El Machete', items: ['Reforma con cubierta', 'Polideportivo multideporte', 'Espacio comunitario continuo'] },
-              eco: { titulo: 'Cadena de Reciclaje', items: ['Puntos ecológicos comunitarios', 'Reciclaje como ingreso', 'Acuerdo Alcaldía + EPM', 'Siembra 150 árboles'] },
-            }
+          const contexto = [
+            { value: '21.8%', label: 'Pobreza multidimensional en Sucre' },
+            { value: '17.8%', label: 'Desempleo juvenil (18-28) en Colombia' },
+            { value: '69%', label: 'Informalidad laboral en Sucre' },
+            { value: '55%', label: 'Jóvenes (18-28) en informalidad' },
+            { value: '100%', label: 'Inversión privada — cero costo público' },
           ]
           return (
             <div>
-              <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #00BFB3 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '24px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+              {/* Hero */}
+              <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #00BFB3 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 pilares · 2 territorios</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes · Estándares IFC</span>
                 </div>
                 <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Huella Social Territorial</h1>
-                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Lo que Caribe LNG deja en cada territorio · Modelo de co-responsabilidad</p>
+                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Construyendo paz y desarrollo desde Tolú y Barbosa</p>
               </div>
 
-              {/* Pilares legend */}
-              <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-                {pilares.map(p => (
-                  <div key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 12, padding: '10px 16px', border: `1px solid ${p.border}`, flex: 1, minWidth: isMobile ? '100%' : 0 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: 0.5, flexShrink: 0 }}>{p.label}</div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#2B2926' }}>{p.desc}</div>
-                      <div style={{ fontSize: 10, color: '#94a3b8' }}>Pilar {p.label}</div>
+              {/* Intro */}
+              <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
+                Caribe LNG opera la cadena de gas natural licuado que conecta mar, puerto y carreteras con los puntos de regasificación en Colombia: <strong style={{ color: '#2B2926' }}>Tolú (Sucre)</strong> y <strong style={{ color: '#2B2926' }}>Barbosa (Antioquia)</strong>. 100% inversión privada, sin costo para los municipios. A través de <strong style={{ color: '#1565C0' }}>Caribe LNG Conecta</strong>, invertimos en el crecimiento de las comunidades donde operamos: formamos jóvenes (18-28 años) para el empleo formal, abrimos espacios de deporte y liderazgo, y fortalecemos economías locales. No es caridad: es un modelo de corresponsabilidad que deja capacidad instalada y transforma territorios.
+              </div>
+
+              {/* Section title */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Tres ejes de inversión alineados con estándares IFC</span>
+              </div>
+
+              {/* 3 Ejes */}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
+                {ejes.map(e => (
+                  <div key={e.key} style={{ background: e.bg, borderRadius: 16, padding: '22px 18px', border: `1px solid ${e.border}`, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: e.color }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: e.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 13, fontWeight: 900, flexShrink: 0 }}>{e.label}</div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: '#2B2926', lineHeight: 1.2 }}>{e.titulo}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: e.color, marginTop: 2 }}>{e.ifc}</div>
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, marginTop: 10 }}>
+                      {e.items.map((item, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
+                          <div style={{ width: 5, height: 5, borderRadius: '50%', background: e.color, flexShrink: 0, marginTop: 6, boxShadow: `0 0 4px ${e.color}60` }} />
+                          <span style={{ fontSize: 12, color: '#475569', lineHeight: 1.5 }}>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 12, padding: '10px 12px', background: `${e.color}10`, borderRadius: 10, border: `1px solid ${e.color}20` }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: e.color, lineHeight: 1.4 }}>→ {e.tagline}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Territories */}
-              {territorios.map(t => (
-                <div key={t.nombre} style={{ marginBottom: 28 }}>
-                  {/* Territory header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '14px 16px', background: `linear-gradient(135deg, ${t.color}10, ${t.color}05)`, borderRadius: 14, border: `1px solid ${t.color}20` }}>
-                    <div style={{ width: 4, height: 32, background: t.color, borderRadius: 2 }} />
-                    <div>
-                      <div style={{ fontSize: 17, fontWeight: 900, color: '#2B2926' }}>{t.nombre}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>{t.sub}</div>
-                    </div>
-                  </div>
-
-                  {/* 3 pilar cards */}
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
-                    {pilares.map(p => {
-                      const data = t[p.key]
-                      return (
-                        <div key={p.key} style={{ background: p.bg, borderRadius: 16, padding: '20px 18px', border: `1px solid ${p.border}`, position: 'relative', overflow: 'hidden' }}>
-                          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: p.color }} />
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: 8, background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 10, fontWeight: 900 }}>{p.label}</div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: '#2B2926' }}>{data.titulo}</div>
-                          </div>
-                          {data.items.map((item, i) => (
-                            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
-                              <div style={{ width: 5, height: 5, borderRadius: '50%', background: p.color, flexShrink: 0, marginTop: 6, boxShadow: `0 0 4px ${p.color}60` }} />
-                              <span style={{ fontSize: 12, color: '#475569', lineHeight: 1.5 }}>{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )
-                    })}
-                  </div>
+              {/* Desarrollo que construye paz */}
+              <div style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid #e8ecf0', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: '#0D47A1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 900, flexShrink: 0 }}>+</div>
+                <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
+                  <strong style={{ color: '#2B2926' }}>Desarrollo que construye paz.</strong> Cada programa genera crecimiento visible — empleo, deporte, economías locales — y al mismo tiempo cierra brechas de vulnerabilidad en los territorios. Cuando un joven tiene oficio, hace deporte y lidera proyectos en su comunidad, el entorno cambia. Invertir en oportunidades es la forma más efectiva de transformar un territorio.
                 </div>
-              ))}
+              </div>
+
+              {/* Contexto */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 3, height: 14, background: '#0D47A1', borderRadius: 2 }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#2B2926', textTransform: 'uppercase', letterSpacing: '1.5px' }}>El contexto que queremos transformar</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: 10, marginBottom: 28 }}>
+                {contexto.map((c, i) => (
+                  <div key={i} style={{ background: 'white', borderRadius: 14, padding: '16px 14px', border: '1px solid #e8ecf0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: i === 4 ? '#10b981' : '#0D47A1' }} />
+                    <div style={{ fontSize: 28, fontWeight: 900, color: '#2B2926', letterSpacing: -1, lineHeight: 1 }}>{c.value}</div>
+                    <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 6, lineHeight: 1.4 }}>{c.label}</div>
+                  </div>
+                ))}
+              </div>
 
               {/* Bottom banner */}
-              <div style={{ background: `linear-gradient(135deg, #0D47A1 0%, #007A87 100%)`, borderRadius: 16, padding: '28px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>Nace del territorio. Se construye con su gente.</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Huella Social · Caribe LNG 2026</div>
+              <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #007A87 100%)', borderRadius: 16, padding: '28px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: 'white', marginBottom: 6 }}>Construyendo paz y desarrollo desde Tolú y Barbosa</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Huella Social Territorial · Caribe LNG 2026</div>
               </div>
             </div>
           )
