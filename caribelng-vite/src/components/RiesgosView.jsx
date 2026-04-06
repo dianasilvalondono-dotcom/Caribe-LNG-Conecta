@@ -74,19 +74,19 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
 
           {/* Quick stats */}
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+            <div onClick={() => { setTab('mapa'); setRiesgoFilter('Todos') }} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center', cursor: 'pointer' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{total}</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sociales</div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+            <div onClick={() => setTab('legislativo')} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center', cursor: 'pointer' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{totalLeg}</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Legislativos</div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+            <div onClick={() => { setTab('mapa'); setRiesgoFilter('Alto') }} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center', cursor: 'pointer' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24' }}>{rojos.length}</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Críticos</div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center' }}>
+            <div onClick={() => { setTab('mapa'); setRiesgoFilter('Bajo') }} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 14px', flex: 1, textAlign: 'center', cursor: 'pointer' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>{verdes.length}</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Controlados</div>
             </div>
