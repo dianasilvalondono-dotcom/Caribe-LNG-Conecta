@@ -1272,7 +1272,7 @@ export default function App() {
             { key: 'jd', label: '2', matchKey: 'JD', titulo: 'Juventud, Deporte y Liderazgo', ifc: 'Ocupación del tiempo libre', color: '#007A87',
               bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', border: '#6ee7b7',
               tagline: 'Jóvenes con actividades deportivas, liderazgo y habilidades para la vida — no en riesgo',
-              items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas: Fútbol con Corazón, Soccer for Peace'] },
+              items: ['Liderazgo juvenil y desarrollo personal', 'Deportes acuáticos y recreación', 'Educación comunitaria y habilidades para la vida', 'Espacios seguros para jóvenes', 'Alianzas con organizaciones deportivas y sociales'] },
             { key: 'ec', label: '3', matchKey: 'EC', titulo: 'Economía Local y Medio Ambiente', ifc: 'Economías locales sostenibles', color: '#00BFB3',
               bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)', border: '#5eead4',
               tagline: 'Comunidades con cadenas productivas fortalecidas y ecosistemas protegidos',
