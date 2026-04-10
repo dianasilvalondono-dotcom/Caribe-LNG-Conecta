@@ -2394,7 +2394,7 @@ export default function App() {
         </svg>
         <div style={{ background: '#0D47A1', padding: '20px 40px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 28 }} />
+            <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 52 }} />
           </div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
         </div>
