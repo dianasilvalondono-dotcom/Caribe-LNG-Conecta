@@ -29,6 +29,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
     nombre: actor.nombre || '', tipo: actor.tipo || '', territorio: actor.territorio || '',
     posicion: actor.posicion || '', riesgo: actor.riesgo || '', poder: actor.poder || 3,
     interes: actor.interes || 3, owner: actor.owner || '', contacto: actor.contacto || '',
+    telefono: actor.telefono || '', correo: actor.correo || '',
     que_hacemos: actor.que_hacemos || '', prioridad: actor.prioridad || ''
   })
   const [editSaving, setEditSaving] = useState(false)
@@ -151,6 +152,18 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
             {actor.owner && <InfoRow label="Owner" val={actor.owner} />}
             {actor.frecuencia && <InfoRow label="Frecuencia" val={actor.frecuencia} />}
             {actor.contacto && <InfoRow label="Contacto" val={actor.contacto} />}
+            {actor.telefono && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${C.border}` }}>
+                <span style={{ fontSize: 12, color: C.subtle, fontWeight: 600 }}>Teléfono</span>
+                <a href={`tel:${actor.telefono}`} style={{ fontSize: 13, color: C.accent, fontWeight: 600, textDecoration: 'none' }}>{actor.telefono}</a>
+              </div>
+            )}
+            {actor.correo && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${C.border}`, gap: 8 }}>
+                <span style={{ fontSize: 12, color: C.subtle, fontWeight: 600 }}>Correo</span>
+                <a href={`mailto:${actor.correo}`} style={{ fontSize: 13, color: C.accent, fontWeight: 600, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.correo}</a>
+              </div>
+            )}
             {actor.accion_tomada && (
               <div style={{ background: '#eff6ff', borderRadius: 8, padding: '8px 12px', marginBottom: 8, borderLeft: `3px solid ${C.accent}` }}>
                 <div style={{ fontSize: 12, color: C.accent, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>
@@ -383,6 +396,18 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Contacto</label>
                     <input value={editFields.contacto} onChange={e => setEditFields({ ...editFields, contacto: e.target.value })}
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Teléfono</label>
+                    <input value={editFields.telefono} onChange={e => setEditFields({ ...editFields, telefono: e.target.value })}
+                      type="tel" placeholder="+57 300 123 4567"
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Correo electrónico</label>
+                    <input value={editFields.correo} onChange={e => setEditFields({ ...editFields, correo: e.target.value })}
+                      type="email" placeholder="nombre@dominio.com"
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
