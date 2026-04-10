@@ -12,6 +12,10 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
   const [newSemaforo, setNewSemaforo] = useState(actor.semaforo)
   const [saving, setSaving] = useState(false)
   const [savingPersonal, setSavingPersonal] = useState(false)
+  const [savingReco, setSavingReco] = useState(false)
+  const [recoSaved, setRecoSaved] = useState(false)
+  // Recomendación de relacionamiento (editable directo por gestora)
+  const [recomendacion, setRecomendacion] = useState(actor.recomendacion_gestora || '')
   // Campos relacionamiento
   const [accionTomada, setAccionTomada] = useState(actor.accion_tomada || '')
   const [fechaAccion, setFechaAccion] = useState(actor.fecha_accion || new Date().toISOString().split('T')[0])
@@ -64,6 +68,18 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
       onUpdated()
     } catch(e) { alert('Error guardando: ' + e.message) }
     finally { setSavingPersonal(false) }
+  }
+
+  async function handleSaveRecomendacion() {
+    setSavingReco(true)
+    setRecoSaved(false)
+    try {
+      await updateActor(actor.id, { recomendacion_gestora: recomendacion })
+      onUpdated()
+      setRecoSaved(true)
+      setTimeout(() => setRecoSaved(false), 2200)
+    } catch(e) { alert('Error guardando: ' + e.message) }
+    finally { setSavingReco(false) }
   }
 
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
@@ -174,6 +190,38 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
             )}
             {actor.que_hacemos && <Block label="Qué hacemos" bg="#f0fdf4" color="#166534">{actor.que_hacemos}</Block>}
             {actor.riesgo_desc && <Block label="Riesgo identificado" bg="#fff7ed" color="#9a3412">{actor.riesgo_desc}</Block>}
+
+            {/* ── Recomendación de relacionamiento (editable directo por gestora) ── */}
+            <div style={{ marginTop: 14, background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '12px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  💡 Recomendación de relacionamiento
+                </div>
+                {recoSaved && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: C.green }}>✓ Guardado</span>
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: '#a16207', marginBottom: 8, lineHeight: 1.4 }}>
+                Recomendación de la gestora sobre cómo relacionarse con este tipo de actor: tono, canales, frecuencia, temas a evitar, oportunidades.
+              </div>
+              <textarea
+                value={recomendacion}
+                onChange={e => setRecomendacion(e.target.value)}
+                placeholder="Ej: Prefiere reuniones presenciales en su oficina los miércoles. Evitar temas de la consulta previa hasta que se cierre el acuerdo. Buena entrada por temas educativos..."
+                style={{ width: '100%', border: '1px solid #fde68a', borderRadius: 8, padding: '9px 11px', fontSize: 13,
+                  resize: 'vertical', minHeight: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+                  color: C.text, background: 'white' }}
+              />
+              <button
+                onClick={handleSaveRecomendacion}
+                disabled={savingReco || recomendacion === (actor.recomendacion_gestora || '')}
+                style={{ marginTop: 8, width: '100%', background: savingReco ? '#94a3b8' : recomendacion === (actor.recomendacion_gestora || '') ? '#e5e7eb' : '#92400e',
+                  color: recomendacion === (actor.recomendacion_gestora || '') ? '#9ca3af' : 'white',
+                  border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700,
+                  cursor: savingReco ? 'wait' : recomendacion === (actor.recomendacion_gestora || '') ? 'default' : 'pointer' }}>
+                {savingReco ? 'Guardando...' : 'Guardar recomendación'}
+              </button>
+            </div>
           </div>
         )}
 
