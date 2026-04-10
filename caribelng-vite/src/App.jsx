@@ -554,14 +554,14 @@ export default function App() {
             paddingLeft: 'max(12px, env(safe-area-inset-left))',
             paddingRight: 'max(12px, env(safe-area-inset-right))',
             paddingTop: 'env(safe-area-inset-top)',
-            height: 'calc(46px + env(safe-area-inset-top))',
+            height: 'calc(58px + env(safe-area-inset-top))',
             overflowX: 'auto', overflowY: 'visible',
             gap: 2, scrollbarWidth: 'none',
           }}>
             {/* Logo — click to go to dashboard */}
             <div onClick={() => setView('dashboard')} style={{ flexShrink: 0, display: 'flex', alignItems: 'center',
-              paddingRight: 10, marginRight: 4, borderRight: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer' }}>
-              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 30 }} />
+              paddingRight: 12, marginRight: 6, borderRight: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer' }}>
+              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 44 }} />
             </div>
             {/* Nav tabs */}
             {NAV.map(n => n.children ? (
@@ -606,7 +606,7 @@ export default function App() {
           </div>
           {/* Mobile dropdown portal — rendered outside scroll container */}
           {navOpen && NAV.filter(n => n.children && n.id === navOpen).map(n => (
-            <div key={n.id} className="clng-mobile-nav" style={{ position: 'absolute', left: 12, right: 12, top: 46, zIndex: 300 }}>
+            <div key={n.id} className="clng-mobile-nav" style={{ position: 'absolute', left: 12, right: 12, top: 58, zIndex: 300 }}>
               <div style={{ background: '#1a2744', borderRadius: 10, padding: 6, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                 {n.children.map(c => (
                   <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
@@ -622,9 +622,9 @@ export default function App() {
             </div>
           ))}
         </div>
-          <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, maxWidth: '100vw' }} className="clng-desktop-nav">
+          <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 84, maxWidth: '100vw' }} className="clng-desktop-nav">
             <div onClick={() => setView('dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 34 }} />
+              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 60 }} />
             </div>
             <div style={{ display: 'flex', gap: 2 }}>
               {NAV.map(n => n.children ? (
