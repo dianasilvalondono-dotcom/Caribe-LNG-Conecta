@@ -14,8 +14,12 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
   const [savingPersonal, setSavingPersonal] = useState(false)
   const [savingReco, setSavingReco] = useState(false)
   const [recoSaved, setRecoSaved] = useState(false)
+  const [savingRecoDAC, setSavingRecoDAC] = useState(false)
+  const [recoDACSaved, setRecoDACSaved] = useState(false)
   // Recomendación de relacionamiento (editable directo por gestora)
   const [recomendacion, setRecomendacion] = useState(actor.recomendacion_gestora || '')
+  // Lectura estratégica DAC (solo admin puede editar)
+  const [recomendacionDAC, setRecomendacionDAC] = useState(actor.recomendacion_dac || '')
   // Campos relacionamiento
   const [accionTomada, setAccionTomada] = useState(actor.accion_tomada || '')
   const [fechaAccion, setFechaAccion] = useState(actor.fecha_accion || new Date().toISOString().split('T')[0])
@@ -80,6 +84,18 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
       setTimeout(() => setRecoSaved(false), 2200)
     } catch(e) { alert('Error guardando: ' + e.message) }
     finally { setSavingReco(false) }
+  }
+
+  async function handleSaveRecomendacionDAC() {
+    setSavingRecoDAC(true)
+    setRecoDACSaved(false)
+    try {
+      await updateActor(actor.id, { recomendacion_dac: recomendacionDAC })
+      onUpdated()
+      setRecoDACSaved(true)
+      setTimeout(() => setRecoDACSaved(false), 2200)
+    } catch(e) { alert('Error guardando: ' + e.message) }
+    finally { setSavingRecoDAC(false) }
   }
 
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
@@ -191,18 +207,18 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
             {actor.que_hacemos && <Block label="Qué hacemos" bg="#f0fdf4" color="#166534">{actor.que_hacemos}</Block>}
             {actor.riesgo_desc && <Block label="Riesgo identificado" bg="#fff7ed" color="#9a3412">{actor.riesgo_desc}</Block>}
 
-            {/* ── Recomendación de relacionamiento (editable directo por gestora) ── */}
+            {/* ── Recomendación de la gestora (amarillo) ── */}
             <div style={{ marginTop: 14, background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '12px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  💡 Recomendación de relacionamiento
+                  💡 Recomendación de la gestora
                 </div>
                 {recoSaved && (
                   <span style={{ fontSize: 11, fontWeight: 700, color: C.green }}>✓ Guardado</span>
                 )}
               </div>
               <div style={{ fontSize: 11, color: '#a16207', marginBottom: 8, lineHeight: 1.4 }}>
-                Recomendación de la gestora sobre cómo relacionarse con este tipo de actor: tono, canales, frecuencia, temas a evitar, oportunidades.
+                Lectura desde el campo: tono, canales, frecuencia, temas a evitar, oportunidades.
               </div>
               <textarea
                 value={recomendacion}
@@ -221,6 +237,48 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                   cursor: savingReco ? 'wait' : recomendacion === (actor.recomendacion_gestora || '') ? 'default' : 'pointer' }}>
                 {savingReco ? 'Guardando...' : 'Guardar recomendación'}
               </button>
+            </div>
+
+            {/* ── Lectura estratégica DAC (azul navy, solo admin edita) ── */}
+            <div style={{ marginTop: 10, background: '#eff6ff', border: `1px solid ${C.navy}33`, borderRadius: 12, padding: '12px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  🎯 Lectura estratégica DAC
+                </div>
+                {recoDACSaved && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: C.green }}>✓ Guardado</span>
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: C.navy, opacity: 0.75, marginBottom: 8, lineHeight: 1.4 }}>
+                {isAdmin
+                  ? 'Tu lectura como Dirección DAC: prioridad política, mensaje institucional, riesgos a vigilar.'
+                  : 'Lectura de la Dirección DAC. Solo lectura para gestoras.'}
+              </div>
+              {isAdmin ? (
+                <>
+                  <textarea
+                    value={recomendacionDAC}
+                    onChange={e => setRecomendacionDAC(e.target.value)}
+                    placeholder="Ej: Actor clave para destrabar el permiso ANLA. Mantener canal directo conmigo. Evitar exposición mediática hasta Q3..."
+                    style={{ width: '100%', border: `1px solid ${C.navy}33`, borderRadius: 8, padding: '9px 11px', fontSize: 13,
+                      resize: 'vertical', minHeight: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+                      color: C.text, background: 'white' }}
+                  />
+                  <button
+                    onClick={handleSaveRecomendacionDAC}
+                    disabled={savingRecoDAC || recomendacionDAC === (actor.recomendacion_dac || '')}
+                    style={{ marginTop: 8, width: '100%', background: savingRecoDAC ? '#94a3b8' : recomendacionDAC === (actor.recomendacion_dac || '') ? '#e5e7eb' : C.navy,
+                      color: recomendacionDAC === (actor.recomendacion_dac || '') ? '#9ca3af' : 'white',
+                      border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700,
+                      cursor: savingRecoDAC ? 'wait' : recomendacionDAC === (actor.recomendacion_dac || '') ? 'default' : 'pointer' }}>
+                    {savingRecoDAC ? 'Guardando...' : 'Guardar lectura DAC'}
+                  </button>
+                </>
+              ) : (
+                <div style={{ background: 'white', border: `1px solid ${C.navy}22`, borderRadius: 8, padding: '9px 11px', fontSize: 13, color: actor.recomendacion_dac ? C.text : C.subtle, lineHeight: 1.5, minHeight: 40, fontStyle: actor.recomendacion_dac ? 'normal' : 'italic' }}>
+                  {actor.recomendacion_dac || 'La Dirección DAC aún no ha registrado lectura estratégica.'}
+                </div>
+              )}
             </div>
           </div>
         )}

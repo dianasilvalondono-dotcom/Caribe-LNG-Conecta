@@ -309,7 +309,7 @@ export default function App() {
   const [dataLoading, setDataLoading] = useState(true)
   const [selectedActor, setSelectedActor] = useState(null)
   const [showNewActor, setShowNewActor] = useState(false)
-  const [newActor, setNewActor] = useState({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '' })
+  const [newActor, setNewActor] = useState({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '', recomendacion_dac: '' })
   const [search, setSearch] = useState('')
   const [filterT, setFilterT] = useState('Todos')
   const [filterS, setFilterS] = useState('Todos')
@@ -974,15 +974,26 @@ export default function App() {
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
                   </div>
-                  {/* Recomendación de relacionamiento */}
+                  {/* Recomendación de la gestora */}
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: '#92400e', display: 'block', marginBottom: 4 }}>💡 Recomendación de relacionamiento</label>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: '#92400e', display: 'block', marginBottom: 4 }}>💡 Recomendación de la gestora</label>
                     <textarea value={newActor.recomendacion_gestora} onChange={e => setNewActor({ ...newActor, recomendacion_gestora: e.target.value })}
-                      placeholder="Cómo relacionarse: tono, canales, frecuencia, temas a evitar, oportunidades..."
+                      placeholder="Lectura desde el campo: tono, canales, frecuencia, temas a evitar, oportunidades..."
                       rows={2}
                       style={{ width: '100%', border: '1px solid #fde68a', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', background: '#fefce8' }} />
                   </div>
+                  {/* Lectura estratégica DAC (solo admin) */}
+                  {isAdmin && (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <label style={{ fontSize: 12, fontWeight: 700, color: C.navy, display: 'block', marginBottom: 4 }}>🎯 Lectura estratégica DAC</label>
+                      <textarea value={newActor.recomendacion_dac} onChange={e => setNewActor({ ...newActor, recomendacion_dac: e.target.value })}
+                        placeholder="Lectura como Dirección DAC: prioridad política, mensaje institucional, riesgos a vigilar..."
+                        rows={2}
+                        style={{ width: '100%', border: `1px solid ${C.navy}33`, borderRadius: 8, padding: '8px 12px',
+                          fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', background: '#eff6ff' }} />
+                    </div>
+                  )}
                 </div>
                 {/* Botones */}
                 <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'flex-end' }}>
@@ -997,7 +1008,7 @@ export default function App() {
                       await addActor(newActor)
                       await loadData()
                       setShowNewActor(false)
-                      setNewActor({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '' })
+                      setNewActor({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '', recomendacion_dac: '' })
                     } catch (err) { alert('Error creando actor: ' + err.message) }
                   }}
                     style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
