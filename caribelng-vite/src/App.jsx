@@ -309,7 +309,7 @@ export default function App() {
   const [dataLoading, setDataLoading] = useState(true)
   const [selectedActor, setSelectedActor] = useState(null)
   const [showNewActor, setShowNewActor] = useState(false)
-  const [newActor, setNewActor] = useState({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', que_hacemos: '' })
+  const [newActor, setNewActor] = useState({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '' })
   const [search, setSearch] = useState('')
   const [filterT, setFilterT] = useState('Todos')
   const [filterS, setFilterS] = useState('Todos')
@@ -943,9 +943,25 @@ export default function App() {
                   </div>
                   {/* Contacto */}
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Contacto</label>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Contacto (cargo / referencia)</label>
                     <input value={newActor.contacto} onChange={e => setNewActor({ ...newActor, contacto: e.target.value })}
-                      placeholder="Email, teléfono, etc."
+                      placeholder="Ej: Asistente, jefe de despacho..."
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  {/* Teléfono */}
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Teléfono</label>
+                    <input value={newActor.telefono} onChange={e => setNewActor({ ...newActor, telefono: e.target.value })}
+                      type="tel" placeholder="+57 300 123 4567"
+                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  {/* Correo */}
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Correo electrónico</label>
+                    <input value={newActor.correo} onChange={e => setNewActor({ ...newActor, correo: e.target.value })}
+                      type="email" placeholder="nombre@dominio.com"
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
                   </div>
@@ -957,6 +973,15 @@ export default function App() {
                       rows={2}
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                  </div>
+                  {/* Recomendación de relacionamiento */}
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: '#92400e', display: 'block', marginBottom: 4 }}>💡 Recomendación de relacionamiento</label>
+                    <textarea value={newActor.recomendacion_gestora} onChange={e => setNewActor({ ...newActor, recomendacion_gestora: e.target.value })}
+                      placeholder="Cómo relacionarse: tono, canales, frecuencia, temas a evitar, oportunidades..."
+                      rows={2}
+                      style={{ width: '100%', border: '1px solid #fde68a', borderRadius: 8, padding: '8px 12px',
+                        fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', background: '#fefce8' }} />
                   </div>
                 </div>
                 {/* Botones */}
@@ -972,7 +997,7 @@ export default function App() {
                       await addActor(newActor)
                       await loadData()
                       setShowNewActor(false)
-                      setNewActor({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', que_hacemos: '' })
+                      setNewActor({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '' })
                     } catch (err) { alert('Error creando actor: ' + err.message) }
                   }}
                     style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
