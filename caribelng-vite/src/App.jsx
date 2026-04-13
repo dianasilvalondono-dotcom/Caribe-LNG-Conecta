@@ -9,7 +9,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
          getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
-         getKpisDac, upsertKpiDac, sendAlerta, getAlertas, markAlertaLeida,
+         getKpisDac, upsertKpiDac, sendAlerta, getAlertas, resolverAlerta,
          getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias, deleteEvidencia,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
@@ -340,6 +340,8 @@ export default function App() {
   const [auditLog, setAuditLog] = useState([])
   const [showAudit, setShowAudit] = useState(false)
   const [alertasRecibidas, setAlertasRecibidas] = useState([])
+  const [alertaResolviendo, setAlertaResolviendo] = useState(null)
+  const [alertaResolucionTexto, setAlertaResolucionTexto] = useState('')
   const [globalSearch, setGlobalSearch] = useState('')
   const [showGlobalSearch, setShowGlobalSearch] = useState(false)
 
@@ -1930,7 +1932,7 @@ export default function App() {
               </div>
 
               {/* Alertas */}
-              <div style={{ background: C.card, borderRadius: 14, padding: '20px 20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: C.card, borderRadius: 14, padding: '20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Alertas de gestoras {pendientes.length > 0 && <span style={{ background: '#ef4444', color: 'white', borderRadius: 10, padding: '1px 7px', fontSize: 12, marginLeft: 6 }}>{pendientes.length}</span>}
@@ -1945,41 +1947,78 @@ export default function App() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {pendientes.map(a => (
-                      <div key={a.id} style={{ background: urgBg[a.urgencia] || '#f8fafc', border: `1.5px solid ${urgColor[a.urgencia] || C.border}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: urgColor[a.urgencia] || C.muted, marginTop: 5, flexShrink: 0 }} />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
-                            <span style={{ fontSize: 12, fontWeight: 800, color: urgColor[a.urgencia] || C.text, textTransform: 'uppercase' }}>{a.urgencia}</span>
-                            <span style={{ fontSize: 12, color: C.muted }}>·</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{a.gestora}</span>
-                            <span style={{ fontSize: 12, color: C.muted }}>·</span>
-                            <span style={{ fontSize: 12, color: C.subtle, background: '#e2e8f0', padding: '1px 7px', borderRadius: 6 }}>{a.territorio}</span>
-                            <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>{new Date(a.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                          </div>
-                          <div style={{ fontSize: 14, color: C.text, lineHeight: 1.5 }}>{a.mensaje}</div>
+                      <div key={a.id} style={{ background: urgBg[a.urgencia] || '#f8fafc', border: `1.5px solid ${urgColor[a.urgencia] || C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+                        {/* Cabecera */}
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: urgColor[a.urgencia] || C.muted, flexShrink: 0 }} />
+                          <span style={{ fontSize: 12, fontWeight: 800, color: urgColor[a.urgencia] || C.text, textTransform: 'uppercase' }}>{a.urgencia}</span>
+                          <span style={{ fontSize: 12, color: C.muted }}>·</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{a.gestora}</span>
+                          <span style={{ fontSize: 12, color: C.subtle, background: '#e2e8f0', padding: '1px 7px', borderRadius: 6 }}>{a.territorio}</span>
+                          <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>{new Date(a.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
-                        <button onClick={async () => { await markAlertaLeida(a.id); const al = await getAlertas(); setAlertasRecibidas(al) }}
-                          style={{ background: 'white', border: `1px solid ${urgColor[a.urgencia] || C.border}`, color: urgColor[a.urgencia] || C.muted, borderRadius: 7, padding: '4px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
-                          ✓ Leída
-                        </button>
+                        {/* Mensaje */}
+                        <div style={{ fontSize: 14, color: C.text, lineHeight: 1.6, marginBottom: 12 }}>{a.mensaje}</div>
+                        {/* Formulario de resolución */}
+                        {alertaResolviendo === a.id ? (
+                          <div style={{ background: 'white', borderRadius: 8, padding: 12, border: `1px solid ${C.border}` }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 6 }}>Nota de cierre (opcional)</div>
+                            <textarea value={alertaResolucionTexto} onChange={e => setAlertaResolucionTexto(e.target.value)}
+                              placeholder="Describe cómo se resolvió o por qué no se pudo resolver…"
+                              rows={3} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '8px 10px', fontSize: 13, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', outline: 'none', marginBottom: 8 }} />
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <button onClick={async () => {
+                                await resolverAlerta(a.id, 'solucionado', alertaResolucionTexto)
+                                setAlertaResolviendo(null); setAlertaResolucionTexto('')
+                                setAlertasRecibidas(await getAlertas())
+                              }} style={{ flex: 1, background: '#22c55e', color: 'white', border: 'none', borderRadius: 7, padding: '8px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                                ✓ Solucionado
+                              </button>
+                              <button onClick={async () => {
+                                await resolverAlerta(a.id, 'no_solucionado', alertaResolucionTexto)
+                                setAlertaResolviendo(null); setAlertaResolucionTexto('')
+                                setAlertasRecibidas(await getAlertas())
+                              }} style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none', borderRadius: 7, padding: '8px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                                ✗ No solucionado
+                              </button>
+                              <button onClick={() => { setAlertaResolviendo(null); setAlertaResolucionTexto('') }}
+                                style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 7, padding: '8px 12px', fontSize: 13, cursor: 'pointer' }}>
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button onClick={() => { setAlertaResolviendo(a.id); setAlertaResolucionTexto('') }}
+                            style={{ background: 'white', border: `1.5px solid ${urgColor[a.urgencia] || C.border}`, color: urgColor[a.urgencia] || C.muted, borderRadius: 7, padding: '6px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                            Resolver alerta
+                          </button>
+                        )}
                       </div>
                     ))}
+                    {/* Alertas resueltas */}
                     {leidas.length > 0 && (
                       <details style={{ marginTop: 4 }}>
-                        <summary style={{ fontSize: 13, color: C.subtle, cursor: 'pointer', padding: '4px 0' }}>{leidas.length} alertas leídas</summary>
+                        <summary style={{ fontSize: 13, color: C.subtle, cursor: 'pointer', padding: '4px 0' }}>{leidas.length} alertas cerradas</summary>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-                          {leidas.map(a => (
-                            <div key={a.id} style={{ background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 14px', opacity: 0.7 }}>
-                              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 3 }}>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase' }}>{a.urgencia}</span>
-                                <span style={{ fontSize: 12, color: C.muted }}>·</span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{a.gestora}</span>
-                                <span style={{ fontSize: 12, color: C.subtle, background: '#e2e8f0', padding: '1px 7px', borderRadius: 6 }}>{a.territorio}</span>
-                                <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>{new Date(a.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                          {leidas.map(a => {
+                            const esSolucionada = a.estado === 'solucionado'
+                            const esNoSolucionada = a.estado === 'no_solucionado'
+                            return (
+                              <div key={a.id} style={{ background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px' }}>
+                                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
+                                  <span style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase' }}>{a.urgencia}</span>
+                                  <span style={{ fontSize: 12, color: C.muted }}>·</span>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{a.gestora}</span>
+                                  <span style={{ fontSize: 12, color: C.subtle, background: '#e2e8f0', padding: '1px 7px', borderRadius: 6 }}>{a.territorio}</span>
+                                  {esSolucionada && <span style={{ background: '#dcfce7', color: '#16a34a', borderRadius: 6, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>✓ Solucionado</span>}
+                                  {esNoSolucionada && <span style={{ background: '#fee2e2', color: '#ef4444', borderRadius: 6, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>✗ No solucionado</span>}
+                                  <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>{new Date(a.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                <div style={{ fontSize: 13, color: C.muted, marginBottom: a.resolucion ? 6 : 0 }}>{a.mensaje}</div>
+                                {a.resolucion && <div style={{ fontSize: 12, color: C.text, background: 'white', borderRadius: 6, padding: '6px 10px', borderLeft: `3px solid ${esSolucionada ? '#22c55e' : '#ef4444'}` }}>{a.resolucion}</div>}
                               </div>
-                              <div style={{ fontSize: 13, color: C.muted }}>{a.mensaje}</div>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       </details>
                     )}

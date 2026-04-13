@@ -548,7 +548,7 @@ export async function getAlertas() {
   return data || []
 }
 
-export async function markAlertaLeida(id) {
-  const { error } = await supabase.from('alertas').update({ leida: true }).eq('id', id)
+export async function resolverAlerta(id, estado, resolucion) {
+  const { error } = await supabase.from('alertas').update({ leida: true, estado, resolucion, resuelta_at: new Date().toISOString() }).eq('id', id)
   if (error) throw error
 }
