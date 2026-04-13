@@ -9,7 +9,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getSeguimientoAcuerdos, addSeguimientoAcuerdo, updateSeguimientoAcuerdo, deleteSeguimientoAcuerdo,
          getRiesgos, getBowTie, getRiesgosLegislativos, getCronogramaLegislativo,
          addCronogramaLegislativo, deleteCronogramaLegislativo,
-         getKpisDac, upsertKpiDac, sendAlerta,
+         getKpisDac, upsertKpiDac, sendAlerta, getAlertas, markAlertaLeida,
          getKnowledgeBase, addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias, deleteEvidencia,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
@@ -339,6 +339,7 @@ export default function App() {
   const [showGuia, setShowGuia] = useState(false)
   const [auditLog, setAuditLog] = useState([])
   const [showAudit, setShowAudit] = useState(false)
+  const [alertasRecibidas, setAlertasRecibidas] = useState([])
   const [globalSearch, setGlobalSearch] = useState('')
   const [showGlobalSearch, setShowGlobalSearch] = useState(false)
 
@@ -397,6 +398,12 @@ export default function App() {
         if (!cronograma.length) setCronograma(await getCronograma() || [])
       }
       if (v === 'knowledge' && !knowledgeBase.length) setKnowledgeBase(await getKnowledgeBase() || [])
+      if (v === 'dac' && isAdmin) {
+        const [al, rs, rd] = await Promise.all([getAlertas(), getReportesSemanales(), getRegistrosDiarios()])
+        setAlertasRecibidas(al || [])
+        setReportes(rs || [])
+        setRegistrosDiarios(rd || [])
+      }
       if (v === 'input') {
         const [ev, rd] = await Promise.all([getEvidencias(), getRegistrosDiarios()])
         setEvidencias(ev || []); setRegistrosDiarios(rd || [])
@@ -506,6 +513,7 @@ export default function App() {
     ]},
     { id: 'riesgos', label: 'Riesgos Sociales', icon: <IconAlert size={16} /> },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
+    ...(isAdmin ? [{ id: 'dac', label: 'Dirección', icon: <IconBell size={16} /> }] : []),
   ]
   // helper: check if a view belongs to a dropdown group
   const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
@@ -1791,11 +1799,11 @@ export default function App() {
                       )}
                     </div>
                     {/* Gallery */}
-                    {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).length > 0 && (
+                    {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Evidencias recientes</div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-                          {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).slice(0, 20).map(ev => (
+                          {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 20).map(ev => (
                             <div key={ev.id} style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                               <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
                               <div style={{ padding: '10px 12px' }}>
@@ -1886,6 +1894,153 @@ export default function App() {
         {view === 'knowledge' && isAdmin && (
           <KnowledgeBaseView docs={knowledgeBase} onReload={loadData} isMobile={isMobile} />
         )}
+
+        {view === 'dac' && isAdmin && (() => {
+          const urgColor = { Alta: '#ef4444', Media: '#f97316', Baja: '#eab308' }
+          const urgBg   = { Alta: '#fee2e2', Media: '#fff7ed', Baja: '#fefce8' }
+          const pendientes = alertasRecibidas.filter(a => !a.leida)
+          const leidas     = alertasRecibidas.filter(a => a.leida)
+          return (
+            <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 16px' }}>
+              {/* Header */}
+              <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, ${C.blue} 100%)`, borderRadius: 16, padding: '24px 28px', marginBottom: 24, color: 'white' }}>
+                <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5 }}>Mesa de Dirección</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>Alertas, reportes y registros de campo · Dirección de Asuntos Corporativos</div>
+                <div style={{ display: 'flex', gap: 20, marginTop: 16 }}>
+                  {[
+                    { label: 'Alertas pendientes', val: pendientes.length, color: pendientes.length > 0 ? '#fca5a5' : '#86efac' },
+                    { label: 'Reportes semana', val: reportes.length },
+                    { label: 'Registros campo', val: registrosDiarios.length },
+                  ].map(s => (
+                    <div key={s.label} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 16px', minWidth: 100 }}>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: s.color || 'white' }}>{s.val}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Alertas */}
+              <div style={{ background: C.card, borderRadius: 14, padding: '20px 20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    Alertas de gestoras {pendientes.length > 0 && <span style={{ background: '#ef4444', color: 'white', borderRadius: 10, padding: '1px 7px', fontSize: 12, marginLeft: 6 }}>{pendientes.length}</span>}
+                  </div>
+                  <button onClick={async () => { const al = await getAlertas(); setAlertasRecibidas(al) }}
+                    style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '5px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    Actualizar
+                  </button>
+                </div>
+                {alertasRecibidas.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: C.subtle, fontSize: 14 }}>Sin alertas por el momento</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {pendientes.map(a => (
+                      <div key={a.id} style={{ background: urgBg[a.urgencia] || '#f8fafc', border: `1.5px solid ${urgColor[a.urgencia] || C.border}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: urgColor[a.urgencia] || C.muted, marginTop: 5, flexShrink: 0 }} />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
+                            <span style={{ fontSize: 12, fontWeight: 800, color: urgColor[a.urgencia] || C.text, textTransform: 'uppercase' }}>{a.urgencia}</span>
+                            <span style={{ fontSize: 12, color: C.muted }}>·</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{a.gestora}</span>
+                            <span style={{ fontSize: 12, color: C.muted }}>·</span>
+                            <span style={{ fontSize: 12, color: C.subtle, background: '#e2e8f0', padding: '1px 7px', borderRadius: 6 }}>{a.territorio}</span>
+                            <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>{new Date(a.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <div style={{ fontSize: 14, color: C.text, lineHeight: 1.5 }}>{a.mensaje}</div>
+                        </div>
+                        <button onClick={async () => { await markAlertaLeida(a.id); const al = await getAlertas(); setAlertasRecibidas(al) }}
+                          style={{ background: 'white', border: `1px solid ${urgColor[a.urgencia] || C.border}`, color: urgColor[a.urgencia] || C.muted, borderRadius: 7, padding: '4px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                          ✓ Leída
+                        </button>
+                      </div>
+                    ))}
+                    {leidas.length > 0 && (
+                      <details style={{ marginTop: 4 }}>
+                        <summary style={{ fontSize: 13, color: C.subtle, cursor: 'pointer', padding: '4px 0' }}>{leidas.length} alertas leídas</summary>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                          {leidas.map(a => (
+                            <div key={a.id} style={{ background: '#f8fafc', border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 14px', opacity: 0.7 }}>
+                              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 3 }}>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase' }}>{a.urgencia}</span>
+                                <span style={{ fontSize: 12, color: C.muted }}>·</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{a.gestora}</span>
+                                <span style={{ fontSize: 12, color: C.subtle, background: '#e2e8f0', padding: '1px 7px', borderRadius: 6 }}>{a.territorio}</span>
+                                <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>{new Date(a.created_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                              <div style={{ fontSize: 13, color: C.muted }}>{a.mensaje}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Reportes semanales */}
+              <div style={{ background: C.card, borderRadius: 14, padding: '20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Reportes Semanales</div>
+                {reportes.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: C.subtle, fontSize: 14 }}>Sin reportes registrados</div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: '#f8fafc' }}>
+                          {['Semana', 'Gestora', 'Territorio', 'Actores', 'Reuniones', 'Incidentes', 'PQRS', 'Novedades'].map(h => (
+                            <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontWeight: 700, color: C.muted, borderBottom: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {reportes.slice(0, 30).map((r, i) => (
+                          <tr key={r.id} style={{ background: i % 2 === 0 ? 'white' : '#fafbfc', borderBottom: `1px solid ${C.border}` }}>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: C.text, whiteSpace: 'nowrap' }}>{r.semana}</td>
+                            <td style={{ padding: '8px 10px', color: C.text }}>{r.gestora_nombre || r.gestora || '—'}</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <span style={{ background: r.territorio === 'Tolú' ? '#e0f2fe' : r.territorio === 'Barbosa' ? '#d1fae5' : '#f1f5f9', color: r.territorio === 'Tolú' ? '#0369a1' : r.territorio === 'Barbosa' ? '#065f46' : C.muted, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>{r.territorio}</span>
+                            </td>
+                            <td style={{ padding: '8px 10px', color: C.text, textAlign: 'center' }}>{r.actores_gestionados ?? '—'}</td>
+                            <td style={{ padding: '8px 10px', color: C.text, textAlign: 'center' }}>{r.reuniones ?? '—'}</td>
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}><span style={{ color: (r.incidentes || 0) > 0 ? '#ef4444' : C.subtle, fontWeight: (r.incidentes || 0) > 0 ? 700 : 400 }}>{r.incidentes ?? 0}</span></td>
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}><span style={{ color: (r.pqrs_pendientes || 0) > 0 ? '#f97316' : C.subtle, fontWeight: (r.pqrs_pendientes || 0) > 0 ? 700 : 400 }}>{r.pqrs_pendientes ?? 0}</span></td>
+                            <td style={{ padding: '8px 10px', color: C.muted, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.novedades || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Registros diarios */}
+              <div style={{ background: C.card, borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Registros de Campo Recientes</div>
+                {registrosDiarios.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: C.subtle, fontSize: 14 }}>Sin registros aún</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {registrosDiarios.slice(0, 20).map(r => (
+                      <div key={r.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                        <div style={{ flexShrink: 0, width: 44, textAlign: 'center' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle }}>{new Date(r.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
+                          <div style={{ background: r.territorio === 'Tolú' ? '#e0f2fe' : r.territorio === 'Barbosa' ? '#d1fae5' : '#f1f5f9', color: r.territorio === 'Tolú' ? '#0369a1' : r.territorio === 'Barbosa' ? '#065f46' : C.muted, borderRadius: 6, padding: '2px 4px', fontSize: 10, fontWeight: 700, marginTop: 3 }}>{r.territorio}</div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          {r.actividad && <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 2 }}>{r.actividad}</div>}
+                          {r.descripcion && <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}>{r.descripcion.substring(0, 200)}{r.descripcion.length > 200 ? '…' : ''}</div>}
+                          {r.gestora_nombre && <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>— {r.gestora_nombre}</div>}
+                        </div>
+                        {r.tiene_incidente && <div style={{ background: '#fee2e2', color: '#ef4444', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>Incidente</div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
 
         {view === 'gestora' && (
           <div>
@@ -2352,10 +2507,10 @@ export default function App() {
             })()}
 
             {/* ── Galería de evidencias recientes ── */}
-            {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).length > 0 && (
+            {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
               <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
                 <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>Evidencias recientes</h3>
-                {evidencias.filter(e => myTerritorio ? e.territorio === myTerritorio : true).slice(0, 10).map(ev => (
+                {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 10).map(ev => (
                   <div key={ev.id} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start' }}>
                     <img src={ev.foto_url} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>

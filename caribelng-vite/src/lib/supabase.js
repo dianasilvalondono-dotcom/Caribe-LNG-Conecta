@@ -537,3 +537,14 @@ export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
   if (error) throw error
   return data
 }
+
+export async function getAlertas() {
+  const { data, error } = await supabase.from('alertas').select('*').order('created_at', { ascending: false })
+  if (error) return []
+  return data || []
+}
+
+export async function markAlertaLeida(id) {
+  const { error } = await supabase.from('alertas').update({ leida: true }).eq('id', id)
+  if (error) throw error
+}
