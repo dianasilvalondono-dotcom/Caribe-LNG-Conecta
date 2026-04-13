@@ -535,6 +535,10 @@ export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
     gestora, territorio, mensaje, urgencia, leida: false
   }).select().single()
   if (error) throw error
+  // Enviar email en background — no bloquea si falla
+  supabase.functions.invoke('send-alert-email', {
+    body: { gestora, territorio, mensaje, urgencia }
+  }).catch(() => {})
   return data
 }
 
