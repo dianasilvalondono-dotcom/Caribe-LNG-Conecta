@@ -423,6 +423,15 @@ export default function App() {
 
   useEffect(() => { loadCoreData() }, [loadCoreData])
   useEffect(() => { loadViewData(view) }, [view, loadViewData])
+  useEffect(() => {
+    if (view === 'dac' && isAdmin) {
+      Promise.all([getAlertas(), getReportesSemanales(), getRegistrosDiarios()]).then(([al, rs, rd]) => {
+        setAlertasRecibidas(al || [])
+        setReportes(rs || [])
+        setRegistrosDiarios(rd || [])
+      })
+    }
+  }, [view, isAdmin])
 
   useEffect(() => {
     if (!session) return
