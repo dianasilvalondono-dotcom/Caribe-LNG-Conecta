@@ -531,9 +531,9 @@ export async function sendPushNotification({ title, body, user_ids, url }) {
 // ── Alertas ───────────────────────────────────────────────────────────────────
 
 export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
-  const { data, error } = await supabase.functions.invoke('super-action', {
-    body: { gestora, territorio, mensaje, urgencia }
-  })
+  const { data, error } = await supabase.from('alertas').insert({
+    gestora, territorio, mensaje, urgencia, leida: false
+  }).select().single()
   if (error) throw error
   return data
 }
