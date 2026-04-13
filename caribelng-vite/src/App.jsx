@@ -1959,16 +1959,20 @@ export default function App() {
                               rows={3} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '8px 10px', fontSize: 13, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', outline: 'none', marginBottom: 8 }} />
                             <div style={{ display: 'flex', gap: 8 }}>
                               <button onClick={async () => {
-                                await resolverAlerta(a.id, 'solucionado', alertaResolucionTexto)
-                                setAlertaResolviendo(null); setAlertaResolucionTexto('')
-                                setAlertasRecibidas(await getAlertas())
+                                try {
+                                  await resolverAlerta(a.id, 'solucionado', alertaResolucionTexto)
+                                  setAlertaResolviendo(null); setAlertaResolucionTexto('')
+                                  setAlertasRecibidas(await getAlertas())
+                                } catch(e) { alert('Error: ' + e.message) }
                               }} style={{ flex: 1, background: '#22c55e', color: 'white', border: 'none', borderRadius: 7, padding: '8px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                                 ✓ Solucionado
                               </button>
                               <button onClick={async () => {
-                                await resolverAlerta(a.id, 'no_solucionado', alertaResolucionTexto)
-                                setAlertaResolviendo(null); setAlertaResolucionTexto('')
-                                setAlertasRecibidas(await getAlertas())
+                                try {
+                                  await resolverAlerta(a.id, 'no_solucionado', alertaResolucionTexto)
+                                  setAlertaResolviendo(null); setAlertaResolucionTexto('')
+                                  setAlertasRecibidas(await getAlertas())
+                                } catch(e) { alert('Error: ' + e.message) }
                               }} style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none', borderRadius: 7, padding: '8px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                                 ✗ No solucionado
                               </button>
