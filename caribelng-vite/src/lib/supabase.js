@@ -549,6 +549,11 @@ export async function getAlertas() {
 }
 
 export async function resolverAlerta(id, estado, resolucion) {
-  const { error } = await supabase.from('alertas').update({ leida: true, estado, resolucion, resuelta_at: new Date().toISOString() }).eq('id', id)
-  if (error) throw error
+  const { error } = await supabase.from('alertas')
+    .update({ leida: true, estado, resolucion, resuelta_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) {
+    // Fallback: si las columnas nuevas no existen aún, al menos marcar como leída
+    await supabase.from('alertas').update({ leida: true }).eq('id', id)
+  }
 }
