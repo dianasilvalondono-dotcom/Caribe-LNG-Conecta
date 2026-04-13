@@ -400,7 +400,7 @@ export default function App() {
         if (!cronograma.length) setCronograma(await getCronograma() || [])
       }
       if (v === 'knowledge' && !knowledgeBase.length) setKnowledgeBase(await getKnowledgeBase() || [])
-      if (v === 'dac' && isAdmin) {
+      if (v === 'dac') {
         const [al, rs, rd] = await Promise.all([getAlertas(), getReportesSemanales(), getRegistrosDiarios()])
         setAlertasRecibidas(al || [])
         setReportes(rs || [])
@@ -425,15 +425,6 @@ export default function App() {
 
   useEffect(() => { loadCoreData() }, [loadCoreData])
   useEffect(() => { loadViewData(view) }, [view, loadViewData])
-  useEffect(() => {
-    if (view === 'dac' && isAdmin) {
-      Promise.all([getAlertas(), getReportesSemanales(), getRegistrosDiarios()]).then(([al, rs, rd]) => {
-        setAlertasRecibidas(al || [])
-        setReportes(rs || [])
-        setRegistrosDiarios(rd || [])
-      })
-    }
-  }, [view, isAdmin])
 
   useEffect(() => {
     if (!session) return
