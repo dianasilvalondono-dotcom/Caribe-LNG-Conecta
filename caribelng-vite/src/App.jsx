@@ -329,6 +329,7 @@ export default function App() {
   const [knowledgeBase, setKnowledgeBase] = useState([])
   const [evidencias, setEvidencias] = useState([])
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
+  const [selectedEvidencia, setSelectedEvidencia] = useState(null)
   const [alertaMensaje, setAlertaMensaje] = useState('')
   const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
   const [alertaEnviada, setAlertaEnviada] = useState(false)
@@ -1806,15 +1807,13 @@ export default function App() {
                         <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Evidencias recientes</div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
                           {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 20).map(ev => (
-                            <div key={ev.id} style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                            <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
+                              style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
                               <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
                               <div style={{ padding: '10px 12px' }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
                                 <div style={{ fontSize: 12, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
                                 {ev.lugar && <div style={{ fontSize: 12, color: C.accent }}>· {ev.lugar}</div>}
-                                <div style={{ fontSize: 12, color: C.subtle }}>GPS {ev.latitud?.toFixed(5)}, {ev.longitud?.toFixed(5)}</div>
-                                {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
-                                  style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
                               </div>
                             </div>
                           ))}
@@ -2555,22 +2554,15 @@ export default function App() {
               <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
                 <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>Evidencias recientes</h3>
                 {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 10).map(ev => (
-                  <div key={ev.id} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start' }}>
+                  <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
+                    style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start', cursor: 'pointer' }}>
                     <img src={ev.foto_url} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 2 }}>{ev.descripcion}</div>
                       <div style={{ fontSize: 12, color: C.subtle }}>
                         — {new Date(ev.capturada_at).toLocaleString('es-CO')}
                       </div>
-                      {ev.lugar && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>
-                        · {ev.lugar}
-                      </div>}
-                      {isAdmin && <button onClick={async () => { if (!confirm('¿Eliminar esta evidencia?')) return; await deleteEvidencia(ev.id); await loadData() }}
-                        style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 4, padding: '2px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 4 }}>Eliminar</button>}
-                      <div style={{ fontSize: 12, color: C.subtle }}>
-                        GPS {ev.latitud.toFixed(5)}, {ev.longitud.toFixed(5)}
-                        {ev.precision_m && <span> · ±{Math.round(ev.precision_m)}m</span>}
-                      </div>
+                      {ev.lugar && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>· {ev.lugar}</div>}
                     </div>
                   </div>
                 ))}
@@ -2598,6 +2590,71 @@ export default function App() {
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
         </div>
       </div>
+
+      {/* ── Evidencia Detail Modal ── */}
+      {selectedEvidencia && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedEvidencia(null) }}>
+          <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 480,
+            maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Evidencia</div>
+              <button onClick={() => setSelectedEvidencia(null)}
+                style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+            </div>
+            {/* Imagen */}
+            <a href={selectedEvidencia.foto_url} target="_blank" rel="noopener noreferrer">
+              <img src={selectedEvidencia.foto_url} alt=""
+                style={{ width: '100%', maxHeight: 300, objectFit: 'cover', display: 'block' }} />
+            </a>
+            {/* Detalle */}
+            <div style={{ padding: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 16, lineHeight: 1.5 }}>
+                {selectedEvidencia.descripcion}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Fecha</span>
+                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
+                    {new Date(selectedEvidencia.capturada_at).toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'short' })}
+                  </span>
+                </div>
+                {selectedEvidencia.lugar && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Lugar</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedEvidencia.lugar}</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Territorio</span>
+                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedEvidencia.territorio}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>GPS</span>
+                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
+                    {selectedEvidencia.latitud?.toFixed(6)}, {selectedEvidencia.longitud?.toFixed(6)}
+                    {selectedEvidencia.precision_m && <span style={{ color: C.subtle }}> · ±{Math.round(selectedEvidencia.precision_m)}m</span>}
+                  </span>
+                </div>
+              </div>
+              {isAdmin && (
+                <button onClick={async () => {
+                  if (!confirm('¿Eliminar esta evidencia?')) return
+                  await deleteEvidencia(selectedEvidencia.id)
+                  await loadData()
+                  setSelectedEvidencia(null)
+                }} style={{ marginTop: 20, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 8,
+                  padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
+                  Eliminar evidencia
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Audit Log Modal ── */}
       {showAudit && (
