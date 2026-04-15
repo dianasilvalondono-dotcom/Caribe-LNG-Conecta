@@ -959,7 +959,8 @@ export default function App() {
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
                   </div>
-                  {/* Teléfono */}
+                  {/* Teléfono — solo admin */}
+                  {isAdmin && (
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Teléfono</label>
                     <input value={newActor.telefono} onChange={e => setNewActor({ ...newActor, telefono: e.target.value })}
@@ -967,7 +968,9 @@ export default function App() {
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
                   </div>
-                  {/* Correo */}
+                  )}
+                  {/* Correo — solo admin */}
+                  {isAdmin && (
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Correo electrónico</label>
                     <input value={newActor.correo} onChange={e => setNewActor({ ...newActor, correo: e.target.value })}
@@ -975,6 +978,7 @@ export default function App() {
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
                   </div>
+                  )}
                   {/* Qué hacemos */}
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Estrategia / Qué hacemos</label>
