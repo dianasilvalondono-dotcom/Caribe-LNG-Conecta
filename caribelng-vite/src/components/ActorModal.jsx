@@ -114,7 +114,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={{ background: 'white', borderRadius: 20, width: '100%', maxWidth: 580,
-        maxHeight: '90vh', overflowY: 'auto', overflow: 'hidden' }}>
+        maxHeight: '90vh', overflowY: 'auto' }}>
 
         {/* Header con gradiente */}
         <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, #1a3d7a 60%, #1565C0 100%)`, padding: '20px 24px 16px', position: 'relative' }}>
