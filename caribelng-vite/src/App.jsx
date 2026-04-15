@@ -1804,7 +1804,17 @@ export default function App() {
                     {/* Gallery */}
                     {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
                       <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Evidencias recientes</div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidencias recientes</div>
+                          {isAdmin && (
+                            <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgDgdg9A2N02R7E_pwEiOOC6AcGvXQw6p7KVALqIFdDhUPo?e=BCkAgB"
+                              target="_blank" rel="noopener noreferrer"
+                              style={{ fontSize: 12, fontWeight: 700, color: C.navy, background: '#EEF2FF', border: `1px solid ${C.navy}`,
+                                borderRadius: 6, padding: '4px 10px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                              Ver en OneDrive →
+                            </a>
+                          )}
+                        </div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
                           {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 20).map(ev => (
                             <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
@@ -2640,13 +2650,19 @@ export default function App() {
                   </span>
                 </div>
               </div>
+              <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgDgdg9A2N02R7E_pwEiOOC6AcGvXQw6p7KVALqIFdDhUPo?e=BCkAgB"
+                target="_blank" rel="noopener noreferrer"
+                style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                  borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                Ver carpeta en OneDrive →
+              </a>
               {isAdmin && (
                 <button onClick={async () => {
                   if (!confirm('¿Eliminar esta evidencia?')) return
                   await deleteEvidencia(selectedEvidencia.id)
                   await loadData()
                   setSelectedEvidencia(null)
-                }} style={{ marginTop: 20, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 8,
+                }} style={{ marginTop: 8, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 8,
                   padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
                   Eliminar evidencia
                 </button>
