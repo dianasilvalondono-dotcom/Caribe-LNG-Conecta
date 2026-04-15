@@ -2447,6 +2447,7 @@ export default function App() {
                       lugar: lugar || null
                     })
                     await loadData()
+                    setFile(null); setPreview(null); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null)
                     setShowEvidenciaCapture(false)
                   } catch (err) {
                     alert('Error subiendo evidencia: ' + err.message)
