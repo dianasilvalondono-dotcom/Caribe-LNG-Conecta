@@ -1910,35 +1910,101 @@ export default function App() {
         )}
 
         {view === 'dac' && isAdmin && (() => {
+          const CT = '#0ea5e9', CB = '#8b5cf6'
           const urgColor = { Alta: '#ef4444', Media: '#f97316', Baja: '#eab308' }
           const urgBg   = { Alta: '#fee2e2', Media: '#fff7ed', Baja: '#fefce8' }
           const pendientes = alertasRecibidas.filter(a => !a.leida)
           const leidas     = alertasRecibidas.filter(a => a.leida)
-          return (
-            <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 16px' }}>
-              {/* Header */}
-              <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, ${C.blue} 100%)`, borderRadius: 16, padding: '24px 28px', marginBottom: 24, color: 'white' }}>
-                <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5 }}>Mesa de Dirección</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>Alertas, reportes y registros de campo · Dirección de Asuntos Corporativos</div>
-                <div style={{ display: 'flex', gap: 20, marginTop: 16 }}>
+          const rdT = registrosDiarios.filter(r => r.territorio === 'Tolú')
+          const rdB = registrosDiarios.filter(r => r.territorio === 'Barbosa')
+          const evT = evidencias.filter(e => e.territorio === 'Tolú')
+          const evB = evidencias.filter(e => e.territorio === 'Barbosa')
+          const repT = reportes.filter(r => r.territorio === 'Tolú')
+          const repB = reportes.filter(r => r.territorio === 'Barbosa')
+          const TerritoryCard = ({ nombre, color, rd, ev, rep }) => (
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ background: color, borderRadius: '12px 12px 0 0', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ color: 'white', fontWeight: 900, fontSize: 16, letterSpacing: -0.3 }}>{nombre}</div>
+                <div style={{ display: 'flex', gap: 10 }}>
                   {[
-                    { label: 'Alertas pendientes', val: pendientes.length, color: pendientes.length > 0 ? '#fca5a5' : '#86efac' },
-                    { label: 'Reportes semana', val: reportes.length },
-                    { label: 'Registros campo', val: registrosDiarios.length },
+                    { v: rd.length, l: 'registros' },
+                    { v: ev.length, l: 'evidencias' },
+                    { v: rep.length, l: 'reportes' },
                   ].map(s => (
-                    <div key={s.label} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 16px', minWidth: 100 }}>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: s.color || 'white' }}>{s.val}</div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>{s.label}</div>
+                    <div key={s.l} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 18, fontWeight: 900, color: 'white', lineHeight: 1 }}>{s.v}</div>
+                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)' }}>{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ border: `1.5px solid ${color}22`, borderTop: 'none', borderRadius: '0 0 12px 12px', background: 'white', padding: 14 }}>
+                {/* Evidencias grid */}
+                {ev.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Evidencias recientes</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                      {ev.slice(0, 6).map(e => (
+                        <div key={e.id} style={{ borderRadius: 8, overflow: 'hidden', aspectRatio: '1', position: 'relative', cursor: 'pointer' }}
+                          onClick={() => window.open(e.foto_url, '_blank')}>
+                          <img src={e.foto_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          {e.lugar && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.6))', padding: '12px 4px 4px', fontSize: 9, color: 'white', lineHeight: 1.2 }}>{e.lugar.split(',')[0]}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Registros recientes */}
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: color, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Registros recientes</div>
+                  {rd.length === 0 ? (
+                    <div style={{ fontSize: 13, color: C.subtle, textAlign: 'center', padding: '12px 0' }}>Sin registros</div>
+                  ) : rd.slice(0, 4).map(r => (
+                    <div key={r.id} style={{ display: 'flex', gap: 10, paddingBottom: 8, marginBottom: 8, borderBottom: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, minWidth: 36, flexShrink: 0, paddingTop: 2 }}>
+                        {new Date(r.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        {r.actividad && <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.actividad}</div>}
+                        {r.descripcion && <div style={{ fontSize: 12, color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.descripcion}</div>}
+                        {r.gestora_nombre && <div style={{ fontSize: 11, color: C.subtle }}>— {r.gestora_nombre}</div>}
+                      </div>
+                      {r.tiene_incidente && <div style={{ fontSize: 10, background: '#fee2e2', color: '#ef4444', borderRadius: 4, padding: '2px 5px', fontWeight: 700, flexShrink: 0 }}>!</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )
+          return (
+            <div style={{ maxWidth: 1140, margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 16px' }}>
+              {/* Header */}
+              <div style={{ background: `linear-gradient(135deg, #0a2d5e 0%, ${C.navy} 40%, ${C.blue} 100%)`, borderRadius: 16, padding: '24px 28px', marginBottom: 20, color: 'white', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', right: -20, top: -20, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                <div style={{ position: 'absolute', right: 40, bottom: -40, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Dirección de Asuntos Corporativos</div>
+                <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5, marginBottom: 18 }}>Mesa de Dirección</div>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  {[
+                    { label: 'Alertas pendientes', val: pendientes.length, color: pendientes.length > 0 ? '#fca5a5' : '#86efac', bg: pendientes.length > 0 ? 'rgba(239,68,68,0.2)' : 'rgba(34,197,94,0.15)' },
+                    { label: 'Registros campo', val: registrosDiarios.length, color: 'white', bg: 'rgba(255,255,255,0.1)' },
+                    { label: 'Evidencias', val: evidencias.length, color: 'white', bg: 'rgba(255,255,255,0.1)' },
+                    { label: 'Reportes', val: reportes.length, color: 'white', bg: 'rgba(255,255,255,0.1)' },
+                  ].map(s => (
+                    <div key={s.label} style={{ background: s.bg, borderRadius: 10, padding: '10px 18px', minWidth: 90 }}>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.val}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Alertas */}
-              <div style={{ background: C.card, borderRadius: 14, padding: '20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: pendientes.length > 0 ? '#fff5f5' : C.card, border: pendientes.length > 0 ? '1.5px solid #fecaca' : `1px solid ${C.border}`, borderRadius: 14, padding: '20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    Alertas de gestoras {pendientes.length > 0 && <span style={{ background: '#ef4444', color: 'white', borderRadius: 10, padding: '1px 7px', fontSize: 12, marginLeft: 6 }}>{pendientes.length}</span>}
+                  <div style={{ fontSize: 15, fontWeight: 800, color: pendientes.length > 0 ? '#ef4444' : C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {pendientes.length > 0 ? '⚠️' : '✅'} Alertas de gestoras
+                    {pendientes.length > 0 && <span style={{ background: '#ef4444', color: 'white', borderRadius: 10, padding: '1px 8px', fontSize: 12 }}>{pendientes.length}</span>}
                   </div>
                   <button onClick={async () => { const al = await getAlertas(); setAlertasRecibidas(al) }}
                     style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '5px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
@@ -2033,67 +2099,52 @@ export default function App() {
                 )}
               </div>
 
-              {/* Reportes semanales */}
-              <div style={{ background: C.card, borderRadius: 14, padding: '20px', marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Reportes Semanales</div>
-                {reportes.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '24px 0', color: C.subtle, fontSize: 14 }}>Sin reportes registrados</div>
-                ) : (
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                      <thead>
-                        <tr style={{ background: '#f8fafc' }}>
-                          {['Semana', 'Gestora', 'Territorio', 'Actores', 'Reuniones', 'Incidentes', 'PQRS', 'Novedades'].map(h => (
-                            <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontWeight: 700, color: C.muted, borderBottom: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {reportes.slice(0, 30).map((r, i) => (
-                          <tr key={r.id} style={{ background: i % 2 === 0 ? 'white' : '#fafbfc', borderBottom: `1px solid ${C.border}` }}>
-                            <td style={{ padding: '8px 10px', fontWeight: 600, color: C.text, whiteSpace: 'nowrap' }}>{r.semana}</td>
-                            <td style={{ padding: '8px 10px', color: C.text }}>{r.gestora_nombre || r.gestora || '—'}</td>
-                            <td style={{ padding: '8px 10px' }}>
-                              <span style={{ background: r.territorio === 'Tolú' ? '#e0f2fe' : r.territorio === 'Barbosa' ? '#d1fae5' : '#f1f5f9', color: r.territorio === 'Tolú' ? '#0369a1' : r.territorio === 'Barbosa' ? '#065f46' : C.muted, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>{r.territorio}</span>
-                            </td>
-                            <td style={{ padding: '8px 10px', color: C.text, textAlign: 'center' }}>{r.actores_gestionados ?? '—'}</td>
-                            <td style={{ padding: '8px 10px', color: C.text, textAlign: 'center' }}>{r.reuniones ?? '—'}</td>
-                            <td style={{ padding: '8px 10px', textAlign: 'center' }}><span style={{ color: (r.incidentes || 0) > 0 ? '#ef4444' : C.subtle, fontWeight: (r.incidentes || 0) > 0 ? 700 : 400 }}>{r.incidentes ?? 0}</span></td>
-                            <td style={{ padding: '8px 10px', textAlign: 'center' }}><span style={{ color: (r.pqrs_pendientes || 0) > 0 ? '#f97316' : C.subtle, fontWeight: (r.pqrs_pendientes || 0) > 0 ? 700 : 400 }}>{r.pqrs_pendientes ?? 0}</span></td>
-                            <td style={{ padding: '8px 10px', color: C.muted, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.novedades || '—'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+              {/* Territorios: dos columnas */}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                <TerritoryCard nombre="Tolú" color={CT} rd={rdT} ev={evT} rep={repT} />
+                <TerritoryCard nombre="Barbosa" color={CB} rd={rdB} ev={evB} rep={repB} />
               </div>
 
-              {/* Registros diarios */}
-              <div style={{ background: C.card, borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Registros de Campo Recientes</div>
-                {registrosDiarios.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '24px 0', color: C.subtle, fontSize: 14 }}>Sin registros aún</div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {registrosDiarios.slice(0, 20).map(r => (
-                      <div key={r.id} onClick={() => setSelectedRegistro(r)}
-                        style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer' }}>
-                        <div style={{ flexShrink: 0, width: 44, textAlign: 'center' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle }}>{new Date(r.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
-                          <div style={{ background: r.territorio === 'Tolú' ? '#e0f2fe' : r.territorio === 'Barbosa' ? '#d1fae5' : '#f1f5f9', color: r.territorio === 'Tolú' ? '#0369a1' : r.territorio === 'Barbosa' ? '#065f46' : C.muted, borderRadius: 6, padding: '2px 4px', fontSize: 10, fontWeight: 700, marginTop: 3 }}>{r.territorio}</div>
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          {r.actividad && <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 2 }}>{r.actividad}</div>}
-                          {r.descripcion && <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}>{r.descripcion.substring(0, 200)}{r.descripcion.length > 200 ? '…' : ''}</div>}
-                          {r.gestora_nombre && <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>— {r.gestora_nombre}</div>}
-                        </div>
-                        {r.tiene_incidente && <div style={{ background: '#fee2e2', color: '#ef4444', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>Incidente</div>}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* Reportes semanales — colapsable */}
+              <details style={{ background: C.card, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, overflow: 'hidden' }}>
+                <summary style={{ padding: '16px 20px', fontSize: 14, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, listStyle: 'none' }}>
+                  <span style={{ flex: 1 }}>Reportes Semanales</span>
+                  <span style={{ background: C.navy, color: 'white', borderRadius: 8, padding: '1px 9px', fontSize: 12 }}>{reportes.length}</span>
+                </summary>
+                <div style={{ padding: '0 20px 20px' }}>
+                  {reportes.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: C.subtle, fontSize: 14 }}>Sin reportes registrados</div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                        <thead>
+                          <tr style={{ background: '#f8fafc' }}>
+                            {['Semana', 'Gestora', 'Territorio', 'Actores', 'Reuniones', 'Incidentes', 'PQRS', 'Novedades'].map(h => (
+                              <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontWeight: 700, color: C.muted, borderBottom: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reportes.slice(0, 30).map((r, i) => (
+                            <tr key={r.id} style={{ background: i % 2 === 0 ? 'white' : '#fafbfc', borderBottom: `1px solid ${C.border}` }}>
+                              <td style={{ padding: '8px 10px', fontWeight: 600, color: C.text, whiteSpace: 'nowrap' }}>{r.semana}</td>
+                              <td style={{ padding: '8px 10px', color: C.text }}>{r.gestora_nombre || r.gestora || '—'}</td>
+                              <td style={{ padding: '8px 10px' }}>
+                                <span style={{ background: r.territorio === 'Tolú' ? `${CT}22` : `${CB}22`, color: r.territorio === 'Tolú' ? CT : CB, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>{r.territorio}</span>
+                              </td>
+                              <td style={{ padding: '8px 10px', color: C.text, textAlign: 'center' }}>{r.actores_gestionados ?? '—'}</td>
+                              <td style={{ padding: '8px 10px', color: C.text, textAlign: 'center' }}>{r.reuniones ?? '—'}</td>
+                              <td style={{ padding: '8px 10px', textAlign: 'center' }}><span style={{ color: (r.incidentes || 0) > 0 ? '#ef4444' : C.subtle, fontWeight: (r.incidentes || 0) > 0 ? 700 : 400 }}>{r.incidentes ?? 0}</span></td>
+                              <td style={{ padding: '8px 10px', textAlign: 'center' }}><span style={{ color: (r.pqrs_pendientes || 0) > 0 ? '#f97316' : C.subtle, fontWeight: (r.pqrs_pendientes || 0) > 0 ? 700 : 400 }}>{r.pqrs_pendientes ?? 0}</span></td>
+                              <td style={{ padding: '8px 10px', color: C.muted, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.novedades || '—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </details>
             </div>
           )
         })()}
