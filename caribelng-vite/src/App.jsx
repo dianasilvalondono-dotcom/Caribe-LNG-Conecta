@@ -403,10 +403,11 @@ export default function App() {
       }
       if (v === 'knowledge' && !knowledgeBase.length) setKnowledgeBase(await getKnowledgeBase() || [])
       if (v === 'dac') {
-        const [al, rs, rd] = await Promise.all([getAlertas(), getReportesSemanales(), getRegistrosDiarios()])
+        const [al, rs, rd, ev] = await Promise.all([getAlertas(), getReportesSemanales(), getRegistrosDiarios(), getEvidencias()])
         setAlertasRecibidas(al || [])
         setReportes(rs || [])
         setRegistrosDiarios(rd || [])
+        setEvidencias(ev || [])
       }
       if (v === 'input') {
         const [ev, rd] = await Promise.all([getEvidencias(), getRegistrosDiarios()])
