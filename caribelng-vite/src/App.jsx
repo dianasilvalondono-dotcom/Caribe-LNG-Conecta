@@ -1910,7 +1910,7 @@ export default function App() {
         )}
 
         {view === 'dac' && isAdmin && (() => {
-          const CT = '#0ea5e9', CB = '#8b5cf6'
+          const CT = '#0ea5e9', CB = '#00BFB3'
           const urgColor = { Alta: '#ef4444', Media: '#f97316', Baja: '#eab308' }
           const urgBg   = { Alta: '#fee2e2', Media: '#fff7ed', Baja: '#fefce8' }
           const pendientes = alertasRecibidas.filter(a => !a.leida)

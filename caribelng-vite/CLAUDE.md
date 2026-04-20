@@ -78,7 +78,7 @@ const C = {
 ## Reglas para Claude
 
 - Cada vez que hagamos un cambio en App.jsx que requiera columnas nuevas en Supabase, incluir al final de la respuesta el `ALTER TABLE` necesario para aplicar ese cambio.
-- Cuando se creen layouts con datos por territorio, siempre usar dos columnas lado a lado: Tolú a la izquierda con color `#0ea5e9`, Barbosa a la derecha con color `#8b5cf6`.
+- Cuando se creen layouts con datos por territorio, siempre usar dos columnas lado a lado: Tolú a la izquierda con color `#0ea5e9`, Barbosa a la derecha con color `#00BFB3`.
 - Al modificar App.jsx, nunca eliminar funcionalidad existente — solo agregar o ajustar. Si un cambio es estructural, avisar antes de implementarlo y esperar confirmación.
 - Los banners de resumen numérico siempre deben ser clickeables y filtrar el contenido de la página al hacer clic.
 - Cualquier campo personal de un actor (cumpleaños, familia, intereses, etc.) va exclusivamente en el tab 🌟 Datos Personales del modal de actor, nunca en otros tabs.
