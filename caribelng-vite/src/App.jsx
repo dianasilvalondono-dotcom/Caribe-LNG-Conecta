@@ -330,6 +330,7 @@ export default function App() {
   const [evidencias, setEvidencias] = useState([])
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
   const [selectedEvidencia, setSelectedEvidencia] = useState(null)
+  const [selectedRegistro, setSelectedRegistro] = useState(null)
   const [alertaMensaje, setAlertaMensaje] = useState('')
   const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
   const [alertaEnviada, setAlertaEnviada] = useState(false)
@@ -1685,9 +1686,10 @@ export default function App() {
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registros recientes</div>
                         {registrosDiarios.slice(0, 15).map(r => (
-                          <div key={r.id} style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
+                          <div key={r.id} onClick={() => setSelectedRegistro(r)}
+                            style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
                             boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 12, alignItems: 'flex-start',
-                            borderLeft: `3px solid ${r.territorio === 'Tolú' ? C.tolu : C.barbosa}` }}>
+                            borderLeft: `3px solid ${r.territorio === 'Tolú' ? C.tolu : C.barbosa}`, cursor: 'pointer' }}>
                             {r.foto_url && <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' }}>
@@ -2074,7 +2076,8 @@ export default function App() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {registrosDiarios.slice(0, 20).map(r => (
-                      <div key={r.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                      <div key={r.id} onClick={() => setSelectedRegistro(r)}
+                        style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer' }}>
                         <div style={{ flexShrink: 0, width: 44, textAlign: 'center' }}>
                           <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle }}>{new Date(r.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
                           <div style={{ background: r.territorio === 'Tolú' ? '#e0f2fe' : r.territorio === 'Barbosa' ? '#d1fae5' : '#f1f5f9', color: r.territorio === 'Tolú' ? '#0369a1' : r.territorio === 'Barbosa' ? '#065f46' : C.muted, borderRadius: 6, padding: '2px 4px', fontSize: 10, fontWeight: 700, marginTop: 3 }}>{r.territorio}</div>
@@ -2600,6 +2603,87 @@ export default function App() {
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
         </div>
       </div>
+
+      {/* ── Registro de Campo Detail Modal ── */}
+      {selectedRegistro && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedRegistro(null) }}>
+          <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 500,
+            maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}>
+            {/* Header */}
+            <div style={{ background: selectedRegistro.territorio === 'Tolú'
+              ? 'linear-gradient(135deg, #004d5a, #007A87)' : 'linear-gradient(135deg, #064e3b, #059669)',
+              padding: '16px 20px', borderRadius: '16px 16px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Registro de Campo
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: 'white', marginTop: 2 }}>
+                  {selectedRegistro.territorio}
+                </div>
+              </div>
+              <button onClick={() => setSelectedRegistro(null)}
+                style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 8, width: 32, height: 32,
+                  fontSize: 18, cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+            {/* Foto si existe */}
+            {selectedRegistro.foto_url && (
+              <a href={selectedRegistro.foto_url} target="_blank" rel="noopener noreferrer">
+                <img src={selectedRegistro.foto_url} alt=""
+                  style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }} />
+              </a>
+            )}
+            {/* Detalle */}
+            <div style={{ padding: 20 }}>
+              {selectedRegistro.actividad && (
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 12 }}>{selectedRegistro.actividad}</div>
+              )}
+              {selectedRegistro.descripcion && (
+                <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, marginBottom: 16,
+                  background: '#f8fafc', borderRadius: 8, padding: 12 }}>{selectedRegistro.descripcion}</div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {selectedRegistro.tipo_reunion && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Tipo</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedRegistro.tipo_reunion}</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Fecha</span>
+                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
+                    {new Date(selectedRegistro.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                  </span>
+                </div>
+                {selectedRegistro.asistentes > 0 && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Asistentes</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedRegistro.asistentes}</span>
+                  </div>
+                )}
+                {(selectedRegistro.lugar || selectedRegistro.geo_lugar) && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Lugar</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedRegistro.lugar || selectedRegistro.geo_lugar}</span>
+                  </div>
+                )}
+                {selectedRegistro.gestora_nombre && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Gestora</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedRegistro.gestora_nombre}</span>
+                  </div>
+                )}
+                {selectedRegistro.tiene_incidente && (
+                  <div style={{ background: '#fee2e2', color: C.red, borderRadius: 8, padding: '8px 12px', fontSize: 13, fontWeight: 700, marginTop: 4 }}>
+                    ⚠️ Este registro incluye un incidente
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Evidencia Detail Modal ── */}
       {selectedEvidencia && (
