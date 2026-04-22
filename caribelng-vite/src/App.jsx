@@ -37,6 +37,7 @@ import RiesgosView from './components/RiesgosView'
 import KPIsView from './components/KPIsView'
 import KnowledgeBaseView from './components/KnowledgeBaseView'
 import ChatBot from './components/ChatBot'
+import OnboardingTour from './components/OnboardingTour'
 import Dashboard from './components/Dashboard'
 
 // LoginScreen → imported from components/LoginScreen
@@ -299,6 +300,11 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  useEffect(() => {
+    if (profile && !profile.onboarding_conecta_completed) setShowOnboarding(true)
+  }, [profile])
   const [authLoading, setAuthLoading] = useState(true)
 
   const [view, setView] = useState('dashboard')
@@ -2871,6 +2877,27 @@ export default function App() {
         session={session}
         isMobile={isMobile}
       />
+
+      {/* Onboarding tour */}
+      {showOnboarding && profile && <OnboardingTour profile={profile} onComplete={() => setShowOnboarding(false)} />}
+
+      {/* Boton flotante para re-ver el tour */}
+      {!showOnboarding && profile && (
+        <button
+          onClick={() => setShowOnboarding(true)}
+          style={{
+            position: 'fixed', bottom: isMobile ? 78 : 90, right: isMobile ? 80 : 90,
+            background: 'white', color: C.navy, border: `1px solid ${C.border}`,
+            padding: '8px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700,
+            cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)', zIndex: 9997,
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}
+          title="Ver tour de bienvenida"
+        >
+          💡 Tour
+        </button>
+      )}
     </div>
   )
 }
