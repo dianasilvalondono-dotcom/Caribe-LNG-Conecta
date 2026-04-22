@@ -551,7 +551,7 @@ export default function App() {
         .clng-mobile-topbar { display: none; }
         @media (max-width: 960px) {
           .clng-sidebar-desktop { display: none !important; }
-          .clng-content { margin-left: 0 !important; padding: 12px !important; }
+          .clng-content { margin-left: 0 !important; padding: 12px !important; overflow-x: hidden !important; }
           .clng-mobile-topbar { display: flex !important; }
           .clng-g1  { grid-template-columns: 1fr !important; }
           .clng-g2  { grid-template-columns: 1fr !important; }
@@ -561,6 +561,26 @@ export default function App() {
           .clng-stat-value { font-size: 22px !important; }
           .clng-stat-pad { padding: 8px 10px !important; }
           .clng-footer-logo { height: 28px !important; }
+        }
+        @media (max-width: 768px) {
+          html, body { overflow-x: hidden !important; }
+          .clng-content * {
+            max-width: 100% !important;
+            min-width: 0 !important;
+            overflow-wrap: break-word !important;
+            word-break: break-word !important;
+          }
+          .clng-content [style*="display: flex"]:not([style*="flex-direction: column"]):not([style*="flex-direction:column"]) {
+            flex-wrap: wrap !important;
+          }
+          .clng-content [style*="grid-template-columns"] {
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+          }
+          .clng-content table { display: block !important; overflow-x: auto !important; max-width: 100% !important; }
+          .clng-content .leaflet-container,
+          .clng-content .leaflet-container *,
+          .clng-content svg,
+          .clng-content svg * { max-width: none !important; }
         }
         @keyframes wave1 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @keyframes wave2 { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
