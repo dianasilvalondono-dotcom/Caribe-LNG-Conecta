@@ -45,6 +45,12 @@ export default function Sidebar({ activeView, onNavigate, profile, session, onSi
         { key: 'riesgos', icon: 'alert', label: 'Riesgos Sociales' },
       ],
     },
+    {
+      label: 'AMBIENTAL',
+      items: [
+        { key: 'ambiental', icon: 'leaf', label: 'Gestión Ambiental' },
+      ],
+    },
     ...(isAdmin ? [{
       label: 'ADMIN',
       items: [

@@ -36,6 +36,7 @@ import InputSemanal from './components/InputSemanal'
 import RiesgosView from './components/RiesgosView'
 import KPIsView from './components/KPIsView'
 import KnowledgeBaseView from './components/KnowledgeBaseView'
+import AmbientalView from './components/AmbientalView'
 import ChatBot from './components/ChatBot'
 import OnboardingTour from './components/OnboardingTour'
 import Sidebar from './components/Sidebar'
@@ -1859,6 +1860,10 @@ export default function App() {
 
         {view === 'knowledge' && isAdmin && (
           <KnowledgeBaseView docs={knowledgeBase} onReload={loadData} isMobile={isMobile} />
+        )}
+
+        {view === 'ambiental' && (
+          <AmbientalView profile={profile} />
         )}
 
         {view === 'dac' && isAdmin && (() => {
