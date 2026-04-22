@@ -311,6 +311,21 @@ export default function App() {
 
   const [view, setView] = useState('dashboard')
   const [navOpen, setNavOpen] = useState(null) // which dropdown is open
+
+  // Swipe desde borde izquierdo → vuelve al dashboard
+  useEffect(() => {
+    let sx = null, sy = null, st = null
+    const onStart = (e) => { const t = e.touches[0]; if (t.clientX <= 30) { sx = t.clientX; sy = t.clientY; st = Date.now() } }
+    const onEnd = (e) => {
+      if (sx === null) return
+      const t = e.changedTouches[0], dx = t.clientX - sx, dy = Math.abs(t.clientY - sy), dt = Date.now() - st
+      if (dx > 80 && dy < 60 && dt < 600 && view !== 'dashboard') setView('dashboard')
+      sx = null
+    }
+    window.addEventListener('touchstart', onStart, { passive: true })
+    window.addEventListener('touchend', onEnd, { passive: true })
+    return () => { window.removeEventListener('touchstart', onStart); window.removeEventListener('touchend', onEnd) }
+  }, [view])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [actors, setActors] = useState([])
   const [agreements, setAgreements] = useState([])
@@ -606,7 +621,13 @@ export default function App() {
         }} aria-label="Abrir menu">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 30 }} />
+        <button
+          onClick={() => setView('dashboard')}
+          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+          title="Ir al dashboard"
+        >
+          <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 30 }} />
+        </button>
         <div style={{ width: 36 }} />
       </div>
 
