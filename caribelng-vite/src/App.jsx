@@ -551,8 +551,9 @@ export default function App() {
         .clng-mobile-topbar { display: none; }
         @media (max-width: 960px) {
           .clng-sidebar-desktop { display: none !important; }
-          .clng-content { margin-left: 0 !important; padding: 12px !important; overflow-x: hidden !important; }
-          .clng-mobile-topbar { display: flex !important; }
+          .clng-content { margin-left: 0 !important; padding: 12px !important; overflow-x: hidden !important; padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important; }
+          .clng-mobile-topbar { display: flex !important; padding-top: calc(10px + env(safe-area-inset-top)) !important; }
+          .clng-sidebar-mobile { padding-top: env(safe-area-inset-top) !important; }
           .clng-g1  { grid-template-columns: 1fr !important; }
           .clng-g2  { grid-template-columns: 1fr !important; }
           .clng-g3  { grid-template-columns: 1fr !important; }
