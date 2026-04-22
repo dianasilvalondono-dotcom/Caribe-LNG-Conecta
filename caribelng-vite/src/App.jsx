@@ -302,6 +302,7 @@ export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   useEffect(() => {
     if (profile && !profile.onboarding_conecta_completed) setShowOnboarding(true)
@@ -547,13 +548,11 @@ export default function App() {
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {navOpen && <div onClick={() => setNavOpen(null)} style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, zIndex: 99 }} />}
       <style>{`
-        .clng-mobile-nav { display: none; }
-        .clng-desktop-nav { display: flex; }
+        .clng-mobile-topbar { display: none; }
         @media (max-width: 960px) {
-          .clng-mobile-nav { display: block !important; }
-          .clng-desktop-nav { display: none !important; }
-          .clng-content { margin-left: 0 !important; padding: 10px !important; }
-          aside { display: none !important; }
+          .clng-sidebar-desktop { display: none !important; }
+          .clng-content { margin-left: 0 !important; padding: 12px !important; }
+          .clng-mobile-topbar { display: flex !important; }
           .clng-g1  { grid-template-columns: 1fr !important; }
           .clng-g2  { grid-template-columns: 1fr !important; }
           .clng-g3  { grid-template-columns: 1fr !important; }
@@ -561,16 +560,62 @@ export default function App() {
           .clng-novedades { display: none !important; }
           .clng-stat-value { font-size: 22px !important; }
           .clng-stat-pad { padding: 8px 10px !important; }
+          .clng-footer-logo { height: 28px !important; }
         }
         @keyframes wave1 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @keyframes wave2 { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
         @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
         .clng-wave-1 { animation: wave1 18s linear infinite; }
         .clng-wave-2 { animation: wave2 24s linear infinite; }
         aside img { animation: logoFloat 3s ease-in-out infinite; }
         .clng-footer-logo { animation: logoFloat 4s ease-in-out infinite; }
+        .clng-sidebar-mobile { animation: slideIn 0.2s ease; }
       `}</style>
-      {/* Sidebar con search + nav + user */}
+      {/* Mobile top bar con hamburguesa */}
+      <div className="clng-mobile-topbar" style={{
+        display: 'none', position: 'sticky', top: 0, zIndex: 90,
+        background: C.navy, padding: '10px 14px',
+        justifyContent: 'space-between', alignItems: 'center',
+      }}>
+        <button onClick={() => setMobileNavOpen(true)} style={{
+          background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
+          width: 36, height: 36, borderRadius: 8, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }} aria-label="Abrir menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 30 }} />
+        <div style={{ width: 36 }} />
+      </div>
+
+      {/* Mobile sidebar drawer */}
+      {mobileNavOpen && (
+        <>
+          <div onClick={() => setMobileNavOpen(false)} style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 98,
+          }} />
+          <div className="clng-sidebar-mobile" style={{ position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 99 }}>
+            <Sidebar
+              activeView={view}
+              onNavigate={(k) => { setView(k); setNavOpen(null); setMobileNavOpen(false) }}
+              profile={profile}
+              session={session}
+              onSignOut={signOut}
+              onReplayTour={() => { setShowOnboarding(true); setMobileNavOpen(false) }}
+              isAdmin={isAdmin}
+              globalSearch={globalSearch}
+              setGlobalSearch={setGlobalSearch}
+              showGlobalSearch={showGlobalSearch}
+              setShowGlobalSearch={setShowGlobalSearch}
+              searchResults={[]}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Sidebar desktop */}
+      <div className="clng-sidebar-desktop">
       <Sidebar
         activeView={view}
         onNavigate={(k) => { setView(k); setNavOpen(null) }}
@@ -600,6 +645,7 @@ export default function App() {
           return results
         })()}
       />
+      </div>
 
       <main className="clng-content" style={{ marginLeft: 240, padding: isMobile ? '10px 10px' : '24px 32px', minHeight: '100vh', boxSizing: 'border-box', overflowX: 'hidden', transition: 'margin-left 0.2s' }}>
 
