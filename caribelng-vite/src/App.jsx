@@ -38,6 +38,7 @@ import KPIsView from './components/KPIsView'
 import KnowledgeBaseView from './components/KnowledgeBaseView'
 import ChatBot from './components/ChatBot'
 import OnboardingTour from './components/OnboardingTour'
+import Sidebar from './components/Sidebar'
 import Dashboard from './components/Dashboard'
 
 // LoginScreen → imported from components/LoginScreen
@@ -546,13 +547,13 @@ export default function App() {
     <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {navOpen && <div onClick={() => setNavOpen(null)} style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, zIndex: 99 }} />}
       <style>{`
-        /* CSS responsive — bypasses JS isMobile detection */
         .clng-mobile-nav { display: none; }
         .clng-desktop-nav { display: flex; }
         @media (max-width: 960px) {
           .clng-mobile-nav { display: block !important; }
           .clng-desktop-nav { display: none !important; }
-          .clng-content { padding: 10px !important; }
+          .clng-content { margin-left: 0 !important; padding: 10px !important; }
+          aside { display: none !important; }
           .clng-g1  { grid-template-columns: 1fr !important; }
           .clng-g2  { grid-template-columns: 1fr !important; }
           .clng-g3  { grid-template-columns: 1fr !important; }
@@ -561,189 +562,46 @@ export default function App() {
           .clng-stat-value { font-size: 22px !important; }
           .clng-stat-pad { padding: 8px 10px !important; }
         }
-        .clng-mobile-nav div::-webkit-scrollbar { display: none; }
+        @keyframes wave1 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes wave2 { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+        @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        .clng-wave-1 { animation: wave1 18s linear infinite; }
+        .clng-wave-2 { animation: wave2 24s linear infinite; }
+        aside img { animation: logoFloat 3s ease-in-out infinite; }
+        .clng-footer-logo { animation: logoFloat 4s ease-in-out infinite; }
       `}</style>
-      {/* Top nav */}
-      <div style={{ background: C.navy, color: 'white', position: 'sticky', top: 0, zIndex: 100 }}>
-        {/* Mobile nav — landscape tab strip (shown via CSS at ≤960px) */}
-        <div className="clng-mobile-nav">
-          {/* Scrollable horizontal tab bar — respects safe area insets for camera notch */}
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            paddingLeft: 'max(12px, env(safe-area-inset-left))',
-            paddingRight: 'max(12px, env(safe-area-inset-right))',
-            paddingTop: 'env(safe-area-inset-top)',
-            height: 'calc(58px + env(safe-area-inset-top))',
-            overflowX: 'auto', overflowY: 'visible',
-            gap: 2, scrollbarWidth: 'none',
-          }}>
-            {/* Logo — click to go to dashboard */}
-            <div onClick={() => setView('dashboard')} style={{ flexShrink: 0, display: 'flex', alignItems: 'center',
-              paddingRight: 12, marginRight: 6, borderRight: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer' }}>
-              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 44 }} />
-            </div>
-            {/* Nav tabs */}
-            {NAV.map(n => n.children ? (
-              <div key={n.id} ref={el => { if (el) el._navId = n.id }} style={{ position: 'relative', flexShrink: 0 }}>
-                <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
-                  style={{ flexShrink: 0,
-                    background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                    color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.6)',
-                    border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer',
-                    fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
-                    whiteSpace: 'nowrap' }}>
-                  {n.icon}
-                  <span>{n.label}</span>
-                  <span style={{ fontSize: 12, marginLeft: 2 }}>▼</span>
-                </button>
-              </div>
-            ) : (
-              <button key={n.id} onClick={() => { setView(n.id); setNavOpen(null) }}
-                style={{ flexShrink: 0,
-                  background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                  color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.6)',
-                  border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer',
-                  fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
-                  whiteSpace: 'nowrap' }}>
-                {n.icon}
-                <span>{n.label}</span>
-              </button>
-            ))}
-            {/* Separator + user */}
-            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
-              paddingLeft: 10, marginLeft: 4, borderLeft: '1px solid rgba(255,255,255,0.12)' }}>
-              {profile?.avatar_url
-                ? <img src={profile.avatar_url} alt="" style={{ width: 24, height: 24, borderRadius: '50%' }} />
-                : <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'white', flexShrink: 0 }}>{initials(profile?.full_name || session.user.email)}</div>
-              }
-              <button onClick={signOut}
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
-                  padding: '4px 8px', color: 'rgba(255,255,255,0.5)', fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                Salir
-              </button>
-            </div>
-          </div>
-          {/* Mobile dropdown portal — rendered outside scroll container */}
-          {navOpen && NAV.filter(n => n.children && n.id === navOpen).map(n => (
-            <div key={n.id} className="clng-mobile-nav" style={{ position: 'absolute', left: 12, right: 12, top: 58, zIndex: 300 }}>
-              <div style={{ background: '#1a2744', borderRadius: 10, padding: 6, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
-                {n.children.map(c => (
-                  <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                      background: view === c.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                      color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
-                      border: 'none', borderRadius: 8, padding: '10px 14px', cursor: 'pointer',
-                      fontSize: 14, fontWeight: 600 }}>
-                    {c.icon}<span>{c.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-          <div style={{ padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 84, maxWidth: '100vw' }} className="clng-desktop-nav">
-            <div onClick={() => setView('dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-              <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 60 }} />
-            </div>
-            <div style={{ display: 'flex', gap: 2 }}>
-              {NAV.map(n => n.children ? (
-                <div key={n.id} data-nav-dropdown style={{ position: 'relative', zIndex: 200 }}>
-                  <button onClick={(e) => { e.stopPropagation(); setNavOpen(navOpen === n.id ? null : n.id) }}
-                    style={{ background: isInGroup(n.id) || navOpen === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                      color: isInGroup(n.id) || navOpen === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
-                      border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
-                      fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {n.icon}<span>{n.label}</span>
-                    <span style={{ fontSize: 12, marginLeft: 2 }}>▼</span>
-                  </button>
-                  {navOpen === n.id && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#1a2744',
-                      borderRadius: 8, padding: 4, zIndex: 200, minWidth: 180, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
-                      {n.children.map(c => (
-                        <button key={c.id} onClick={() => { setView(c.id); setNavOpen(null) }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%',
-                            background: view === c.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                            color: view === c.id ? '#93c5fd' : 'rgba(255,255,255,0.7)',
-                            border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer',
-                            fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                          {c.icon}<span>{c.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button key={n.id} onClick={() => { setView(n.id); setNavOpen(null) }}
-                  style={{ background: view === n.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                    color: view === n.id ? '#93c5fd' : 'rgba(255,255,255,0.55)',
-                    border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
-                    fontSize: 15, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  {n.icon}<span>{n.label}</span>
-                </button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {/* Búsqueda global */}
-              <div style={{ position: 'relative' }}>
-                <input value={globalSearch} onChange={e => { setGlobalSearch(e.target.value); setShowGlobalSearch(!!e.target.value) }}
-                  onFocus={() => { if (globalSearch) setShowGlobalSearch(true) }}
-                  placeholder="Buscar todo..."
-                  style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
-                    padding: '5px 12px', fontSize: 13, color: 'white', width: 180, outline: 'none', fontFamily: 'inherit' }} />
-                {showGlobalSearch && globalSearch.length >= 2 && (() => {
-                  const q = globalSearch.toLowerCase()
-                  const results = []
-                  // Actores
-                  actors.filter(a => a.nombre?.toLowerCase().includes(q) || a.tipo?.toLowerCase().includes(q) || a.contacto?.toLowerCase().includes(q)).slice(0, 4)
-                    .forEach(a => results.push({ icon: '👤', label: a.nombre, sub: `${a.tipo} · ${a.territorio}`, action: () => { setSelectedActor(a); setView('actores') } }))
-                  // Registros diarios
-                  registrosDiarios.filter(r => r.descripcion?.toLowerCase().includes(q) || r.lugar?.toLowerCase().includes(q) || r.tipo_reunion?.toLowerCase().includes(q)).slice(0, 3)
-                    .forEach(r => results.push({ icon: '', label: r.descripcion?.substring(0, 50), sub: `${r.tipo_reunion} · ${r.fecha}`, action: () => { setView('input'); setInputSubTab('diario') } }))
-                  // Acuerdos
-                  agreements.filter(a => a.nombre?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(a => results.push({ icon: '', label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('huella') }))
-                  // Riesgos
-                  riesgos.filter(r => r.riesgo?.toLowerCase().includes(q) || r.accion_inmediata?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(r => results.push({ icon: '', label: r.riesgo?.substring(0, 50), sub: r.semaforo, action: () => setView('riesgos') }))
-                  // Seguimiento
-                  seguimiento.filter(s => s.compromiso?.toLowerCase().includes(q) || s.actividad?.toLowerCase().includes(q)).slice(0, 2)
-                    .forEach(s => results.push({ icon: '', label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('huella') }))
-                  if (!results.length) results.push({ icon: '', label: 'Sin resultados', sub: '', action: () => {} })
-                  return (
-                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#1a2744',
-                      borderRadius: 10, padding: 6, zIndex: 300, minWidth: 300, maxHeight: 350, overflowY: 'auto',
-                      boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}>
-                      {results.map((r, i) => (
-                        <div key={i} onClick={() => { r.action(); setShowGlobalSearch(false); setGlobalSearch('') }}
-                          style={{ display: 'flex', gap: 8, padding: '8px 10px', borderRadius: 6, cursor: 'pointer',
-                            alignItems: 'flex-start' }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>{r.icon}</span>
-                          <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
-                            {r.sub && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{r.sub}</div>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                })()}
-              </div>
-              {profile?.avatar_url
-                ? <img src={profile.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: '50%' }} />
-                : <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white' }}>{initials(profile?.full_name || session.user.email)}</div>
-              }
-              <button onClick={signOut}
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6,
-                  padding: '4px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 15, cursor: 'pointer' }}>
-                Salir
-              </button>
-            </div>
-          </div>
-      </div>
+      {/* Sidebar con search + nav + user */}
+      <Sidebar
+        activeView={view}
+        onNavigate={(k) => { setView(k); setNavOpen(null) }}
+        profile={profile}
+        session={session}
+        onSignOut={signOut}
+        onReplayTour={() => setShowOnboarding(true)}
+        isAdmin={isAdmin}
+        globalSearch={globalSearch}
+        setGlobalSearch={setGlobalSearch}
+        showGlobalSearch={showGlobalSearch}
+        setShowGlobalSearch={setShowGlobalSearch}
+        searchResults={(() => {
+          if (!globalSearch || globalSearch.length < 2) return []
+          const q = globalSearch.toLowerCase()
+          const results = []
+          actors.filter(a => a.nombre?.toLowerCase().includes(q) || a.tipo?.toLowerCase().includes(q) || a.contacto?.toLowerCase().includes(q)).slice(0, 4)
+            .forEach(a => results.push({ label: a.nombre, sub: `${a.tipo} · ${a.territorio}`, action: () => { setSelectedActor(a); setView('actores') } }))
+          registrosDiarios.filter(r => r.descripcion?.toLowerCase().includes(q) || r.lugar?.toLowerCase().includes(q) || r.tipo_reunion?.toLowerCase().includes(q)).slice(0, 3)
+            .forEach(r => results.push({ label: r.descripcion?.substring(0, 50), sub: `${r.tipo_reunion} · ${r.fecha}`, action: () => { setView('input'); setInputSubTab('diario') } }))
+          agreements.filter(a => a.nombre?.toLowerCase().includes(q)).slice(0, 2)
+            .forEach(a => results.push({ label: a.nombre, sub: `${a.territorio} · ${a.avance}%`, action: () => setView('huella') }))
+          riesgos.filter(r => r.riesgo?.toLowerCase().includes(q) || r.accion_inmediata?.toLowerCase().includes(q)).slice(0, 2)
+            .forEach(r => results.push({ label: r.riesgo?.substring(0, 50), sub: r.semaforo, action: () => setView('riesgos') }))
+          seguimiento.filter(s => s.compromiso?.toLowerCase().includes(q) || s.actividad?.toLowerCase().includes(q)).slice(0, 2)
+            .forEach(s => results.push({ label: s.compromiso?.substring(0, 50), sub: s.estado, action: () => setView('huella') }))
+          return results
+        })()}
+      />
 
-      <div style={{ padding: isMobile ? '10px 10px' : '24px 40px', width: '100%', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <main className="clng-content" style={{ marginLeft: 240, padding: isMobile ? '10px 10px' : '24px 32px', minHeight: '100vh', boxSizing: 'border-box', overflowX: 'hidden', transition: 'margin-left 0.2s' }}>
 
         {/* ━━ DASHBOARD ━━ */}
         {view === 'dashboard' && (
@@ -2645,22 +2503,32 @@ export default function App() {
             </p>
           </div>
         )}
-      </div>
 
-      {/* Footer with waves */}
-      <div style={{ marginTop: 40 }}>
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ display: 'block', width: '100%', height: 60 }}>
-          <path d="M0,40 C320,100 520,0 720,50 C920,100 1140,20 1440,60 L1440,120 L0,120 Z" fill="#1565C0" opacity="0.3" />
-          <path d="M0,60 C280,10 480,90 740,40 C1000,-10 1200,80 1440,40 L1440,120 L0,120 Z" fill="#1565C0" opacity="0.5" />
-          <path d="M0,80 C360,40 540,100 780,60 C1020,20 1260,90 1440,50 L1440,120 L0,120 Z" fill="#0D47A1" />
-        </svg>
-        <div style={{ background: '#0D47A1', padding: '20px 40px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 52 }} />
+        {/* Footer con olas animadas */}
+        <div style={{ marginTop: 60, position: 'relative', height: 100, overflow: 'hidden' }}>
+          <svg className="clng-wave-1" viewBox="0 0 2400 80" preserveAspectRatio="none"
+               style={{ position: 'absolute', bottom: 20, left: 0, width: '200%', height: 80 }}>
+            <path d="M0,40 C200,80 400,0 600,40 C800,80 1000,0 1200,40 C1400,80 1600,0 1800,40 C2000,80 2200,0 2400,40 L2400,80 L0,80 Z"
+                  fill={`${C.blue}15`} />
+          </svg>
+          <svg className="clng-wave-2" viewBox="0 0 2400 80" preserveAspectRatio="none"
+               style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: 80 }}>
+            <path d="M0,50 C150,70 350,20 600,50 C850,80 1050,20 1200,50 C1350,70 1550,20 1800,50 C2050,80 2250,20 2400,50 L2400,80 L0,80 Z"
+                  fill={`${C.barbosa}14`} />
+          </svg>
+          <svg className="clng-wave-1" viewBox="0 0 2400 60" preserveAspectRatio="none"
+               style={{ position: 'absolute', bottom: 10, left: 0, width: '200%', height: 60, animationDuration: '12s' }}>
+            <path d="M0,30 C300,50 500,10 800,30 C1100,50 1300,10 1600,30 C1900,50 2100,10 2400,30 L2400,60 L0,60 Z"
+                  fill={`${C.navy}08`} />
+          </svg>
+          <div style={{ position: 'absolute', bottom: 32, left: 0, right: 0, textAlign: 'center', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <img src="/logo-conecta.svg" alt="Caribe LNG Conecta" className="clng-footer-logo" style={{ height: 32 }} />
+            <span style={{ fontSize: 9, color: C.muted, fontWeight: 500, letterSpacing: 1 }}>
+              Plan de Gestion Social 2026
+            </span>
           </div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Plan de Gestión Social 2026 · Dirección de Asuntos Corporativos</div>
         </div>
-      </div>
+      </main>
 
       {/* ── Registro de Campo Detail Modal ── */}
       {selectedRegistro && (
@@ -2880,24 +2748,6 @@ export default function App() {
 
       {/* Onboarding tour */}
       {showOnboarding && profile && <OnboardingTour profile={profile} onComplete={() => setShowOnboarding(false)} />}
-
-      {/* Boton flotante para re-ver el tour */}
-      {!showOnboarding && profile && (
-        <button
-          onClick={() => setShowOnboarding(true)}
-          style={{
-            position: 'fixed', bottom: isMobile ? 78 : 90, right: isMobile ? 80 : 90,
-            background: 'white', color: C.navy, border: `1px solid ${C.border}`,
-            padding: '8px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700,
-            cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.12)', zIndex: 9997,
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}
-          title="Ver tour de bienvenida"
-        >
-          💡 Tour
-        </button>
-      )}
     </div>
   )
 }

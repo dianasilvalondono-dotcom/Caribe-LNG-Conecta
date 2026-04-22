@@ -35,7 +35,7 @@ export default function OnboardingTour({ profile, onComplete }) {
     }] : []),
     {
       icon: '👥',
-      title: 'Base de 184 actores mapeados',
+      title: 'Base de mas de 500 actores mapeados',
       body: 'En "Actores" tienes toda la base con filtros por territorio, sector, poder/interes y semaforo. Click en cualquiera abre el modal con su historia de interacciones y datos personales.',
       accent: '#1565C0',
     },
