@@ -1,103 +1,37 @@
-const CACHE_NAME = 'caribe-lng-v22';
+// ── KILL SWITCH SW ──────────────────────────────────────────────────────────
+// Este service worker se auto-elimina en la próxima visita y limpia todos los
+// caches. Se instaló para recuperar usuarios con SW viejo cacheado después de
+// cambios de env vars y bundle. Una vez todos los usuarios pasen por acá, se
+// reintroduce un SW normal en el próximo deploy.
+// ────────────────────────────────────────────────────────────────────────────
 
-// Assets to cache on install (app shell)
-const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-];
+self.addEventListener('install', () => {
+  self.skipWaiting()
+})
 
-// Install: precache the app shell
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
-  );
-  self.skipWaiting();
-});
-
-// Activate: delete old caches
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
-});
+  event.waitUntil((async () => {
+    // 1. Borrar TODOS los caches
+    try {
+      const keys = await caches.keys()
+      await Promise.all(keys.map((k) => caches.delete(k)))
+    } catch {}
 
-// Fetch: network-first for API calls, cache-first for static assets
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
+    // 2. Tomar control de pestañas abiertas
+    try { await self.clients.claim() } catch {}
 
-  // Skip non-GET and cross-origin requests (Supabase, Google Fonts, etc.)
-  if (request.method !== 'GET' || url.origin !== self.location.origin) {
-    return;
-  }
+    // 3. Desregistrarse a sí mismo
+    try { await self.registration.unregister() } catch {}
 
-  // Network-first for navigation requests (always fresh HTML)
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match('/index.html'))
-    );
-    return;
-  }
+    // 4. Recargar todas las pestañas abiertas para que carguen sin SW
+    try {
+      const tabs = await self.clients.matchAll({ type: 'window' })
+      tabs.forEach((t) => {
+        try { t.navigate(t.url) } catch {}
+      })
+    } catch {}
+  })())
+})
 
-  // Network-first for SVGs (logos change)
-  if (url.pathname.endsWith('.svg')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
-    return;
-  }
-
-  // Cache-first for other static assets (JS, CSS, images, fonts)
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return response;
-      });
-    })
-  );
-});
-
-// ── Push Notifications ──────────────────────────────────────────────────────
-self.addEventListener('push', (event) => {
-  let data = { title: 'Caribe LNG Conecta', body: 'Nueva notificación', url: '/' };
-  try { data = event.data.json(); } catch {}
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: '/logo-simbolo.svg',
-      badge: '/logo-simbolo.svg',
-      data: { url: data.url },
-      vibrate: [200, 100, 200],
-    })
-  );
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const url = event.notification.data?.url || '/';
-  event.waitUntil(clients.openWindow(url));
-});
+// Fetch handler vacío — dejamos pasar todo al navegador sin cachear
+self.addEventListener('fetch', () => {})
