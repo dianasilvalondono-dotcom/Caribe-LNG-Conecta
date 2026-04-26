@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Hardcoded para forzar el proyecto Conecta correcto.
+// Workaround temporal: las env vars de Vercel quedaron apuntando al proyecto
+// Financiera por error. Cuando se corrijan en Vercel, podemos volver a
+// import.meta.env.VITE_SUPABASE_URL / _ANON_KEY.
+const supabaseUrl = 'https://vtvmlzgekfnptlqyiikr.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0dm1semdla2ZucHRscXlpaWtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDE0ODYsImV4cCI6MjA4ODY3NzQ4Nn0.A9YWCOCyTq1W_EwMsL5in_RD86TPrrzIgk8jFa8WZ6A'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
