@@ -355,6 +355,7 @@ export default function App() {
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
   const [selectedEvidencia, setSelectedEvidencia] = useState(null)
   const [selectedRegistro, setSelectedRegistro] = useState(null)
+  const [selectedRegistro, setSelectedRegistro] = useState(null)
   const [alertaMensaje, setAlertaMensaje] = useState('')
   const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
   const [alertaEnviada, setAlertaEnviada] = useState(false)
@@ -1917,16 +1918,18 @@ export default function App() {
                   {rd.length === 0 ? (
                     <div style={{ fontSize: 13, color: C.subtle, textAlign: 'center', padding: '12px 0' }}>Sin registros</div>
                   ) : rd.slice(0, 4).map(r => (
-                    <div key={r.id} style={{ display: 'flex', gap: 10, paddingBottom: 8, marginBottom: 8, borderBottom: `1px solid ${C.border}` }}>
+                    <div key={r.id} onClick={() => setSelectedRegistro(r)}
+                      style={{ display: 'flex', gap: 10, paddingBottom: 8, marginBottom: 8, borderBottom: `1px solid ${C.border}`, cursor: 'pointer', transition: 'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, minWidth: 36, flexShrink: 0, paddingTop: 2 }}>
                         {new Date(r.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        {r.actividad && <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.actividad}</div>}
+                        {r.tipo_reunion && <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.tipo_reunion}{r.lugar && <span style={{ color: C.subtle, fontWeight: 500 }}> · {r.lugar}</span>}</div>}
                         {r.descripcion && <div style={{ fontSize: 12, color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.descripcion}</div>}
-                        {r.gestora_nombre && <div style={{ fontSize: 11, color: C.subtle }}>— {r.gestora_nombre}</div>}
                       </div>
-                      {r.tiene_incidente && <div style={{ fontSize: 10, background: '#fee2e2', color: '#ef4444', borderRadius: 4, padding: '2px 5px', fontWeight: 700, flexShrink: 0 }}>!</div>}
+                      {r.foto_url && <div style={{ fontSize: 14, color: color, flexShrink: 0, paddingTop: 2 }}>📷</div>}
                     </div>
                   ))}
                 </div>
@@ -2774,6 +2777,99 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* ── Registro Detail Modal ── */}
+      {selectedRegistro && (() => {
+        const r = selectedRegistro
+        const fecha = r.fecha ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : ''
+        const created = r.created_at ? new Date(r.created_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }) : ''
+        const yyyymm = r.created_at ? `${new Date(r.created_at).getFullYear()}-${String(new Date(r.created_at).getMonth() + 1).padStart(2, '0')}` : ''
+        const oneDriveUrl = `https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent(`/personal/diana_silva_caribelng_com/Documents/Conecta/Registros/${r.territorio}/${yyyymm}`)}`
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+            onClick={(e) => { if (e.target === e.currentTarget) setSelectedRegistro(null) }}>
+            <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 560,
+              maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}>
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Registro de campo</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, marginTop: 2 }}>{r.tipo_reunion || 'Registro'}</div>
+                </div>
+                <button onClick={() => setSelectedRegistro(null)}
+                  style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+              </div>
+              {/* Foto si existe */}
+              {r.foto_url && (
+                <a href={r.foto_url} target="_blank" rel="noopener noreferrer">
+                  <img src={r.foto_url} alt=""
+                    style={{ width: '100%', maxHeight: 320, objectFit: 'cover', display: 'block' }} />
+                </a>
+              )}
+              {/* Detalle */}
+              <div style={{ padding: 20 }}>
+                {r.descripcion && (
+                  <div style={{ fontSize: 14, color: C.text, marginBottom: 18, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                    {r.descripcion}
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Fecha</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{fecha}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Territorio</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.territorio}</span>
+                  </div>
+                  {r.lugar && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Lugar</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.lugar}</span>
+                    </div>
+                  )}
+                  {r.asistentes > 0 && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Asistentes</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.asistentes}</span>
+                    </div>
+                  )}
+                  {r.geo_lugar && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Ubicación</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.geo_lugar}</span>
+                    </div>
+                  )}
+                  {r.latitud != null && r.longitud != null && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>GPS</span>
+                      <a href={`https://www.google.com/maps?q=${r.latitud},${r.longitud}`} target="_blank" rel="noopener noreferrer"
+                        style={{ fontSize: 13, color: C.accent, fontWeight: 600, textDecoration: 'none' }}>
+                        {r.latitud.toFixed(6)}, {r.longitud.toFixed(6)}
+                        {r.precision_m && <span style={{ color: C.subtle }}> · ±{Math.round(r.precision_m)}m</span>}
+                        <span style={{ marginLeft: 6 }}>↗</span>
+                      </a>
+                    </div>
+                  )}
+                  {created && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Capturado</span>
+                      <span style={{ fontSize: 12, color: C.subtle }}>{created}</span>
+                    </div>
+                  )}
+                </div>
+                <a href={oneDriveUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'block', marginTop: 18, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                    borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                  Ver carpeta en OneDrive →
+                </a>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* ── Audit Log Modal ── */}
       {showAudit && (
