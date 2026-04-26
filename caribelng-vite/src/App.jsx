@@ -1763,7 +1763,7 @@ export default function App() {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                           <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidencias recientes</div>
                           {isAdmin && (
-                            <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgDgdg9A2N02R7E_pwEiOOC6AcGvXQw6p7KVALqIFdDhUPo?e=BCkAgB"
+                            <a href="https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=%2Fpersonal%2Fdiana_silva_caribelng_com%2FDocuments%2FConecta%2FEvidencias"
                               target="_blank" rel="noopener noreferrer"
                               style={{ fontSize: 12, fontWeight: 700, color: C.navy, background: '#EEF2FF', border: `1px solid ${C.navy}`,
                                 borderRadius: 6, padding: '4px 10px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
@@ -2753,7 +2753,7 @@ export default function App() {
                   </span>
                 </div>
               </div>
-              <a href="https://course2-my.sharepoint.com/:f:/g/personal/diana_silva_caribelng_com/IgDgdg9A2N02R7E_pwEiOOC6AcGvXQw6p7KVALqIFdDhUPo?e=BCkAgB"
+              <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent(`/personal/diana_silva_caribelng_com/Documents/Conecta/Evidencias/${selectedEvidencia.territorio}/${new Date(selectedEvidencia.capturada_at).getFullYear()}-${String(new Date(selectedEvidencia.capturada_at).getMonth() + 1).padStart(2, '0')}`)}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
                   borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
