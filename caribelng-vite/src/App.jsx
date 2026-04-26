@@ -355,7 +355,6 @@ export default function App() {
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
   const [selectedEvidencia, setSelectedEvidencia] = useState(null)
   const [selectedRegistro, setSelectedRegistro] = useState(null)
-  const [selectedRegistro, setSelectedRegistro] = useState(null)
   const [alertaMensaje, setAlertaMensaje] = useState('')
   const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
   const [alertaEnviada, setAlertaEnviada] = useState(false)
