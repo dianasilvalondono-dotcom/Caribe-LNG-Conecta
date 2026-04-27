@@ -338,6 +338,9 @@ export default function App() {
   const [filterT, setFilterT] = useState('Todos')
   const [filterS, setFilterS] = useState('Todos')
   const [filterR, setFilterR] = useState('Todos')
+  const [filterContacto, setFilterContacto] = useState('Todos') // Todos | reciente | sin_contacto
+  const [filterPrioridad, setFilterPrioridad] = useState('Todos') // Todos | A | B | C
+  const actoresGridRef = useRef(null)
   const [cronograma, setCronograma] = useState([])
   const [huellaSocial, setHuellaSocial] = useState([])
   const [expandedAcuerdo, setExpandedAcuerdo] = useState(null)
@@ -499,13 +502,19 @@ export default function App() {
     }
   }, [actors])
 
-  const filtered = useMemo(() => actors.filter(a => {
-    if (search && !a.nombre?.toLowerCase().includes(search.toLowerCase()) && !a.tipo?.toLowerCase().includes(search.toLowerCase()) && !(a.contacto || '').toLowerCase().includes(search.toLowerCase())) return false
-    if (filterT !== 'Todos' && a.territorio !== filterT) return false
-    if (filterS !== 'Todos' && a.semaforo !== filterS) return false
-    if (filterR !== 'Todos' && a.riesgo?.toLowerCase() !== filterR.toLowerCase()) return false
-    return true
-  }), [actors, search, filterT, filterS, filterR])
+  const filtered = useMemo(() => {
+    const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    return actors.filter(a => {
+      if (search && !a.nombre?.toLowerCase().includes(search.toLowerCase()) && !a.tipo?.toLowerCase().includes(search.toLowerCase()) && !(a.contacto || '').toLowerCase().includes(search.toLowerCase())) return false
+      if (filterT !== 'Todos' && a.territorio !== filterT) return false
+      if (filterS !== 'Todos' && a.semaforo !== filterS) return false
+      if (filterR !== 'Todos' && a.riesgo?.toLowerCase() !== filterR.toLowerCase()) return false
+      if (filterContacto === 'reciente' && (!a.fecha_accion || new Date(a.fecha_accion) < hace30)) return false
+      if (filterContacto === 'sin_contacto' && a.fecha_accion && new Date(a.fecha_accion) >= hace30) return false
+      if (filterPrioridad !== 'Todos' && String(a.prioridad) !== filterPrioridad) return false
+      return true
+    })
+  }, [actors, search, filterT, filterS, filterR, filterContacto, filterPrioridad])
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
   const [isPortrait, setIsPortrait] = useState(() => window.innerHeight > window.innerWidth && window.innerWidth < 960)
@@ -756,7 +765,7 @@ export default function App() {
             </div>
             </div>
 
-            {/* ── Resumen de impacto ── */}
+            {/* ── Resumen de impacto (cards clickeables que filtran la grilla) ── */}
             {(() => {
               const now = new Date()
               const hace30 = new Date(now - 30 * 24 * 60 * 60 * 1000)
@@ -766,32 +775,84 @@ export default function App() {
               const prioAContactados = prioA.filter(a => a.fecha_accion && new Date(a.fecha_accion) >= hace30).length
               const verdes = actors.filter(a => a.semaforo === 'verde').length
               const relPct = actors.length ? Math.round((verdes / actors.length) * 100) : 0
+              const scrollToGrid = () => actoresGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              const applyFilter = (apply) => {
+                // Reset todos los filtros y aplicar el nuevo set
+                setFilterT('Todos'); setFilterS('Todos'); setFilterR('Todos')
+                setFilterContacto('Todos'); setFilterPrioridad('Todos'); setSearch('')
+                apply()
+                setTimeout(scrollToGrid, 50)
+              }
+              const isReciente = filterContacto === 'reciente' && filterPrioridad === 'Todos' && filterS === 'Todos'
+              const isSinContacto = filterContacto === 'sin_contacto' && filterPrioridad === 'Todos'
+              const isPrioAReciente = filterPrioridad === 'A' && filterContacto === 'reciente'
+              const isVerde = filterS === 'verde' && filterContacto === 'Todos' && filterPrioridad === 'Todos'
+              const cardBase = (active, accent) => ({
+                background: 'white',
+                borderRadius: 14,
+                padding: '14px 16px',
+                border: active ? `2px solid ${accent}` : '1px solid #e8ecf0',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'transform 0.12s, box-shadow 0.12s, border-color 0.12s',
+                boxShadow: active ? `0 6px 18px ${accent}33` : '0 1px 3px rgba(0,0,0,0.03)',
+                outline: 'none',
+                textAlign: 'left',
+                width: '100%',
+                fontFamily: 'inherit',
+                appearance: 'none',
+              })
+              const onHover = (accent) => (e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = `0 8px 22px ${accent}3a`
+              }
+              const onLeave = (active, accent) => (e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = active ? `0 6px 18px ${accent}33` : '0 1px 3px rgba(0,0,0,0.03)'
+              }
               return (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
-                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                  <button type="button"
+                    onClick={() => applyFilter(() => setFilterContacto('reciente'))}
+                    onMouseEnter={onHover('#22c55e')} onMouseLeave={onLeave(isReciente, '#22c55e')}
+                    style={cardBase(isReciente, '#22c55e')}
+                    title="Click para ver solo los actores contactados en los últimos 30 días">
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: '#22c55e' }} />
                     <div style={{ fontSize: 24, fontWeight: 900, color: '#22c55e' }}>{contactadosReciente}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Contactados este mes</div>
-                    <div style={{ fontSize: 12, color: '#94a3b8' }}>de {actors.length} actores</div>
-                  </div>
-                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>de {actors.length} actores · ver lista →</div>
+                  </button>
+                  <button type="button"
+                    onClick={() => applyFilter(() => setFilterContacto('sin_contacto'))}
+                    onMouseEnter={onHover(sinContacto30 > 100 ? '#ef4444' : '#f59e0b')} onMouseLeave={onLeave(isSinContacto, sinContacto30 > 100 ? '#ef4444' : '#f59e0b')}
+                    style={cardBase(isSinContacto, sinContacto30 > 100 ? '#ef4444' : '#f59e0b')}
+                    title="Click para ver los actores sin contacto en 30+ días">
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: sinContacto30 > 100 ? '#ef4444' : '#f59e0b' }} />
                     <div style={{ fontSize: 24, fontWeight: 900, color: sinContacto30 > 100 ? '#ef4444' : '#f59e0b' }}>{sinContacto30}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Sin contacto (30+ días)</div>
-                    <div style={{ fontSize: 12, color: '#94a3b8' }}>requieren atención</div>
-                  </div>
-                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>requieren atención · ver lista →</div>
+                  </button>
+                  <button type="button"
+                    onClick={() => applyFilter(() => { setFilterPrioridad('A'); setFilterContacto('reciente') })}
+                    onMouseEnter={onHover(C.navy)} onMouseLeave={onLeave(isPrioAReciente, C.navy)}
+                    style={cardBase(isPrioAReciente, C.navy)}
+                    title="Click para ver actores prioridad A contactados este mes">
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: C.navy }} />
                     <div style={{ fontSize: 24, fontWeight: 900, color: C.navy }}>{prioAContactados}/{prioA.length}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Prioridad A activos</div>
-                    <div style={{ fontSize: 12, color: '#94a3b8' }}>contactados este mes</div>
-                  </div>
-                  <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', border: '1px solid #e8ecf0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>contactados este mes · ver lista →</div>
+                  </button>
+                  <button type="button"
+                    onClick={() => applyFilter(() => setFilterS('verde'))}
+                    onMouseEnter={onHover(relPct >= 50 ? '#22c55e' : '#f59e0b')} onMouseLeave={onLeave(isVerde, relPct >= 50 ? '#22c55e' : '#f59e0b')}
+                    style={cardBase(isVerde, relPct >= 50 ? '#22c55e' : '#f59e0b')}
+                    title="Click para ver los actores con relación estable (semáforo verde)">
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: relPct >= 50 ? '#22c55e' : '#f59e0b' }} />
                     <div style={{ fontSize: 24, fontWeight: 900, color: relPct >= 50 ? '#22c55e' : '#f59e0b' }}>{relPct}%</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#2B2926' }}>Relación estable</div>
-                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{verdes} actores en verde</div>
-                  </div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{verdes} actores en verde · ver lista →</div>
+                  </button>
                 </div>
               )
             })()}
@@ -1078,13 +1139,32 @@ export default function App() {
             </div>
 
             {/* Grilla */}
-            {dataLoading ? (
-              <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>Cargando actores...</div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(290px, 1fr))', gap: 8 }}>
-                {filtered.map(a => <ActorCard key={a.id} actor={a} onClick={setSelectedActor} />)}
-              </div>
-            )}
+            <div ref={actoresGridRef} style={{ scrollMarginTop: 16 }}>
+              {(filterContacto !== 'Todos' || filterPrioridad !== 'Todos') && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, padding: '8px 12px', background: '#eff6ff', border: `1px solid ${C.navy}33`, borderRadius: 10 }}>
+                  <span style={{ fontSize: 12, color: C.navy, fontWeight: 700 }}>Filtro activo:</span>
+                  {filterContacto === 'reciente' && <span style={{ background: C.navy, color: 'white', borderRadius: 16, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>Contactados este mes</span>}
+                  {filterContacto === 'sin_contacto' && <span style={{ background: '#f59e0b', color: 'white', borderRadius: 16, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>Sin contacto 30+ días</span>}
+                  {filterPrioridad !== 'Todos' && <span style={{ background: C.navy, color: 'white', borderRadius: 16, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>Prioridad {filterPrioridad}</span>}
+                  <span style={{ fontSize: 12, color: C.muted, marginLeft: 'auto' }}>{filtered.length} actor{filtered.length === 1 ? '' : 'es'}</span>
+                  <button onClick={() => { setFilterContacto('Todos'); setFilterPrioridad('Todos') }}
+                    style={{ background: 'white', color: C.navy, border: `1px solid ${C.navy}55`, borderRadius: 8, padding: '4px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    Limpiar
+                  </button>
+                </div>
+              )}
+              {dataLoading ? (
+                <div style={{ textAlign: 'center', padding: 40, color: C.subtle }}>Cargando actores...</div>
+              ) : filtered.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 40, color: C.subtle, background: 'white', borderRadius: 12, border: `1px solid ${C.border}` }}>
+                  No hay actores que cumplan estos filtros.
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(290px, 1fr))', gap: 8 }}>
+                  {filtered.map(a => <ActorCard key={a.id} actor={a} onClick={setSelectedActor} />)}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
