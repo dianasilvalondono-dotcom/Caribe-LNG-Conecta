@@ -20,6 +20,8 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
   const [recomendacion, setRecomendacion] = useState(actor.recomendacion_gestora || '')
   // Lectura estratégica DAC (solo admin puede editar)
   const [recomendacionDAC, setRecomendacionDAC] = useState(actor.recomendacion_dac || '')
+  // Posición (editable junto con la Lectura DAC para flujo más rápido)
+  const [posicion, setPosicion] = useState(actor.posicion || 'Neutro')
   // Campos relacionamiento
   const [accionTomada, setAccionTomada] = useState(actor.accion_tomada || '')
   const [fechaAccion, setFechaAccion] = useState(actor.fecha_accion || new Date().toISOString().split('T')[0])
@@ -90,7 +92,27 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
     setSavingRecoDAC(true)
     setRecoDACSaved(false)
     try {
-      await updateActor(actor.id, { recomendacion_dac: recomendacionDAC })
+      const posicionAnterior = actor.posicion || ''
+      const posicionCambio = posicion !== posicionAnterior
+      const recoCambio = recomendacionDAC !== (actor.recomendacion_dac || '')
+      const updates = { recomendacion_dac: recomendacionDAC }
+      if (posicionCambio) updates.posicion = posicion
+      await updateActor(actor.id, updates)
+      // Registrar en historial como interaction tipo "Lectura DAC"
+      const partes = []
+      if (posicionCambio) partes.push(`Posición: ${posicionAnterior || '(sin definir)'} → ${posicion}`)
+      if (recoCambio && recomendacionDAC.trim()) partes.push(recomendacionDAC.trim())
+      if (partes.length > 0) {
+        await addInteraction({
+          actorId: actor.id,
+          tipo: 'Lectura DAC',
+          resumen: partes.join('\n\n'),
+          semaforo_nuevo: actor.semaforo,
+          userId: session.user.id
+        })
+        const fresh = await getInteractions(actor.id)
+        setInteractions(fresh || [])
+      }
       onUpdated()
       setRecoDACSaved(true)
       setTimeout(() => setRecoDACSaved(false), 2200)
@@ -256,6 +278,25 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
               </div>
               {isAdmin ? (
                 <>
+                  {/* Posición editable junto con la lectura */}
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: C.navy, opacity: 0.8, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Posición del actor
+                    </label>
+                    <select
+                      value={posicion}
+                      onChange={e => setPosicion(e.target.value)}
+                      style={{ width: '100%', border: `1px solid ${C.navy}33`, borderRadius: 8, padding: '8px 10px', fontSize: 13,
+                        fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text, background: 'white', cursor: 'pointer' }}>
+                      {['Aliado clave','Aliado','Aliado potencial','Favorable','Neutro','Neutral / Por definir','Opositor potencial','Opositor'].map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                      {/* Mantener el valor actual si no está en la lista estándar */}
+                      {actor.posicion && !['Aliado clave','Aliado','Aliado potencial','Favorable','Neutro','Neutral / Por definir','Opositor potencial','Opositor'].includes(actor.posicion) && (
+                        <option value={actor.posicion}>{actor.posicion}</option>
+                      )}
+                    </select>
+                  </div>
                   <textarea
                     value={recomendacionDAC}
                     onChange={e => setRecomendacionDAC(e.target.value)}
@@ -264,15 +305,23 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                       resize: 'vertical', minHeight: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
                       color: C.text, background: 'white' }}
                   />
-                  <button
-                    onClick={handleSaveRecomendacionDAC}
-                    disabled={savingRecoDAC || recomendacionDAC === (actor.recomendacion_dac || '')}
-                    style={{ marginTop: 8, width: '100%', background: savingRecoDAC ? '#94a3b8' : recomendacionDAC === (actor.recomendacion_dac || '') ? '#e5e7eb' : C.navy,
-                      color: recomendacionDAC === (actor.recomendacion_dac || '') ? '#9ca3af' : 'white',
-                      border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700,
-                      cursor: savingRecoDAC ? 'wait' : recomendacionDAC === (actor.recomendacion_dac || '') ? 'default' : 'pointer' }}>
-                    {savingRecoDAC ? 'Guardando...' : 'Guardar lectura DAC'}
-                  </button>
+                  {(() => {
+                    const sinCambios = recomendacionDAC === (actor.recomendacion_dac || '') && posicion === (actor.posicion || 'Neutro')
+                    return (
+                      <button
+                        onClick={handleSaveRecomendacionDAC}
+                        disabled={savingRecoDAC || sinCambios}
+                        style={{ marginTop: 8, width: '100%', background: savingRecoDAC ? '#94a3b8' : sinCambios ? '#e5e7eb' : C.navy,
+                          color: sinCambios ? '#9ca3af' : 'white',
+                          border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700,
+                          cursor: savingRecoDAC ? 'wait' : sinCambios ? 'default' : 'pointer' }}>
+                        {savingRecoDAC ? 'Guardando...' : 'Guardar lectura DAC'}
+                      </button>
+                    )
+                  })()}
+                  <div style={{ fontSize: 11, color: C.navy, opacity: 0.6, marginTop: 6, textAlign: 'center', lineHeight: 1.4 }}>
+                    Al guardar, el cambio queda registrado en el historial del actor.
+                  </div>
                 </>
               ) : (
                 <div style={{ background: 'white', border: `1px solid ${C.navy}22`, borderRadius: 8, padding: '9px 11px', fontSize: 13, color: actor.recomendacion_dac ? C.text : C.subtle, lineHeight: 1.5, minHeight: 40, fontStyle: actor.recomendacion_dac ? 'normal' : 'italic' }}>
