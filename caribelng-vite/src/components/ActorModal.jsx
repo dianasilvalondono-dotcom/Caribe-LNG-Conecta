@@ -18,8 +18,9 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
   const [recoDACSaved, setRecoDACSaved] = useState(false)
   // Recomendación de relacionamiento (editable directo por gestora)
   const [recomendacion, setRecomendacion] = useState(actor.recomendacion_gestora || '')
-  // Lectura estratégica DAC (solo admin puede editar)
-  const [recomendacionDAC, setRecomendacionDAC] = useState(actor.recomendacion_dac || '')
+  // Lectura estratégica DAC: la caja arranca vacía y queda vacía después de guardar.
+  // La lectura previa se muestra como tarjeta arriba, no como contenido del textarea.
+  const [recomendacionDAC, setRecomendacionDAC] = useState('')
   // Posición (editable junto con la Lectura DAC para flujo más rápido)
   const [posicion, setPosicion] = useState(actor.posicion || 'Neutro')
   // Campos relacionamiento
@@ -94,14 +95,18 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
     try {
       const posicionAnterior = actor.posicion || ''
       const posicionCambio = posicion !== posicionAnterior
-      const recoCambio = recomendacionDAC !== (actor.recomendacion_dac || '')
-      const updates = { recomendacion_dac: recomendacionDAC }
+      const nuevaLectura = recomendacionDAC.trim()
+      const tieneNuevaLectura = nuevaLectura.length > 0
+      const updates = {}
+      if (tieneNuevaLectura) updates.recomendacion_dac = nuevaLectura
       if (posicionCambio) updates.posicion = posicion
-      await updateActor(actor.id, updates)
+      if (Object.keys(updates).length > 0) {
+        await updateActor(actor.id, updates)
+      }
       // Registrar en historial como interaction tipo "Lectura DAC"
       const partes = []
       if (posicionCambio) partes.push(`Posición: ${posicionAnterior || '(sin definir)'} → ${posicion}`)
-      if (recoCambio && recomendacionDAC.trim()) partes.push(recomendacionDAC.trim())
+      if (tieneNuevaLectura) partes.push(nuevaLectura)
       if (partes.length > 0) {
         await addInteraction({
           actorId: actor.id,
@@ -113,9 +118,12 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
         const fresh = await getInteractions(actor.id)
         setInteractions(fresh || [])
       }
+      // Limpiar el textarea para que quede listo para la próxima lectura.
+      // La lectura recién guardada se muestra como "Última lectura" arriba.
+      setRecomendacionDAC('')
       onUpdated()
       setRecoDACSaved(true)
-      setTimeout(() => setRecoDACSaved(false), 2200)
+      setTimeout(() => setRecoDACSaved(false), 3000)
     } catch(e) { alert('Error guardando: ' + e.message) }
     finally { setSavingRecoDAC(false) }
   }
@@ -278,6 +286,17 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
               </div>
               {isAdmin ? (
                 <>
+                  {/* Tarjeta con la última lectura registrada */}
+                  {actor.recomendacion_dac && (
+                    <div style={{ background: 'white', border: `1px solid ${C.navy}22`, borderRadius: 8, padding: '10px 12px', marginBottom: 10 }}>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: C.navy, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+                        Última lectura registrada{actor.updated_at ? ` · ${new Date(actor.updated_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}` : ''}
+                      </div>
+                      <div style={{ fontSize: 13, color: C.text, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                        {actor.recomendacion_dac}
+                      </div>
+                    </div>
+                  )}
                   {/* Posición editable junto con la lectura */}
                   <div style={{ marginBottom: 10 }}>
                     <label style={{ fontSize: 11, fontWeight: 700, color: C.navy, opacity: 0.8, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -297,16 +316,21 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                       )}
                     </select>
                   </div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: C.navy, opacity: 0.8, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {actor.recomendacion_dac ? 'Nueva lectura' : 'Lectura'}
+                  </label>
                   <textarea
                     value={recomendacionDAC}
                     onChange={e => setRecomendacionDAC(e.target.value)}
-                    placeholder="Ej: Actor clave para destrabar el permiso ANLA. Mantener canal directo conmigo. Evitar exposición mediática hasta Q3..."
+                    placeholder={actor.recomendacion_dac
+                      ? 'Escribe una nueva lectura. Reemplazará la anterior y quedará archivada en el historial.'
+                      : 'Ej: Actor clave para destrabar el permiso ANLA. Mantener canal directo conmigo. Evitar exposición mediática hasta Q3...'}
                     style={{ width: '100%', border: `1px solid ${C.navy}33`, borderRadius: 8, padding: '9px 11px', fontSize: 13,
                       resize: 'vertical', minHeight: 80, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
                       color: C.text, background: 'white' }}
                   />
                   {(() => {
-                    const sinCambios = recomendacionDAC === (actor.recomendacion_dac || '') && posicion === (actor.posicion || 'Neutro')
+                    const sinCambios = !recomendacionDAC.trim() && posicion === (actor.posicion || 'Neutro')
                     return (
                       <button
                         onClick={handleSaveRecomendacionDAC}
@@ -315,13 +339,19 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
                           color: sinCambios ? '#9ca3af' : 'white',
                           border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700,
                           cursor: savingRecoDAC ? 'wait' : sinCambios ? 'default' : 'pointer' }}>
-                        {savingRecoDAC ? 'Guardando...' : 'Guardar lectura DAC'}
+                        {savingRecoDAC ? 'Guardando...' : 'Registrar lectura DAC'}
                       </button>
                     )
                   })()}
-                  <div style={{ fontSize: 11, color: C.navy, opacity: 0.6, marginTop: 6, textAlign: 'center', lineHeight: 1.4 }}>
-                    Al guardar, el cambio queda registrado en el historial del actor.
-                  </div>
+                  {recoDACSaved ? (
+                    <div style={{ fontSize: 12, color: C.green, fontWeight: 700, marginTop: 8, textAlign: 'center', background: '#dcfce7', borderRadius: 6, padding: '6px 8px' }}>
+                      ✓ Lectura registrada en el historial del actor
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 11, color: C.navy, opacity: 0.6, marginTop: 6, textAlign: 'center', lineHeight: 1.4 }}>
+                      Cada lectura queda archivada en el historial (pestaña Actividad).
+                    </div>
+                  )}
                 </>
               ) : (
                 <div style={{ background: 'white', border: `1px solid ${C.navy}22`, borderRadius: 8, padding: '9px 11px', fontSize: 13, color: actor.recomendacion_dac ? C.text : C.subtle, lineHeight: 1.5, minHeight: 40, fontStyle: actor.recomendacion_dac ? 'normal' : 'italic' }}>
