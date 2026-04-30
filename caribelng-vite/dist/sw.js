@@ -1,8 +1,6 @@
-// ── KILL SWITCH SW ──────────────────────────────────────────────────────────
-// Este service worker se auto-elimina en la próxima visita y limpia todos los
-// caches. Se instaló para recuperar usuarios con SW viejo cacheado después de
-// cambios de env vars y bundle. Una vez todos los usuarios pasen por acá, se
-// reintroduce un SW normal en el próximo deploy.
+// ── No-op service worker ────────────────────────────────────────────────────
+// SW mínimo que existe pero NO cachea ni recarga.
+// Reemplaza al kill-switch anterior que estaba creando un loop de recarga.
 // ────────────────────────────────────────────────────────────────────────────
 
 self.addEventListener('install', () => {
@@ -11,27 +9,15 @@ self.addEventListener('install', () => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
-    // 1. Borrar TODOS los caches
+    // Borrar cualquier caché viejo
     try {
       const keys = await caches.keys()
       await Promise.all(keys.map((k) => caches.delete(k)))
     } catch {}
-
-    // 2. Tomar control de pestañas abiertas
+    // Tomar control sin recargar
     try { await self.clients.claim() } catch {}
-
-    // 3. Desregistrarse a sí mismo
-    try { await self.registration.unregister() } catch {}
-
-    // 4. Recargar todas las pestañas abiertas para que carguen sin SW
-    try {
-      const tabs = await self.clients.matchAll({ type: 'window' })
-      tabs.forEach((t) => {
-        try { t.navigate(t.url) } catch {}
-      })
-    } catch {}
   })())
 })
 
-// Fetch handler vacío — dejamos pasar todo al navegador sin cachear
+// Fetch passthrough — sin cache, sin intercepción, sin loop
 self.addEventListener('fetch', () => {})

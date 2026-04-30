@@ -34,6 +34,7 @@ export default function Sidebar({ activeView, onNavigate, profile, session, onSi
       items: [
         { key: 'gestora', icon: 'pin', label: 'Mi Territorio' },
         { key: 'input', icon: 'edit', label: 'Registro de Campo' },
+        { key: 'comite', icon: 'users', label: 'Comité Social' },
         { key: 'actores', icon: 'users', label: 'Actores' },
       ],
     },

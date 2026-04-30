@@ -401,12 +401,18 @@ async function blobToBase64(blob) {
   })
 }
 
-export async function uploadToOneDrive(fileOrBlob, fileName, territorio, type) {
+export async function uploadToOneDrive(fileOrBlob, fileName, territorio, type, contentType) {
   const base64 = await blobToBase64(fileOrBlob)
+  let ct = contentType
+  if (!ct) {
+    if (type === 'reporte') ct = 'application/json'
+    else if (type === 'acta') ct = fileOrBlob.type || 'application/pdf'
+    else ct = 'image/jpeg'
+  }
   return fetch('/api/upload-onedrive', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fileName, territorio: territorio || 'General', fileBase64: base64, type, contentType: type === 'reporte' ? 'application/json' : 'image/jpeg' })
+    body: JSON.stringify({ fileName, territorio: territorio || 'General', fileBase64: base64, type, contentType: ct })
   })
 }
 
@@ -558,4 +564,50 @@ export async function resolverAlerta(id, estado, resolucion) {
     // Fallback: si las columnas nuevas no existen aún, al menos marcar como leída
     await supabase.from('alertas').update({ leida: true }).eq('id', id)
   }
+}
+
+// ── Comité Social — Actas ────────────────────────────────────────────────────
+
+export async function getComiteActas() {
+  const { data, error } = await supabase
+    .from('comite_actas')
+    .select('*, profile:profiles!user_id(full_name, email)')
+    .order('fecha_comite', { ascending: false })
+    .order('created_at', { ascending: false })
+  if (error) {
+    // Fallback sin join si la tabla no expone la FK
+    const { data: d2 } = await supabase
+      .from('comite_actas')
+      .select('*')
+      .order('fecha_comite', { ascending: false })
+      .order('created_at', { ascending: false })
+    return d2 || []
+  }
+  return data || []
+}
+
+export async function uploadActaToOneDrive(file) {
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').split('.')[0]
+  const ext = (file.name && file.name.includes('.')) ? file.name.split('.').pop() : 'pdf'
+  const safeName = (file.name || 'acta').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80)
+  const fileName = `${ts}_${safeName}`
+  const res = await uploadToOneDrive(file, fileName, 'General', 'acta', file.type || 'application/octet-stream')
+  if (!res.ok) throw new Error('OneDrive upload failed')
+  const json = await res.json()
+  return { url: json.webUrl, name: file.name || fileName }
+}
+
+export async function addComiteActa({ fecha_comite, titulo, asistentes, temas, acuerdos, compromisos, archivo_url, archivo_nombre, foto_url, user_id }) {
+  const { data, error } = await supabase
+    .from('comite_actas')
+    .insert({ fecha_comite, titulo, asistentes, temas, acuerdos, compromisos, archivo_url, archivo_nombre, foto_url, user_id })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteComiteActa(id) {
+  const { error } = await supabase.from('comite_actas').delete().eq('id', id)
+  if (error) throw error
 }

@@ -14,6 +14,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias, deleteEvidencia,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
          addRegistroDiario, getRegistrosDiarios,
+         getComiteActas, addComiteActa, deleteComiteActa, uploadActaToOneDrive, uploadToOneDrive,
          getAuditLog, subscribeToPush, sendPushNotification } from './lib/supabase'
 
 import { IconDashboard, IconPin, IconUsers, IconGlobe, IconHandshake, IconLeaf, IconCalendar,
@@ -299,6 +300,142 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 }
 
 // ━━ Main App ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── Comité Social — Uploader de actas ────────────────────────────────────────
+function ComiteUploader({ session, onSaved, isMobile }) {
+  const today = new Date().toISOString().split('T')[0]
+  const [open, setOpen] = useState(false)
+  const [fecha, setFecha] = useState(today)
+  const [titulo, setTitulo] = useState('')
+  const [asistentes, setAsistentes] = useState('')
+  const [temas, setTemas] = useState('')
+  const [acuerdos, setAcuerdos] = useState('')
+  const [compromisos, setCompromisos] = useState('')
+  const [archivo, setArchivo] = useState(null)
+  const [foto, setFoto] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [done, setDone] = useState(false)
+  const fileRef = useRef(null)
+  const fotoRef = useRef(null)
+
+  const reset = () => {
+    setFecha(today); setTitulo(''); setAsistentes(''); setTemas(''); setAcuerdos(''); setCompromisos('')
+    setArchivo(null); setFoto(null)
+    if (fileRef.current) fileRef.current.value = ''
+    if (fotoRef.current) fotoRef.current.value = ''
+  }
+
+  async function handleSave() {
+    if (!fecha) { alert('Falta la fecha del comité'); return }
+    setSaving(true)
+    try {
+      let archivo_url = null, archivo_nombre = null, foto_url = null
+      if (archivo) {
+        const r = await uploadActaToOneDrive(archivo)
+        archivo_url = r.url; archivo_nombre = r.name
+      }
+      if (foto) {
+        const fres = await uploadToOneDrive(foto, `comite_${fecha}_foto.jpg`, 'General', 'acta', foto.type || 'image/jpeg')
+        if (fres.ok) { const j = await fres.json(); foto_url = j.webUrl }
+      }
+      await addComiteActa({
+        fecha_comite: fecha,
+        titulo: titulo.trim() || null,
+        asistentes: asistentes.trim() || null,
+        temas: temas.trim() || null,
+        acuerdos: acuerdos.trim() || null,
+        compromisos: compromisos.trim() || null,
+        archivo_url, archivo_nombre, foto_url,
+        user_id: session.user.id,
+      })
+      reset()
+      setDone(true)
+      setTimeout(() => setDone(false), 2800)
+      setOpen(false)
+      await onSaved()
+    } catch (e) {
+      alert('Error guardando el acta: ' + (e.message || e))
+    } finally { setSaving(false) }
+  }
+
+  if (!open) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
+        background: C.card, borderRadius: 14, border: `1px solid ${C.border}`, padding: '14px 18px', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>¿Tuvieron comité hoy?</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>Sube el acta del comité semanal para que quede en el historial.</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {done && <span style={{ fontSize: 12, fontWeight: 700, color: C.green, background: '#dcfce7', borderRadius: 6, padding: '4px 10px' }}>✓ Acta registrada</span>}
+          <button onClick={() => setOpen(true)}
+            style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            + Subir acta
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const inputStyle = { width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text, background: 'white' }
+  const textareaStyle = { ...inputStyle, resize: 'vertical', minHeight: 70 }
+
+  return (
+    <div style={{ background: C.card, borderRadius: 14, border: `2px solid ${C.navy}`, padding: '20px', boxShadow: '0 6px 18px rgba(13,71,161,0.12)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nueva acta</div>
+        <button onClick={() => { setOpen(false); reset() }}
+          style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: 12, marginBottom: 12 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha del comité</label>
+          <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={inputStyle} />
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Título (opcional)</label>
+          <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Comité Social #14 — preparación reunión EPM" style={inputStyle} />
+        </div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asistentes</label>
+        <input value={asistentes} onChange={e => setAsistentes(e.target.value)} placeholder="Ej: Diana Silva, Alexandra Acevedo, Ana Leonor Pérez, Felipe Rodríguez" style={inputStyle} />
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Temas tratados</label>
+        <textarea value={temas} onChange={e => setTemas(e.target.value)} placeholder="Resumen de los principales temas del comité…" style={textareaStyle} />
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acuerdos / Decisiones</label>
+        <textarea value={acuerdos} onChange={e => setAcuerdos(e.target.value)} placeholder="Qué se acordó, decisiones tomadas…" style={textareaStyle} />
+      </div>
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compromisos pendientes</label>
+        <textarea value={compromisos} onChange={e => setCompromisos(e.target.value)} placeholder="Quién hace qué para el próximo comité…" style={textareaStyle} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 14 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acta (PDF / Word)</label>
+          <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={e => setArchivo(e.target.files?.[0] || null)}
+            style={{ ...inputStyle, padding: '8px 6px' }} />
+          {archivo && <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>📎 {archivo.name}</div>}
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Foto del comité (opcional)</label>
+          <input ref={fotoRef} type="file" accept="image/*"
+            onChange={e => setFoto(e.target.files?.[0] || null)}
+            style={{ ...inputStyle, padding: '8px 6px' }} />
+          {foto && <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>📷 {foto.name}</div>}
+        </div>
+      </div>
+      <button onClick={handleSave} disabled={saving}
+        style={{ width: '100%', background: saving ? '#94a3b8' : C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '11px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
+        {saving ? 'Guardando…' : 'Registrar acta en el historial'}
+      </button>
+    </div>
+  )
+}
+
 export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -364,6 +501,8 @@ export default function App() {
   const [actorEdits, setActorEdits] = useState([])
   const [editingActor, setEditingActor] = useState(null)
   const [registrosDiarios, setRegistrosDiarios] = useState([])
+  const [comiteActas, setComiteActas] = useState([])
+  const [selectedActa, setSelectedActa] = useState(null)
   const [inputSubTab, setInputSubTab] = useState('diario')
   const [showGuia, setShowGuia] = useState(false)
   const [auditLog, setAuditLog] = useState([])
@@ -443,6 +582,9 @@ export default function App() {
       if (v === 'gestora') {
         const [ev, rd] = await Promise.all([getEvidencias(), getRegistrosDiarios()])
         setEvidencias(ev || []); setRegistrosDiarios(rd || [])
+      }
+      if (v === 'comite') {
+        setComiteActas(await getComiteActas() || [])
       }
     } catch (err) { console.error('Error loading view data:', err) }
   }, [session, cronograma.length, huellaSocial.length, riesgosLeg.length, kpisDac.length, knowledgeBase.length])
@@ -543,6 +685,7 @@ export default function App() {
     { id: 'miterritorio', label: 'Mi Territorio', icon: <IconPin size={16} />, children: [
       { id: 'gestora', label: 'Vista General', icon: <IconPin size={16} /> },
       { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
+      { id: 'comite', label: 'Comité Social', icon: <IconUsers size={16} /> },
     ]},
     { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
     { id: 'estrategia', label: 'Estrategia Social', icon: <IconGlobe size={16} />, children: [
@@ -2679,6 +2822,114 @@ export default function App() {
           </div>
         )}
 
+        {/* ━━ COMITÉ SOCIAL — Repositorio de actas ━━ */}
+        {view === 'comite' && (() => {
+          const actas = comiteActas || []
+          const totalActas = actas.length
+          const now = new Date()
+          const startMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+          const actasMes = actas.filter(a => a.fecha_comite && new Date(a.fecha_comite + 'T00:00:00') >= startMonth).length
+          const ultima = actas[0]
+          const diasDesdeUltima = ultima && ultima.fecha_comite
+            ? Math.max(0, Math.floor((now - new Date(ultima.fecha_comite + 'T00:00:00')) / (24*60*60*1000)))
+            : null
+          const tonoUltima = diasDesdeUltima == null
+            ? { color: C.subtle, bg: 'rgba(255,255,255,0.1)' }
+            : diasDesdeUltima <= 7
+              ? { color: '#86efac', bg: 'rgba(34,197,94,0.18)' }
+              : diasDesdeUltima <= 14
+                ? { color: '#fde68a', bg: 'rgba(245,158,11,0.18)' }
+                : { color: '#fca5a5', bg: 'rgba(239,68,68,0.18)' }
+          return (
+            <div style={{ maxWidth: 1140, margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 16px' }}>
+              {/* Hero */}
+              <div style={{ background: `linear-gradient(135deg, #0a2d5e 0%, ${C.navy} 45%, ${C.blue} 100%)`,
+                borderRadius: 16, padding: '24px 28px', marginBottom: 20, color: 'white', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', right: -30, top: -30, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                <div style={{ position: 'absolute', right: 60, bottom: -50, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Mi Territorio · Repositorio</div>
+                <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Comité Social</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 16, maxWidth: 720, lineHeight: 1.55 }}>
+                  Historial completo de actas del comité semanal. Miércoles 9:00 a.m. Cada acta queda archivada con sus asistentes, temas, acuerdos y compromisos. El archivo formal vive en OneDrive.
+                </div>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 18px', minWidth: 100 }}>
+                    <div style={{ fontSize: 24, fontWeight: 900, color: 'white', lineHeight: 1 }}>{totalActas}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>Actas registradas</div>
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 18px', minWidth: 100 }}>
+                    <div style={{ fontSize: 24, fontWeight: 900, color: 'white', lineHeight: 1 }}>{actasMes}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>Este mes</div>
+                  </div>
+                  <div style={{ background: tonoUltima.bg, borderRadius: 10, padding: '10px 18px', minWidth: 130 }}>
+                    <div style={{ fontSize: 24, fontWeight: 900, color: tonoUltima.color, lineHeight: 1 }}>
+                      {diasDesdeUltima == null ? '—' : `${diasDesdeUltima}d`}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>Desde la última</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Formulario de carga */}
+              <ComiteUploader
+                session={session}
+                onSaved={async () => { setComiteActas(await getComiteActas() || []) }}
+                isMobile={isMobile}
+              />
+
+              {/* Timeline / lista de actas */}
+              <div style={{ marginTop: 24, background: C.card, borderRadius: 14, border: `1px solid ${C.border}`, padding: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Historial de actas</div>
+                  <div style={{ fontSize: 12, color: C.subtle }}>{totalActas} {totalActas === 1 ? 'acta' : 'actas'}</div>
+                </div>
+                {actas.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 0', color: C.subtle, fontSize: 14 }}>
+                    Aún no hay actas registradas. Sube la primera arriba.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {actas.map(a => {
+                      const d = a.fecha_comite ? new Date(a.fecha_comite + 'T00:00:00') : null
+                      const fechaCorta = d ? d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
+                      const dia = d ? d.toLocaleDateString('es-CO', { weekday: 'short' }) : ''
+                      const autor = a.profile?.full_name || ''
+                      return (
+                        <div key={a.id} onClick={() => setSelectedActa(a)}
+                          style={{ display: 'flex', gap: 14, padding: '12px 14px', borderRadius: 12, border: `1px solid ${C.border}`,
+                            background: '#fafbfc', cursor: 'pointer', transition: 'all 0.15s', alignItems: 'flex-start' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = C.navy + '55' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#fafbfc'; e.currentTarget.style.borderColor = C.border }}>
+                          <div style={{ minWidth: 70, flexShrink: 0, textAlign: 'center', background: 'white', borderRadius: 10, border: `1px solid ${C.border}`, padding: '8px 6px' }}>
+                            <div style={{ fontSize: 10, color: C.subtle, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>{dia}</div>
+                            <div style={{ fontSize: 14, color: C.navy, fontWeight: 800, lineHeight: 1.2, marginTop: 2 }}>{fechaCorta}</div>
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {a.titulo || `Comité Social — ${fechaCorta}`}
+                            </div>
+                            {a.temas && (
+                              <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                {a.temas}
+                              </div>
+                            )}
+                            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
+                              {a.archivo_url && <span style={{ fontSize: 11, fontWeight: 700, background: '#eff6ff', color: C.navy, borderRadius: 6, padding: '2px 8px' }}>📎 Acta</span>}
+                              {a.foto_url && <span style={{ fontSize: 11, fontWeight: 700, background: '#fef3c7', color: '#92400e', borderRadius: 6, padding: '2px 8px' }}>📷 Foto</span>}
+                              {a.acuerdos && <span style={{ fontSize: 11, fontWeight: 700, background: '#dcfce7', color: '#166534', borderRadius: 6, padding: '2px 8px' }}>✓ Acuerdos</span>}
+                              {autor && <span style={{ fontSize: 11, color: C.subtle, marginLeft: 'auto' }}>— {autor}</span>}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Footer con olas animadas */}
         <div style={{ marginTop: 60, position: 'relative', height: 100, overflow: 'hidden' }}>
           <svg className="clng-wave-1" viewBox="0 0 2400 80" preserveAspectRatio="none"
@@ -2944,6 +3195,103 @@ export default function App() {
                     borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
                   Ver carpeta en OneDrive →
                 </a>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* ── Acta Detail Modal ── */}
+      {selectedActa && (() => {
+        const a = selectedActa
+        const d = a.fecha_comite ? new Date(a.fecha_comite + 'T00:00:00') : null
+        const fechaLarga = d ? d.toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : ''
+        const autor = a.profile?.full_name || ''
+        const onDelete = async () => {
+          if (!confirm('¿Eliminar esta acta del historial? El archivo en OneDrive no se borra.')) return
+          try {
+            await deleteComiteActa(a.id)
+            setComiteActas((await getComiteActas()) || [])
+            setSelectedActa(null)
+          } catch (e) { alert('Error eliminando: ' + (e.message || e)) }
+        }
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+            onClick={(e) => { if (e.target === e.currentTarget) setSelectedActa(null) }}>
+            <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 620,
+              maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '16px 22px', borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Comité Social</div>
+                  <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginTop: 2 }}>{a.titulo || 'Acta del comité'}</div>
+                </div>
+                <button onClick={() => setSelectedActa(null)}
+                  style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+              </div>
+              {a.foto_url && (
+                <a href={a.foto_url} target="_blank" rel="noopener noreferrer">
+                  <img src={a.foto_url} alt="" style={{ width: '100%', maxHeight: 280, objectFit: 'cover', display: 'block' }} />
+                </a>
+              )}
+              <div style={{ padding: 22 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 14, borderBottom: `1px solid ${C.border}`, marginBottom: 14 }}>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Fecha</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{fechaLarga}</span>
+                  </div>
+                  {autor && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Subido por</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{autor}</span>
+                    </div>
+                  )}
+                  {a.asistentes && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Asistentes</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600, lineHeight: 1.5 }}>{a.asistentes}</span>
+                    </div>
+                  )}
+                </div>
+                {a.temas && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Temas tratados</div>
+                    <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{a.temas}</div>
+                  </div>
+                )}
+                {a.acuerdos && (
+                  <div style={{ marginBottom: 14, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>✓ Acuerdos / Decisiones</div>
+                    <div style={{ fontSize: 13, color: '#14532d', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{a.acuerdos}</div>
+                  </div>
+                )}
+                {a.compromisos && (
+                  <div style={{ marginBottom: 14, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>→ Compromisos pendientes</div>
+                    <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{a.compromisos}</div>
+                  </div>
+                )}
+                {a.archivo_url && (
+                  <a href={a.archivo_url} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'block', marginTop: 10, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                      borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                    📎 Abrir acta en OneDrive {a.archivo_nombre ? `· ${a.archivo_nombre}` : ''}
+                  </a>
+                )}
+                <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent('/personal/diana_silva_caribelng_com/Documents/Conecta/Actas Comite Social/' + (d ? d.getFullYear() : new Date().getFullYear()))}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'block', marginTop: 8, background: 'white', color: C.navy, border: `1px solid ${C.navy}55`,
+                    borderRadius: 10, padding: '8px 16px', fontSize: 12, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                  Ver carpeta del año en OneDrive →
+                </a>
+                {isAdmin && (
+                  <button onClick={onDelete}
+                    style={{ marginTop: 10, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 10,
+                      padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
+                    Eliminar acta del historial
+                  </button>
+                )}
               </div>
             </div>
           </div>

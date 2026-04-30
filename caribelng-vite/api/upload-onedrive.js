@@ -39,6 +39,7 @@ export default async function handler(req, res) {
     let folder
     if (type === 'reporte') folder = `Conecta/Reportes/${t}`
     else if (type === 'registro') folder = `Conecta/Registros/${t}/${month}`
+    else if (type === 'acta') folder = `Conecta/Actas Comite Social/${now.getFullYear()}`
     else folder = `Conecta/Evidencias/${t}/${month}`
     const filePath = `${folder}/${fileName}`
 
