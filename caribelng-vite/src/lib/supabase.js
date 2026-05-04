@@ -611,3 +611,21 @@ export async function deleteComiteActa(id) {
   const { error } = await supabase.from('comite_actas').delete().eq('id', id)
   if (error) throw error
 }
+
+export async function updateComiteActa(id, fields) {
+  const { data, error } = await supabase.from('comite_actas').update(fields).eq('id', id).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function updateEvidencia(id, fields) {
+  const { data, error } = await supabase.from('evidencias').update(fields).eq('id', id).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function updateRegistroDiario(id, fields) {
+  const { data, error } = await supabase.from('registros_diarios').update(fields).eq('id', id).select().single()
+  if (error) throw error
+  return data
+}

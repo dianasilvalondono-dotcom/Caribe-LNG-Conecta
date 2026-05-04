@@ -14,7 +14,8 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          uploadEvidenciaPhoto, addEvidencia, getEvidencias, deleteEvidencia,
          submitActorEdit, getActorEdits, approveActorEdit, rejectActorEdit,
          addRegistroDiario, getRegistrosDiarios,
-         getComiteActas, addComiteActa, deleteComiteActa, uploadActaToOneDrive, uploadToOneDrive,
+         getComiteActas, addComiteActa, deleteComiteActa, updateComiteActa, uploadActaToOneDrive, uploadToOneDrive,
+         updateEvidencia, updateRegistroDiario,
          getAuditLog, subscribeToPush, sendPushNotification } from './lib/supabase'
 
 import { IconDashboard, IconPin, IconUsers, IconGlobe, IconHandshake, IconLeaf, IconCalendar,
@@ -300,13 +301,203 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 }
 
 // ━━ Main App ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ── Comité Social — Uploader de actas ────────────────────────────────────────
+// ── Modal editor reusable para Acta de reunión PGS ───────────────────────────
+function ActaEditModal({ acta, isAdmin, currentUserId, onClose, onSaved, onDeleted, isMobile }) {
+  const isOwner = acta.user_id === currentUserId
+  const canEdit = isAdmin || isOwner
+  const [editing, setEditing] = useState(false)
+  const [fields, setFields] = useState({
+    fecha_comite: acta.fecha_comite || '',
+    titulo: acta.titulo || '',
+    asistentes: acta.asistentes || '',
+    temas: acta.temas || '',
+    acuerdos: acta.acuerdos || '',
+    compromisos: acta.compromisos || '',
+  })
+  const [saving, setSaving] = useState(false)
+
+  const d = acta.fecha_comite ? new Date(acta.fecha_comite + 'T00:00:00') : null
+  const fechaLarga = d ? d.toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : ''
+  const autor = acta.profile?.full_name || ''
+
+  async function handleSave() {
+    setSaving(true)
+    try {
+      await updateComiteActa(acta.id, {
+        fecha_comite: fields.fecha_comite,
+        titulo: fields.titulo.trim() || null,
+        asistentes: fields.asistentes.trim() || null,
+        temas: fields.temas.trim() || null,
+        acuerdos: fields.acuerdos.trim() || null,
+        compromisos: fields.compromisos.trim() || null,
+      })
+      setEditing(false)
+      await onSaved()
+    } catch (e) { alert('Error guardando: ' + (e.message || e)) }
+    finally { setSaving(false) }
+  }
+
+  const inputStyle = { width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text, background: 'white' }
+  const textareaStyle = { ...inputStyle, resize: 'vertical', minHeight: 80 }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 620,
+        maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '16px 22px', borderBottom: `1px solid ${C.border}` }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Reunión PGS</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginTop: 2 }}>
+              {editing ? 'Editar acta' : (acta.titulo || 'Acta de reunión')}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            {!editing && canEdit && (
+              <button onClick={() => setEditing(true)}
+                style={{ background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}55`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                ✎ Editar
+              </button>
+            )}
+            <button onClick={onClose}
+              style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+          </div>
+        </div>
+        {acta.foto_url && !editing && (
+          <a href={acta.foto_url} target="_blank" rel="noopener noreferrer">
+            <img src={acta.foto_url} alt="" style={{ width: '100%', maxHeight: 280, objectFit: 'cover', display: 'block' }} />
+          </a>
+        )}
+        <div style={{ padding: 22 }}>
+          {editing ? (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha</label>
+                  <input type="date" value={fields.fecha_comite} onChange={e => setFields({ ...fields, fecha_comite: e.target.value })} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Título</label>
+                  <input value={fields.titulo} onChange={e => setFields({ ...fields, titulo: e.target.value })} style={inputStyle} />
+                </div>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asistentes</label>
+                <input value={fields.asistentes} onChange={e => setFields({ ...fields, asistentes: e.target.value })} style={inputStyle} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Temas tratados</label>
+                <textarea value={fields.temas} onChange={e => setFields({ ...fields, temas: e.target.value })} style={textareaStyle} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acuerdos / Decisiones</label>
+                <textarea value={fields.acuerdos} onChange={e => setFields({ ...fields, acuerdos: e.target.value })} style={textareaStyle} />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compromisos pendientes</label>
+                <textarea value={fields.compromisos} onChange={e => setFields({ ...fields, compromisos: e.target.value })} style={textareaStyle} />
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => setEditing(false)} disabled={saving}
+                  style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  Cancelar
+                </button>
+                <button onClick={handleSave} disabled={saving}
+                  style={{ flex: 2, background: saving ? '#94a3b8' : C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: saving ? 'wait' : 'pointer' }}>
+                  {saving ? 'Guardando…' : 'Guardar cambios'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 14, borderBottom: `1px solid ${C.border}`, marginBottom: 14 }}>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Fecha</span>
+                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{fechaLarga}</span>
+                </div>
+                {autor && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Subido por</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{autor}</span>
+                  </div>
+                )}
+                {acta.asistentes && (
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Asistentes</span>
+                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600, lineHeight: 1.5 }}>{acta.asistentes}</span>
+                  </div>
+                )}
+              </div>
+              {acta.temas && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Temas tratados</div>
+                  <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{acta.temas}</div>
+                </div>
+              )}
+              {acta.acuerdos && (
+                <div style={{ marginBottom: 14, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>✓ Acuerdos / Decisiones</div>
+                  <div style={{ fontSize: 13, color: '#14532d', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{acta.acuerdos}</div>
+                </div>
+              )}
+              {acta.compromisos && (
+                <div style={{ marginBottom: 14, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>→ Compromisos pendientes</div>
+                  <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{acta.compromisos}</div>
+                </div>
+              )}
+              {acta.archivo_url && (
+                <a href={acta.archivo_url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'block', marginTop: 10, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                    borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                  📎 Abrir acta en OneDrive {acta.archivo_nombre ? `· ${acta.archivo_nombre}` : ''}
+                </a>
+              )}
+              <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent('/personal/diana_silva_caribelng_com/Documents/Conecta/Actas Comite Social/' + (d ? d.getFullYear() : new Date().getFullYear()))}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ display: 'block', marginTop: 8, background: 'white', color: C.navy, border: `1px solid ${C.navy}55`,
+                  borderRadius: 10, padding: '8px 16px', fontSize: 12, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                Ver carpeta del año en OneDrive →
+              </a>
+              {isAdmin && (
+                <button onClick={onDeleted}
+                  style={{ marginTop: 10, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 10,
+                    padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
+                  Eliminar acta del historial
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Reuniones PGS — Uploader de actas ────────────────────────────────────────
+const TIPOS_REUNION = [
+  'Comité Social interno',
+  'Reunión con comunidad',
+  'Reunión con JAC',
+  'Reunión institucional',
+  'Reunión con EPM',
+  'Reunión con Compas',
+  'Reunión con autoridad / regulador',
+  'Reunión con aliado / proveedor',
+  'Otra',
+]
+
 function ComiteUploader({ session, onSaved, isMobile }) {
   const today = new Date().toISOString().split('T')[0]
   const [open, setOpen] = useState(false)
   const [fecha, setFecha] = useState(today)
+  const [tipo, setTipo] = useState(TIPOS_REUNION[0])
+  const [lugar, setLugar] = useState('')
   const [titulo, setTitulo] = useState('')
   const [asistentes, setAsistentes] = useState('')
+  const [participantesExternos, setParticipantesExternos] = useState('')
   const [temas, setTemas] = useState('')
   const [acuerdos, setAcuerdos] = useState('')
   const [compromisos, setCompromisos] = useState('')
@@ -318,14 +509,19 @@ function ComiteUploader({ session, onSaved, isMobile }) {
   const fotoRef = useRef(null)
 
   const reset = () => {
-    setFecha(today); setTitulo(''); setAsistentes(''); setTemas(''); setAcuerdos(''); setCompromisos('')
+    setFecha(today); setTipo(TIPOS_REUNION[0]); setLugar(''); setTitulo('')
+    setAsistentes(''); setParticipantesExternos('')
+    setTemas(''); setAcuerdos(''); setCompromisos('')
     setArchivo(null); setFoto(null)
     if (fileRef.current) fileRef.current.value = ''
     if (fotoRef.current) fotoRef.current.value = ''
   }
 
   async function handleSave() {
-    if (!fecha) { alert('Falta la fecha del comité'); return }
+    if (!fecha) { alert('Falta la fecha de la reunión'); return }
+    if (!temas.trim() && !archivo) {
+      alert('Escribe los temas tratados o adjunta el archivo del acta.'); return
+    }
     setSaving(true)
     try {
       let archivo_url = null, archivo_nombre = null, foto_url = null
@@ -334,14 +530,21 @@ function ComiteUploader({ session, onSaved, isMobile }) {
         archivo_url = r.url; archivo_nombre = r.name
       }
       if (foto) {
-        const fres = await uploadToOneDrive(foto, `comite_${fecha}_foto.jpg`, 'General', 'acta', foto.type || 'image/jpeg')
+        const fres = await uploadToOneDrive(foto, `reunion_${fecha}_foto.jpg`, 'General', 'acta', foto.type || 'image/jpeg')
         if (fres.ok) { const j = await fres.json(); foto_url = j.webUrl }
       }
+      // Construir el resumen final con tipo + lugar embebidos hasta que existan columnas dedicadas
+      const tituloFinal = titulo.trim() || `${tipo} — ${new Date(fecha + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}`
+      const meta = [`Tipo: ${tipo}`]
+      if (lugar.trim()) meta.push(`Lugar: ${lugar.trim()}`)
+      if (participantesExternos.trim()) meta.push(`Participantes externos: ${participantesExternos.trim()}`)
+      const temasFinal = (meta.join(' · ') + (temas.trim() ? `\n\n${temas.trim()}` : '')).trim()
+      const asistentesFinal = asistentes.trim() || null
       await addComiteActa({
         fecha_comite: fecha,
-        titulo: titulo.trim() || null,
-        asistentes: asistentes.trim() || null,
-        temas: temas.trim() || null,
+        titulo: tituloFinal,
+        asistentes: asistentesFinal,
+        temas: temasFinal,
         acuerdos: acuerdos.trim() || null,
         compromisos: compromisos.trim() || null,
         archivo_url, archivo_nombre, foto_url,
@@ -362,14 +565,14 @@ function ComiteUploader({ session, onSaved, isMobile }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
         background: C.card, borderRadius: 14, border: `1px solid ${C.border}`, padding: '14px 18px', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>¿Tuvieron comité hoy?</div>
-          <div style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>Sube el acta del comité semanal para que quede en el historial.</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>¿Tuviste una reunión del PGS?</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>Comité social, comunidad, JAC, institucional, EPM, Compas… Registra el acta acá para que quede en el historial.</div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {done && <span style={{ fontSize: 12, fontWeight: 700, color: C.green, background: '#dcfce7', borderRadius: 6, padding: '4px 10px' }}>✓ Acta registrada</span>}
           <button onClick={() => setOpen(true)}
             style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-            + Subir acta
+            + Nueva acta
           </button>
         </div>
       </div>
@@ -382,27 +585,43 @@ function ComiteUploader({ session, onSaved, isMobile }) {
   return (
     <div style={{ background: C.card, borderRadius: 14, border: `2px solid ${C.navy}`, padding: '20px', boxShadow: '0 6px 18px rgba(13,71,161,0.12)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nueva acta</div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nueva acta de reunión</div>
         <button onClick={() => { setOpen(false); reset() }}
           style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: 12, marginBottom: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 12 }}>
         <div>
-          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha del comité</label>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha de la reunión</label>
           <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={inputStyle} />
         </div>
         <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo de reunión</label>
+          <select value={tipo} onChange={e => setTipo(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+            {TIPOS_REUNION.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 12 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Lugar</label>
+          <input value={lugar} onChange={e => setLugar(e.target.value)} placeholder="Vereda, sede de la JAC, oficina EPM…" style={inputStyle} />
+        </div>
+        <div>
           <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Título (opcional)</label>
-          <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Comité Social #14 — preparación reunión EPM" style={inputStyle} />
+          <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Socialización Plan de Gestión Social" style={inputStyle} />
         </div>
       </div>
       <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asistentes</label>
-        <input value={asistentes} onChange={e => setAsistentes(e.target.value)} placeholder="Ej: Diana Silva, Alexandra Acevedo, Ana Leonor Pérez, Felipe Rodríguez" style={inputStyle} />
+        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asistentes Caribe LNG</label>
+        <input value={asistentes} onChange={e => setAsistentes(e.target.value)} placeholder="Diana Silva, Alexandra Acevedo, Felipe Rodríguez…" style={inputStyle} />
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Participantes externos</label>
+        <input value={participantesExternos} onChange={e => setParticipantesExternos(e.target.value)} placeholder="Pdte. JAC X, Alcalde, lider Y, contraparte Z…" style={inputStyle} />
       </div>
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Temas tratados</label>
-        <textarea value={temas} onChange={e => setTemas(e.target.value)} placeholder="Resumen de los principales temas del comité…" style={textareaStyle} />
+        <textarea value={temas} onChange={e => setTemas(e.target.value)} placeholder="Resumen de los principales temas tratados en la reunión…" style={textareaStyle} />
       </div>
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acuerdos / Decisiones</label>
@@ -494,7 +713,11 @@ export default function App() {
   const [evidencias, setEvidencias] = useState([])
   const [showEvidenciaCapture, setShowEvidenciaCapture] = useState(false)
   const [selectedEvidencia, setSelectedEvidencia] = useState(null)
+  const [evidenciaEditMode, setEvidenciaEditMode] = useState(false)
+  const [evidenciaEditFields, setEvidenciaEditFields] = useState({ descripcion: '', lugar: '' })
   const [selectedRegistro, setSelectedRegistro] = useState(null)
+  const [registroEditMode, setRegistroEditMode] = useState(false)
+  const [registroEditFields, setRegistroEditFields] = useState({ descripcion: '', tipo_reunion: '', lugar: '', asistentes: 0 })
   const [alertaMensaje, setAlertaMensaje] = useState('')
   const [alertaUrgencia, setAlertaUrgencia] = useState('Media')
   const [alertaEnviada, setAlertaEnviada] = useState(false)
@@ -685,7 +908,7 @@ export default function App() {
     { id: 'miterritorio', label: 'Mi Territorio', icon: <IconPin size={16} />, children: [
       { id: 'gestora', label: 'Vista General', icon: <IconPin size={16} /> },
       { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
-      { id: 'comite', label: 'Comité Social', icon: <IconUsers size={16} /> },
+      { id: 'comite', label: 'Reuniones PGS', icon: <IconUsers size={16} /> },
     ]},
     { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
     { id: 'estrategia', label: 'Estrategia Social', icon: <IconGlobe size={16} />, children: [
@@ -1898,23 +2121,26 @@ export default function App() {
                 reportes={reportes} seguimiento={seguimiento} onSaved={loadData} isAdmin={isAdmin} />
             )}
 
-            {/* ── SUB-TAB: EVIDENCIAS ── */}
+            {/* ── SUB-TAB: EVIDENCIAS (subida múltiple) ── */}
             {inputSubTab === 'evidencias' && (() => {
               const EvidenciasTab = () => {
-                const [file, setFile] = useState(null)
-                const [preview, setPreview] = useState(null)
+                const [files, setFiles] = useState([])
+                const [previews, setPreviews] = useState([])
                 const [desc, setDesc] = useState('')
                 const [geo, setGeo] = useState(null)
                 const [lugar, setLugar] = useState(null)
                 const [captureTime, setCaptureTime] = useState(null)
                 const [uploading, setUploading] = useState(false)
+                const [progress, setProgress] = useState(null) // { done, total, failed }
                 const fileRef = useRef(null)
 
-                const handleFile = (e) => {
-                  const f = e.target.files?.[0]
-                  if (!f) return
-                  setFile(f)
-                  setPreview(URL.createObjectURL(f))
+                const handleFiles = (e) => {
+                  const fs = Array.from(e.target.files || [])
+                  if (fs.length === 0) return
+                  // Liberar URLs previas
+                  previews.forEach(u => { try { URL.revokeObjectURL(u) } catch {} })
+                  setFiles(fs)
+                  setPreviews(fs.map(f => URL.createObjectURL(f)))
                   setCaptureTime(new Date().toISOString())
                   if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
@@ -1934,47 +2160,121 @@ export default function App() {
                   }
                 }
 
+                const removeFile = (idx) => {
+                  try { URL.revokeObjectURL(previews[idx]) } catch {}
+                  setFiles(files.filter((_, i) => i !== idx))
+                  setPreviews(previews.filter((_, i) => i !== idx))
+                }
+
+                const reset = () => {
+                  previews.forEach(u => { try { URL.revokeObjectURL(u) } catch {} })
+                  setFiles([]); setPreviews([]); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null); setProgress(null)
+                }
+
+                const total = files.length
+
                 return (
                   <div>
                     {/* Upload card */}
                     <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
-                      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
-                      {!preview ? (
+                      <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: 'none' }} />
+                      {total === 0 ? (
                         <div onClick={() => fileRef.current?.click()}
                           style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
-                          <div style={{ fontSize: 40, marginBottom: 8 }}></div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
-                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>GPS + hora + lugar automáticos</div>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Subir una o varias evidencias</div>
+                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Selecciona varias fotos a la vez · GPS + hora + lugar automáticos</div>
                         </div>
                       ) : (
                         <div>
-                          <img src={preview} alt="" style={{ width: '100%', borderRadius: 10, maxHeight: 180, objectFit: 'cover', marginBottom: 10 }} />
+                          {/* Grid de previews con botón ✕ por foto */}
+                          <div style={{ display: 'grid', gridTemplateColumns: total === 1 ? '1fr' : 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8, marginBottom: 10 }}>
+                            {previews.map((src, i) => (
+                              <div key={i} style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', aspectRatio: '1', background: '#f1f5f9' }}>
+                                <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                {!uploading && (
+                                  <button onClick={() => removeFile(i)} aria-label="Quitar"
+                                    style={{ position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, lineHeight: 1, padding: 0 }}>
+                                    ✕
+                                  </button>
+                                )}
+                                <div style={{ position: 'absolute', bottom: 4, left: 6, fontSize: 10, color: 'white', fontWeight: 700, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{i + 1}</div>
+                              </div>
+                            ))}
+                            {/* Botón + para agregar más */}
+                            {!uploading && (
+                              <div onClick={() => fileRef.current?.click()}
+                                style={{ aspectRatio: '1', border: `2px dashed ${C.accent}66`, borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: C.accent, background: `${C.accent}05` }}>
+                                <div style={{ fontSize: 22, fontWeight: 800 }}>+</div>
+                                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 2 }}>Agregar</div>
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: C.muted, marginBottom: 8, fontWeight: 700 }}>
+                            {total} {total === 1 ? 'foto seleccionada' : 'fotos seleccionadas'}
+                          </div>
                           {captureTime && (
                             <div style={{ background: '#f8fafc', borderRadius: 8, padding: 10, marginBottom: 10, fontSize: 13 }}>
-                              <div>— {new Date(captureTime).toLocaleString('es-CO')}</div>
-                              {geo && <div>GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              <div>📅 {new Date(captureTime).toLocaleString('es-CO')}</div>
+                              {geo && <div>📍 GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
                               {lugar && <div>· {lugar}</div>}
                             </div>
                           )}
-                          <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="Descripción de la evidencia *" rows={2}
+                          <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder={total > 1 ? `Descripción común para las ${total} evidencias *` : 'Descripción de la evidencia *'} rows={2}
                             style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
+                          {progress && (
+                            <div style={{ marginBottom: 10 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.muted, marginBottom: 4, fontWeight: 700 }}>
+                                <span>Subiendo {progress.done}/{progress.total}{progress.failed ? ` · ${progress.failed} con error` : ''}</span>
+                                <span>{Math.round((progress.done / progress.total) * 100)}%</span>
+                              </div>
+                              <div style={{ height: 6, borderRadius: 4, background: '#e2e8f0', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', background: progress.failed ? C.orange : C.green, width: `${(progress.done / progress.total) * 100}%`, transition: 'width 0.3s' }} />
+                              </div>
+                            </div>
+                          )}
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setLugar(null); setCaptureTime(null) }}
-                              style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+                            <button onClick={reset} disabled={uploading}
+                              style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.5 : 1 }}>Cancelar</button>
                             <button onClick={async () => {
-                              if (!desc.trim() || !geo) return alert(geo ? 'Agrega una descripción' : 'Esperando GPS...')
+                              if (!desc.trim()) return alert('Agrega una descripción')
+                              if (!geo) return alert('Esperando GPS...')
                               setUploading(true)
-                              try {
-                                const foto_url = await uploadEvidenciaPhoto(file, myTerritorio)
-                                await addEvidencia({ user_id: session.user.id, territorio: myTerritorio || 'Nacional', foto_url, latitud: geo.lat, longitud: geo.lng, precision_m: geo.accuracy, descripcion: desc.trim(), capturada_at: captureTime, lugar })
-                                await loadData()
-                                setFile(null); setPreview(null); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null)
-                              } catch (err) { alert('Error: ' + err.message) }
-                              finally { setUploading(false) }
+                              setProgress({ done: 0, total, failed: 0 })
+                              let failed = 0
+                              for (let i = 0; i < files.length; i++) {
+                                try {
+                                  const foto_url = await uploadEvidenciaPhoto(files[i], myTerritorio)
+                                  await addEvidencia({
+                                    user_id: session.user.id,
+                                    territorio: myTerritorio || 'Nacional',
+                                    foto_url,
+                                    latitud: geo.lat, longitud: geo.lng, precision_m: geo.accuracy,
+                                    descripcion: desc.trim(),
+                                    capturada_at: captureTime,
+                                    lugar
+                                  })
+                                } catch (err) {
+                                  failed++
+                                  console.error('Evidencia falló:', files[i]?.name, err)
+                                }
+                                setProgress({ done: i + 1, total, failed })
+                              }
+                              await loadData()
+                              setUploading(false)
+                              if (failed === 0) {
+                                reset()
+                              } else {
+                                alert(`${total - failed} evidencias subidas, ${failed} con error. Revisa la consola.`)
+                              }
                             }}
-                              disabled={uploading || !desc.trim()}
+                              disabled={uploading || !desc.trim() || total === 0}
                               style={{ flex: 2, background: uploading || !desc.trim() ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
-                              {uploading ? 'Subiendo...' : geo ? 'Guardar' : 'Guardar sin GPS'}
+                              {uploading
+                                ? `Subiendo ${progress?.done || 0}/${total}…`
+                                : total > 1
+                                  ? `Guardar ${total} evidencias${geo ? '' : ' sin GPS'}`
+                                  : (geo ? 'Guardar' : 'Guardar sin GPS')}
                             </button>
                           </div>
                         </div>
@@ -2848,9 +3148,9 @@ export default function App() {
                 <div style={{ position: 'absolute', right: -30, top: -30, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
                 <div style={{ position: 'absolute', right: 60, bottom: -50, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Mi Territorio · Repositorio</div>
-                <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Comité Social</div>
+                <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Reuniones · Plan de Gestión Social</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 16, maxWidth: 720, lineHeight: 1.55 }}>
-                  Historial completo de actas del comité semanal. Miércoles 9:00 a.m. Cada acta queda archivada con sus asistentes, temas, acuerdos y compromisos. El archivo formal vive en OneDrive.
+                  Historial de actas de TODAS las reuniones del PGS — internas y externas: comité social semanal de los miércoles, reuniones con comunidades, instituciones, EPM, Compas, JAC, autoridades. Sube el acta escrita en la app o adjunta el archivo formal; el archivo vive en OneDrive.
                 </div>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 18px', minWidth: 100 }}>
@@ -2880,7 +3180,7 @@ export default function App() {
               {/* Timeline / lista de actas */}
               <div style={{ marginTop: 24, background: C.card, borderRadius: 14, border: `1px solid ${C.border}`, padding: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Historial de actas</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Historial de reuniones</div>
                   <div style={{ fontSize: 12, color: C.subtle }}>{totalActas} {totalActas === 1 ? 'acta' : 'actas'}</div>
                 </div>
                 {actas.length === 0 ? (
@@ -3038,7 +3338,11 @@ export default function App() {
       )}
 
       {/* ── Evidencia Detail Modal ── */}
-      {selectedEvidencia && (
+      {selectedEvidencia && (() => {
+        const ev = selectedEvidencia
+        const isOwner = ev.user_id === session?.user?.id
+        const canEdit = isAdmin || isOwner
+        return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={(e) => { if (e.target === e.currentTarget) setSelectedEvidencia(null) }}>
@@ -3047,66 +3351,109 @@ export default function App() {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Evidencia</div>
-              <button onClick={() => setSelectedEvidencia(null)}
-                style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+              <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>{evidenciaEditMode ? 'Editar evidencia' : 'Evidencia'}</div>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                {!evidenciaEditMode && canEdit && (
+                  <button onClick={() => {
+                    setEvidenciaEditFields({ descripcion: ev.descripcion || '', lugar: ev.lugar || '' })
+                    setEvidenciaEditMode(true)
+                  }}
+                    style={{ background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}55`, borderRadius: 8, padding: '5px 11px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    ✎ Editar
+                  </button>
+                )}
+                <button onClick={() => { setSelectedEvidencia(null); setEvidenciaEditMode(false) }}
+                  style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+              </div>
             </div>
             {/* Imagen */}
-            <a href={selectedEvidencia.foto_url} target="_blank" rel="noopener noreferrer">
-              <img src={selectedEvidencia.foto_url} alt=""
+            <a href={ev.foto_url} target="_blank" rel="noopener noreferrer">
+              <img src={ev.foto_url} alt=""
                 style={{ width: '100%', maxHeight: 300, objectFit: 'cover', display: 'block' }} />
             </a>
             {/* Detalle */}
             <div style={{ padding: 20 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 16, lineHeight: 1.5 }}>
-                {selectedEvidencia.descripcion}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Fecha</span>
-                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
-                    {new Date(selectedEvidencia.capturada_at).toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'short' })}
-                  </span>
-                </div>
-                {selectedEvidencia.lugar && (
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Lugar</span>
-                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedEvidencia.lugar}</span>
+              {evidenciaEditMode ? (
+                <>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Descripción</label>
+                  <textarea value={evidenciaEditFields.descripcion} onChange={e => setEvidenciaEditFields({ ...evidenciaEditFields, descripcion: e.target.value })}
+                    rows={3} style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 14, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 12 }} />
+                  <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Lugar</label>
+                  <input value={evidenciaEditFields.lugar} onChange={e => setEvidenciaEditFields({ ...evidenciaEditFields, lugar: e.target.value })}
+                    style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 14, fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 14 }} />
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => setEvidenciaEditMode(false)}
+                      style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancelar</button>
+                    <button onClick={async () => {
+                      try {
+                        await updateEvidencia(ev.id, {
+                          descripcion: evidenciaEditFields.descripcion.trim(),
+                          lugar: evidenciaEditFields.lugar.trim() || null,
+                        })
+                        await loadData()
+                        setEvidenciaEditMode(false)
+                        setSelectedEvidencia({ ...ev, ...evidenciaEditFields, lugar: evidenciaEditFields.lugar.trim() || null, descripcion: evidenciaEditFields.descripcion.trim() })
+                      } catch (e) { alert('Error guardando: ' + (e.message || e)) }
+                    }}
+                      style={{ flex: 2, background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      Guardar cambios
+                    </button>
                   </div>
-                )}
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Territorio</span>
-                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{selectedEvidencia.territorio}</span>
-                </div>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>GPS</span>
-                  <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
-                    {selectedEvidencia.latitud?.toFixed(6)}, {selectedEvidencia.longitud?.toFixed(6)}
-                    {selectedEvidencia.precision_m && <span style={{ color: C.subtle }}> · ±{Math.round(selectedEvidencia.precision_m)}m</span>}
-                  </span>
-                </div>
-              </div>
-              <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent(`/personal/diana_silva_caribelng_com/Documents/Conecta/Evidencias/${selectedEvidencia.territorio}/${new Date(selectedEvidencia.capturada_at).getFullYear()}-${String(new Date(selectedEvidencia.capturada_at).getMonth() + 1).padStart(2, '0')}`)}`}
-                target="_blank" rel="noopener noreferrer"
-                style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
-                  borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-                Ver carpeta en OneDrive →
-              </a>
-              {isAdmin && (
-                <button onClick={async () => {
-                  if (!confirm('¿Eliminar esta evidencia?')) return
-                  await deleteEvidencia(selectedEvidencia.id)
-                  await loadData()
-                  setSelectedEvidencia(null)
-                }} style={{ marginTop: 8, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 8,
-                  padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
-                  Eliminar evidencia
-                </button>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 16, lineHeight: 1.5 }}>
+                    {ev.descripcion}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Fecha</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
+                        {new Date(ev.capturada_at).toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'short' })}
+                      </span>
+                    </div>
+                    {ev.lugar && (
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Lugar</span>
+                        <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{ev.lugar}</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>Territorio</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{ev.territorio}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <span style={{ fontSize: 12, color: C.muted, width: 80, flexShrink: 0 }}>GPS</span>
+                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>
+                        {ev.latitud?.toFixed(6)}, {ev.longitud?.toFixed(6)}
+                        {ev.precision_m && <span style={{ color: C.subtle }}> · ±{Math.round(ev.precision_m)}m</span>}
+                      </span>
+                    </div>
+                  </div>
+                  <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent(`/personal/diana_silva_caribelng_com/Documents/Conecta/Evidencias/${ev.territorio}/${new Date(ev.capturada_at).getFullYear()}-${String(new Date(ev.capturada_at).getMonth() + 1).padStart(2, '0')}`)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                      borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                    Ver carpeta en OneDrive →
+                  </a>
+                  {isAdmin && (
+                    <button onClick={async () => {
+                      if (!confirm('¿Eliminar esta evidencia?')) return
+                      await deleteEvidencia(ev.id)
+                      await loadData()
+                      setSelectedEvidencia(null)
+                    }} style={{ marginTop: 8, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 8,
+                      padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
+                      Eliminar evidencia
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
         </div>
-      )}
+        )
+      })()}
 
       {/* ── Registro Detail Modal ── */}
       {selectedRegistro && (() => {
@@ -3124,15 +3471,31 @@ export default function App() {
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Registro de campo</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, marginTop: 2 }}>{r.tipo_reunion || 'Registro'}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, marginTop: 2 }}>{registroEditMode ? 'Editar registro' : (r.tipo_reunion || 'Registro')}</div>
                 </div>
-                <button onClick={() => setSelectedRegistro(null)}
-                  style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  {!registroEditMode && (isAdmin || r.user_id === session?.user?.id) && (
+                    <button onClick={() => {
+                      setRegistroEditFields({
+                        descripcion: r.descripcion || '',
+                        tipo_reunion: r.tipo_reunion || '',
+                        lugar: r.lugar || '',
+                        asistentes: r.asistentes || 0,
+                      })
+                      setRegistroEditMode(true)
+                    }}
+                      style={{ background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}55`, borderRadius: 8, padding: '5px 11px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                      ✎ Editar
+                    </button>
+                  )}
+                  <button onClick={() => { setSelectedRegistro(null); setRegistroEditMode(false) }}
+                    style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+                </div>
               </div>
               {/* Foto si existe */}
-              {r.foto_url && (
+              {r.foto_url && !registroEditMode && (
                 <a href={r.foto_url} target="_blank" rel="noopener noreferrer">
                   <img src={r.foto_url} alt=""
                     style={{ width: '100%', maxHeight: 320, objectFit: 'cover', display: 'block' }} />
@@ -3140,61 +3503,105 @@ export default function App() {
               )}
               {/* Detalle */}
               <div style={{ padding: 20 }}>
-                {r.descripcion && (
-                  <div style={{ fontSize: 14, color: C.text, marginBottom: 18, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                    {r.descripcion}
-                  </div>
+                {registroEditMode ? (
+                  <>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo de reunión</label>
+                    <input value={registroEditFields.tipo_reunion} onChange={e => setRegistroEditFields({ ...registroEditFields, tipo_reunion: e.target.value })}
+                      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 14, fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 12 }} />
+                    <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Lugar</label>
+                    <input value={registroEditFields.lugar} onChange={e => setRegistroEditFields({ ...registroEditFields, lugar: e.target.value })}
+                      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 14, fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 12 }} />
+                    <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Asistentes</label>
+                    <input type="number" min="0" value={registroEditFields.asistentes} onChange={e => setRegistroEditFields({ ...registroEditFields, asistentes: Number(e.target.value) || 0 })}
+                      style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 14, fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 12 }} />
+                    <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Descripción</label>
+                    <textarea value={registroEditFields.descripcion} onChange={e => setRegistroEditFields({ ...registroEditFields, descripcion: e.target.value })}
+                      rows={5} style={{ width: '100%', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 11px', fontSize: 14, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 14 }} />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setRegistroEditMode(false)}
+                        style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancelar</button>
+                      <button onClick={async () => {
+                        try {
+                          await updateRegistroDiario(r.id, {
+                            descripcion: registroEditFields.descripcion.trim(),
+                            tipo_reunion: registroEditFields.tipo_reunion.trim() || null,
+                            lugar: registroEditFields.lugar.trim() || null,
+                            asistentes: registroEditFields.asistentes,
+                          })
+                          await loadData()
+                          setRegistroEditMode(false)
+                          setSelectedRegistro({ ...r,
+                            descripcion: registroEditFields.descripcion.trim(),
+                            tipo_reunion: registroEditFields.tipo_reunion.trim() || null,
+                            lugar: registroEditFields.lugar.trim() || null,
+                            asistentes: registroEditFields.asistentes,
+                          })
+                        } catch (e) { alert('Error guardando: ' + (e.message || e)) }
+                      }}
+                        style={{ flex: 2, background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                        Guardar cambios
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {r.descripcion && (
+                      <div style={{ fontSize: 14, color: C.text, marginBottom: 18, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                        {r.descripcion}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Fecha</span>
+                        <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{fecha}</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Territorio</span>
+                        <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.territorio}</span>
+                      </div>
+                      {r.lugar && (
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Lugar</span>
+                          <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.lugar}</span>
+                        </div>
+                      )}
+                      {r.asistentes > 0 && (
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Asistentes</span>
+                          <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.asistentes}</span>
+                        </div>
+                      )}
+                      {r.geo_lugar && (
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Ubicación</span>
+                          <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.geo_lugar}</span>
+                        </div>
+                      )}
+                      {r.latitud != null && r.longitud != null && (
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>GPS</span>
+                          <a href={`https://www.google.com/maps?q=${r.latitud},${r.longitud}`} target="_blank" rel="noopener noreferrer"
+                            style={{ fontSize: 13, color: C.accent, fontWeight: 600, textDecoration: 'none' }}>
+                            {r.latitud.toFixed(6)}, {r.longitud.toFixed(6)}
+                            {r.precision_m && <span style={{ color: C.subtle }}> · ±{Math.round(r.precision_m)}m</span>}
+                            <span style={{ marginLeft: 6 }}>↗</span>
+                          </a>
+                        </div>
+                      )}
+                      {created && (
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Capturado</span>
+                          <span style={{ fontSize: 12, color: C.subtle }}>{created}</span>
+                        </div>
+                      )}
+                    </div>
+                    <a href={oneDriveUrl} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'block', marginTop: 18, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                        borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                      Ver carpeta en OneDrive →
+                    </a>
+                  </>
                 )}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Fecha</span>
-                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{fecha}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Territorio</span>
-                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.territorio}</span>
-                  </div>
-                  {r.lugar && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Lugar</span>
-                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.lugar}</span>
-                    </div>
-                  )}
-                  {r.asistentes > 0 && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Asistentes</span>
-                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.asistentes}</span>
-                    </div>
-                  )}
-                  {r.geo_lugar && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Ubicación</span>
-                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{r.geo_lugar}</span>
-                    </div>
-                  )}
-                  {r.latitud != null && r.longitud != null && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>GPS</span>
-                      <a href={`https://www.google.com/maps?q=${r.latitud},${r.longitud}`} target="_blank" rel="noopener noreferrer"
-                        style={{ fontSize: 13, color: C.accent, fontWeight: 600, textDecoration: 'none' }}>
-                        {r.latitud.toFixed(6)}, {r.longitud.toFixed(6)}
-                        {r.precision_m && <span style={{ color: C.subtle }}> · ±{Math.round(r.precision_m)}m</span>}
-                        <span style={{ marginLeft: 6 }}>↗</span>
-                      </a>
-                    </div>
-                  )}
-                  {created && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 90, flexShrink: 0 }}>Capturado</span>
-                      <span style={{ fontSize: 12, color: C.subtle }}>{created}</span>
-                    </div>
-                  )}
-                </div>
-                <a href={oneDriveUrl} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'block', marginTop: 18, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
-                    borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-                  Ver carpeta en OneDrive →
-                </a>
               </div>
             </div>
           </div>
@@ -3202,101 +3609,24 @@ export default function App() {
       })()}
 
       {/* ── Acta Detail Modal ── */}
-      {selectedActa && (() => {
-        const a = selectedActa
-        const d = a.fecha_comite ? new Date(a.fecha_comite + 'T00:00:00') : null
-        const fechaLarga = d ? d.toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : ''
-        const autor = a.profile?.full_name || ''
-        const onDelete = async () => {
-          if (!confirm('¿Eliminar esta acta del historial? El archivo en OneDrive no se borra.')) return
-          try {
-            await deleteComiteActa(a.id)
-            setComiteActas((await getComiteActas()) || [])
-            setSelectedActa(null)
-          } catch (e) { alert('Error eliminando: ' + (e.message || e)) }
-        }
-        return (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 400,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-            onClick={(e) => { if (e.target === e.currentTarget) setSelectedActa(null) }}>
-            <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 620,
-              maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '16px 22px', borderBottom: `1px solid ${C.border}` }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Comité Social</div>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginTop: 2 }}>{a.titulo || 'Acta del comité'}</div>
-                </div>
-                <button onClick={() => setSelectedActa(null)}
-                  style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
-              </div>
-              {a.foto_url && (
-                <a href={a.foto_url} target="_blank" rel="noopener noreferrer">
-                  <img src={a.foto_url} alt="" style={{ width: '100%', maxHeight: 280, objectFit: 'cover', display: 'block' }} />
-                </a>
-              )}
-              <div style={{ padding: 22 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 14, borderBottom: `1px solid ${C.border}`, marginBottom: 14 }}>
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Fecha</span>
-                    <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{fechaLarga}</span>
-                  </div>
-                  {autor && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Subido por</span>
-                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{autor}</span>
-                    </div>
-                  )}
-                  {a.asistentes && (
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <span style={{ fontSize: 12, color: C.muted, width: 100, flexShrink: 0 }}>Asistentes</span>
-                      <span style={{ fontSize: 13, color: C.text, fontWeight: 600, lineHeight: 1.5 }}>{a.asistentes}</span>
-                    </div>
-                  )}
-                </div>
-                {a.temas && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Temas tratados</div>
-                    <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{a.temas}</div>
-                  </div>
-                )}
-                {a.acuerdos && (
-                  <div style={{ marginBottom: 14, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>✓ Acuerdos / Decisiones</div>
-                    <div style={{ fontSize: 13, color: '#14532d', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{a.acuerdos}</div>
-                  </div>
-                )}
-                {a.compromisos && (
-                  <div style={{ marginBottom: 14, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>→ Compromisos pendientes</div>
-                    <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{a.compromisos}</div>
-                  </div>
-                )}
-                {a.archivo_url && (
-                  <a href={a.archivo_url} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', marginTop: 10, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
-                      borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-                    📎 Abrir acta en OneDrive {a.archivo_nombre ? `· ${a.archivo_nombre}` : ''}
-                  </a>
-                )}
-                <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent('/personal/diana_silva_caribelng_com/Documents/Conecta/Actas Comite Social/' + (d ? d.getFullYear() : new Date().getFullYear()))}`}
-                  target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'block', marginTop: 8, background: 'white', color: C.navy, border: `1px solid ${C.navy}55`,
-                    borderRadius: 10, padding: '8px 16px', fontSize: 12, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-                  Ver carpeta del año en OneDrive →
-                </a>
-                {isAdmin && (
-                  <button onClick={onDelete}
-                    style={{ marginTop: 10, background: '#fee2e2', color: C.red, border: 'none', borderRadius: 10,
-                      padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
-                    Eliminar acta del historial
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )
-      })()}
+      {selectedActa && (
+        <ActaEditModal
+          acta={selectedActa}
+          isAdmin={isAdmin}
+          currentUserId={session?.user?.id}
+          onClose={() => setSelectedActa(null)}
+          onSaved={async () => { setComiteActas(await getComiteActas() || []) }}
+          onDeleted={async () => {
+            if (!confirm('¿Eliminar esta acta del historial? El archivo en OneDrive no se borra.')) return
+            try {
+              await deleteComiteActa(selectedActa.id)
+              setComiteActas((await getComiteActas()) || [])
+              setSelectedActa(null)
+            } catch (e) { alert('Error eliminando: ' + (e.message || e)) }
+          }}
+          isMobile={isMobile}
+        />
+      )}
 
       {/* ── Audit Log Modal ── */}
       {showAudit && (
