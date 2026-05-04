@@ -629,3 +629,98 @@ export async function updateRegistroDiario(id, fields) {
   if (error) throw error
   return data
 }
+
+// ── Notificaciones por email a la DAC ────────────────────────────────────────
+
+export async function sendNotificationEmail({ to, subject, html, replyTo }) {
+  // Best-effort: si falla, no bloquea el flujo principal.
+  try {
+    const r = await fetch('/api/send-notification-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, subject, html, replyTo }),
+    })
+    return r.ok
+  } catch (e) {
+    console.error('Email notif falló:', e)
+    return false
+  }
+}
+
+const C_NAVY = '#0D47A1'
+const C_TEXT = '#2B2926'
+
+export function buildActaEmail({ titulo, fecha_comite, asistentes, temas, acuerdos, compromisos, archivo_url, archivo_nombre, foto_url, autor }) {
+  const fechaFmt = fecha_comite
+    ? new Date(fecha_comite + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+    : '—'
+  const subject = `📋 Nueva acta de reunión PGS — ${titulo || fechaFmt}`
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; color: ${C_TEXT};">
+      <div style="background: ${C_NAVY}; color: white; padding: 20px 24px; border-radius: 10px 10px 0 0;">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7;">Reuniones · Plan de Gestión Social</div>
+        <h2 style="margin: 4px 0 0; font-size: 19px;">${escapeHtml(titulo || 'Nueva acta registrada')}</h2>
+      </div>
+      <div style="border: 1px solid #E8ECF0; border-top: none; border-radius: 0 0 10px 10px; padding: 22px;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px;">
+          <tr><td style="padding: 4px 0; color: #5C6370; font-size: 12px; width: 110px;">Fecha</td><td style="padding: 4px 0; font-weight: 600; font-size: 13px;">${escapeHtml(fechaFmt)}</td></tr>
+          ${autor ? `<tr><td style="padding: 4px 0; color: #5C6370; font-size: 12px;">Subido por</td><td style="padding: 4px 0; font-weight: 600; font-size: 13px;">${escapeHtml(autor)}</td></tr>` : ''}
+          ${asistentes ? `<tr><td style="padding: 4px 0; color: #5C6370; font-size: 12px; vertical-align: top;">Asistentes</td><td style="padding: 4px 0; font-weight: 600; font-size: 13px; line-height: 1.5;">${escapeHtml(asistentes)}</td></tr>` : ''}
+        </table>
+        ${temas ? sectionHtml('Temas tratados', temas) : ''}
+        ${acuerdos ? boxHtml('✓ Acuerdos / Decisiones', acuerdos, '#f0fdf4', '#bbf7d0', '#166534', '#14532d') : ''}
+        ${compromisos ? boxHtml('→ Compromisos pendientes', compromisos, '#fffbeb', '#fde68a', '#92400e', '#78350f') : ''}
+        ${archivo_url ? `<a href="${archivo_url}" style="display: block; margin-top: 14px; background: #EEF2FF; color: ${C_NAVY}; border: 1px solid ${C_NAVY}; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; text-align: center; text-decoration: none;">📎 Abrir acta en OneDrive${archivo_nombre ? ` · ${escapeHtml(archivo_nombre)}` : ''}</a>` : ''}
+        ${foto_url ? `<a href="${foto_url}" style="display: block; margin-top: 8px; background: white; color: ${C_NAVY}; border: 1px solid ${C_NAVY}55; border-radius: 8px; padding: 8px 16px; font-size: 12px; font-weight: 700; text-align: center; text-decoration: none;">📷 Ver foto del comité</a>` : ''}
+        <p style="margin-top: 22px; font-size: 12px; color: #8D95A0; text-align: center;">Caribe LNG Conecta · Reuniones del Plan de Gestión Social</p>
+      </div>
+    </div>`
+  return { subject, html }
+}
+
+export function buildPosicionCambioEmail({ actor_nombre, actor_territorio, posicion_anterior, posicion_nueva, autor, recomendacion_gestora }) {
+  const subject = `🎯 Posición de actor cambiada — ${actor_nombre}`
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; color: ${C_TEXT};">
+      <div style="background: ${C_NAVY}; color: white; padding: 20px 24px; border-radius: 10px 10px 0 0;">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7;">Cambio de posición de actor</div>
+        <h2 style="margin: 4px 0 0; font-size: 19px;">${escapeHtml(actor_nombre)}</h2>
+      </div>
+      <div style="border: 1px solid #E8ECF0; border-top: none; border-radius: 0 0 10px 10px; padding: 22px;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+          <tr><td style="padding: 4px 0; color: #5C6370; font-size: 12px; width: 130px;">Territorio</td><td style="padding: 4px 0; font-weight: 600; font-size: 13px;">${escapeHtml(actor_territorio || '—')}</td></tr>
+          <tr><td style="padding: 4px 0; color: #5C6370; font-size: 12px;">Cambio realizado por</td><td style="padding: 4px 0; font-weight: 600; font-size: 13px;">${escapeHtml(autor || '—')}</td></tr>
+        </table>
+        <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;">
+          <div style="font-size: 11px; font-weight: 800; color: #9a3412; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Posición</div>
+          <div style="font-size: 14px; color: #7c2d12; font-weight: 600;">
+            <span style="text-decoration: line-through; opacity: 0.7;">${escapeHtml(posicion_anterior || '(sin definir)')}</span>
+            <span style="margin: 0 10px; color: #c2410c; font-weight: 800;">→</span>
+            <span style="font-weight: 800;">${escapeHtml(posicion_nueva)}</span>
+          </div>
+        </div>
+        ${recomendacion_gestora ? boxHtml('💡 Recomendación de la gestora', recomendacion_gestora, '#fffbeb', '#fde68a', '#92400e', '#78350f') : ''}
+        <p style="margin-top: 22px; font-size: 12px; color: #8D95A0; text-align: center;">Caribe LNG Conecta · Base de Actores</p>
+      </div>
+    </div>`
+  return { subject, html }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
+function sectionHtml(title, body) {
+  return `<div style="margin-bottom: 14px;">
+    <div style="font-size: 11px; font-weight: 800; color: ${C_NAVY}; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">${escapeHtml(title)}</div>
+    <div style="font-size: 13px; color: ${C_TEXT}; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(body)}</div>
+  </div>`
+}
+
+function boxHtml(title, body, bg, border, titleColor, textColor) {
+  return `<div style="margin-bottom: 14px; background: ${bg}; border: 1px solid ${border}; border-radius: 10px; padding: 12px 14px;">
+    <div style="font-size: 11px; font-weight: 800; color: ${titleColor}; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">${escapeHtml(title)}</div>
+    <div style="font-size: 13px; color: ${textColor}; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(body)}</div>
+  </div>`
+}

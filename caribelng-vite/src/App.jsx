@@ -16,6 +16,7 @@ import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          addRegistroDiario, getRegistrosDiarios,
          getComiteActas, addComiteActa, deleteComiteActa, updateComiteActa, uploadActaToOneDrive, uploadToOneDrive,
          updateEvidencia, updateRegistroDiario,
+         sendNotificationEmail, buildActaEmail,
          getAuditLog, subscribeToPush, sendPushNotification } from './lib/supabase'
 
 import { IconDashboard, IconPin, IconUsers, IconGlobe, IconHandshake, IconLeaf, IconCalendar,
@@ -550,6 +551,20 @@ function ComiteUploader({ session, onSaved, isMobile }) {
         archivo_url, archivo_nombre, foto_url,
         user_id: session.user.id,
       })
+      // Notificar por email a la DAC (best-effort, no bloquea si falla)
+      try {
+        const { subject, html } = buildActaEmail({
+          titulo: tituloFinal,
+          fecha_comite: fecha,
+          asistentes: asistentesFinal,
+          temas: temasFinal,
+          acuerdos: acuerdos.trim(),
+          compromisos: compromisos.trim(),
+          archivo_url, archivo_nombre, foto_url,
+          autor: session.user.email || '',
+        })
+        sendNotificationEmail({ subject, html })
+      } catch {}
       reset()
       setDone(true)
       setTimeout(() => setDone(false), 2800)

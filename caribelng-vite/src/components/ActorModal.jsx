@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { C, SEMAFORO, getTipoColor } from '../lib/constants'
 import { Avatar, Pill, InfoRow, Block, Field, SemDot } from './ui'
-import { getInteractions, addInteraction, updateActor, submitActorEdit } from '../lib/supabase'
+import { getInteractions, addInteraction, updateActor, submitActorEdit, sendNotificationEmail, buildPosicionCambioEmail } from '../lib/supabase'
 
 export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin, profile }) {
   const [interactions, setInteractions] = useState([])
@@ -23,6 +23,11 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
   const [recomendacionDAC, setRecomendacionDAC] = useState('')
   // Posición (editable junto con la Lectura DAC para flujo más rápido)
   const [posicion, setPosicion] = useState(actor.posicion || 'Neutro')
+  // Cambio rápido de posición desde la tab Perfil (gestoras + admin)
+  const [posicionPanelOpen, setPosicionPanelOpen] = useState(false)
+  const [posicionInline, setPosicionInline] = useState(actor.posicion || 'Neutro')
+  const [posicionInlineSaving, setPosicionInlineSaving] = useState(false)
+  const [posicionInlineSaved, setPosicionInlineSaved] = useState(false)
   // Campos relacionamiento
   const [accionTomada, setAccionTomada] = useState(actor.accion_tomada || '')
   const [fechaAccion, setFechaAccion] = useState(actor.fecha_accion || new Date().toISOString().split('T')[0])
@@ -87,6 +92,44 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
       setTimeout(() => setRecoSaved(false), 2200)
     } catch(e) { alert('Error guardando: ' + e.message) }
     finally { setSavingReco(false) }
+  }
+
+  async function handleSavePosicionInline() {
+    if (posicionInline === (actor.posicion || 'Neutro')) { setPosicionPanelOpen(false); return }
+    setPosicionInlineSaving(true)
+    setPosicionInlineSaved(false)
+    try {
+      const posicionAnterior = actor.posicion || ''
+      await updateActor(actor.id, { posicion: posicionInline })
+      // Registrar en historial como interaction tipo "Cambio posición"
+      try {
+        await addInteraction({
+          actorId: actor.id,
+          tipo: 'Cambio posición',
+          resumen: `Posición: ${posicionAnterior || '(sin definir)'} → ${posicionInline}`,
+          semaforo_nuevo: actor.semaforo,
+          userId: session.user.id,
+        })
+      } catch {}
+      // Notificar a Diana por email (solo si no es la propia Diana quien hizo el cambio)
+      if (!isAdmin) {
+        try {
+          const { subject, html } = buildPosicionCambioEmail({
+            actor_nombre: actor.nombre,
+            actor_territorio: actor.territorio,
+            posicion_anterior: posicionAnterior,
+            posicion_nueva: posicionInline,
+            autor: profile?.full_name || session.user.email || '',
+            recomendacion_gestora: actor.recomendacion_gestora,
+          })
+          sendNotificationEmail({ subject, html })
+        } catch {}
+      }
+      onUpdated()
+      setPosicionInlineSaved(true)
+      setTimeout(() => { setPosicionInlineSaved(false); setPosicionPanelOpen(false) }, 1800)
+    } catch (e) { alert('Error guardando posición: ' + (e.message || e)) }
+    finally { setPosicionInlineSaving(false) }
   }
 
   async function handleSaveRecomendacionDAC() {
@@ -184,28 +227,64 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
         {/* ── TAB: PERFIL ── */}
         {modalTab === 'perfil' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 8 }}>
               {[
-                { label: 'Estado relación', value: sc.label, color: sc.color,
+                { key: 'estado', label: 'Estado relación', value: sc.label, color: sc.color,
                   desc: actor.semaforo === 'rojo' ? 'Sin acercamiento' : actor.semaforo === 'naranja' ? 'En construcción' : actor.semaforo === 'amarillo' ? 'Avanzando' : 'Relación activa',
                   bg: sc.bg },
-                { label: 'Posición', value: actor.posicion, color: (actor.posicion || '').includes('Aliado') ? '#10b981' : (actor.posicion || '').includes('Opositor') ? '#ef4444' : '#64748b',
+                { key: 'posicion', label: 'Posición', value: actor.posicion || 'Sin definir', color: (actor.posicion || '').includes('Aliado') ? '#10b981' : (actor.posicion || '').includes('Opositor') ? '#ef4444' : '#64748b',
                   desc: (actor.posicion || '').includes('Aliado') ? 'Apoya el proyecto' : (actor.posicion || '').includes('Opositor') ? 'Se opone activamente' : 'Sin posición definida',
                   bg: (actor.posicion || '').includes('Aliado') ? '#ecfdf5' : (actor.posicion || '').includes('Opositor') ? '#fff1f2' : '#f8fafc' },
-                { label: 'Riesgo', value: actor.riesgo || 'N/A', color: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? '#ef4444' : actor.riesgo === 'Medio' ? '#f59e0b' : '#10b981',
+                { key: 'riesgo', label: 'Riesgo', value: actor.riesgo || 'N/A', color: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? '#ef4444' : actor.riesgo === 'Medio' ? '#f59e0b' : '#10b981',
                   desc: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? 'Gestión prioritaria' : actor.riesgo === 'Medio' ? 'Seguimiento regular' : 'Monitoreo rutina',
                   bg: (actor.riesgo === 'Alto' || actor.riesgo === 'Muy Alto') ? '#fff1f2' : actor.riesgo === 'Medio' ? '#fffbeb' : '#ecfdf5' },
-              ].map(item => (
-                <div key={item.label} style={{ background: item.bg, borderRadius: 12, padding: '12px 12px', border: `1px solid ${item.color}20` }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>{item.label}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}60` }} />
-                    <span style={{ fontSize: 14, fontWeight: 800, color: item.color }}>{item.value}</span>
+              ].map(item => {
+                const clickable = item.key === 'posicion'
+                return (
+                  <div key={item.label}
+                    onClick={clickable ? () => { setPosicionInline(actor.posicion || 'Neutro'); setPosicionPanelOpen(o => !o) } : undefined}
+                    style={{ background: item.bg, borderRadius: 12, padding: '12px 12px', border: `1px solid ${item.color}20`, position: 'relative', cursor: clickable ? 'pointer' : 'default', transition: 'transform 0.12s' }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>{item.label}{clickable && <span style={{ color: C.accent, marginLeft: 4, fontWeight: 700 }}>· editar</span>}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}60` }} />
+                      <span style={{ fontSize: 14, fontWeight: 800, color: item.color }}>{item.value}</span>
+                    </div>
+                    <div style={{ fontSize: 10, color: '#64748b' }}>{item.desc}</div>
                   </div>
-                  <div style={{ fontSize: 10, color: '#64748b' }}>{item.desc}</div>
-                </div>
-              ))}
+                )
+              })}
             </div>
+            {/* Panel inline de cambio de posición */}
+            {posicionPanelOpen && (
+              <div style={{ background: '#eff6ff', border: `1.5px solid ${C.navy}55`, borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Cambiar posición del actor</div>
+                  {posicionInlineSaved && <span style={{ fontSize: 11, fontWeight: 700, color: '#16a34a' }}>✓ Guardado</span>}
+                </div>
+                <div style={{ fontSize: 11, color: C.navy, opacity: 0.7, marginBottom: 8, lineHeight: 1.4 }}>
+                  {isAdmin
+                    ? 'Cambia la posición del actor. Queda registrado en el historial.'
+                    : 'Cambia la posición del actor. La Dirección DAC recibe una notificación por correo y queda registrado en el historial.'}
+                </div>
+                <select value={posicionInline} onChange={e => setPosicionInline(e.target.value)}
+                  style={{ width: '100%', border: `1px solid ${C.navy}33`, borderRadius: 8, padding: '8px 10px', fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box', background: 'white', cursor: 'pointer', marginBottom: 8 }}>
+                  {['Aliado clave','Aliado','Aliado potencial','Favorable','Neutro','Neutral / Por definir','Opositor potencial','Opositor'].map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                  {actor.posicion && !['Aliado clave','Aliado','Aliado potencial','Favorable','Neutro','Neutral / Por definir','Opositor potencial','Opositor'].includes(actor.posicion) && (
+                    <option value={actor.posicion}>{actor.posicion}</option>
+                  )}
+                </select>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => setPosicionPanelOpen(false)} disabled={posicionInlineSaving}
+                    style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Cancelar</button>
+                  <button onClick={handleSavePosicionInline} disabled={posicionInlineSaving || posicionInline === (actor.posicion || 'Neutro')}
+                    style={{ flex: 2, background: posicionInlineSaving ? '#94a3b8' : (posicionInline === (actor.posicion || 'Neutro') ? '#e5e7eb' : C.navy), color: posicionInline === (actor.posicion || 'Neutro') ? '#9ca3af' : 'white', border: 'none', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 700, cursor: posicionInlineSaving ? 'wait' : 'pointer' }}>
+                    {posicionInlineSaving ? 'Guardando…' : 'Guardar nueva posición'}
+                  </button>
+                </div>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 16, marginBottom: 14, background: '#f8fafc', borderRadius: 8, padding: '10px 12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <div><div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>PODER</div><Pill value={actor.poder} color={C.accent} /></div>
               <div><div style={{ fontSize: 11, color: C.subtle, fontWeight: 700, marginBottom: 3 }}>INTERÉS</div><Pill value={actor.interes} color={C.barbosa} /></div>
