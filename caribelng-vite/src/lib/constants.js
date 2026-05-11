@@ -21,6 +21,7 @@ export const SEMAFORO = {
   amarillo: { color: C.yellow, bg: '#fef9c3', label: 'Amarillo', dot: '🟡' },
   naranja:  { color: C.orange, bg: '#ffedd5', label: 'Naranja',  dot: '🟠' },
   rojo:     { color: C.red,    bg: '#fee2e2', label: 'Rojo',     dot: '🔴' },
+  monitor:  { color: '#64748B', bg: '#E2E8F0', label: 'Mapeado · Monitor', dot: '⚪️' },
 }
 
 export const TIPO_COLOR = {

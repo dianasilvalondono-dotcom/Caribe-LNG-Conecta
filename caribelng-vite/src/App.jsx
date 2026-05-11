@@ -860,6 +860,7 @@ export default function App() {
       amarillo: arr.filter(a => a.semaforo === 'amarillo').length,
       naranja: arr.filter(a => a.semaforo === 'naranja').length,
       rojo: arr.filter(a => a.semaforo === 'rojo').length,
+      monitor: arr.filter(a => a.semaforo === 'monitor').length,
     })
     const toluArr = actors.filter(a => a.territorio === 'Tolú')
     const barbosaArr = actors.filter(a => a.territorio === 'Barbosa')
@@ -870,6 +871,7 @@ export default function App() {
       amarillo: actors.filter(a => a.semaforo === 'amarillo').length,
       naranja: actors.filter(a => a.semaforo === 'naranja').length,
       rojo: actors.filter(a => a.semaforo === 'rojo').length,
+      monitor: actors.filter(a => a.semaforo === 'monitor').length,
       prioA: actors.filter(a => a.prioridad === 'A').length,
       alto: actors.filter(a => a.riesgo === 'Alto' || a.riesgo === 'Muy Alto').length,
       tolu: toluArr.length,
@@ -1151,7 +1153,8 @@ export default function App() {
               const now = new Date()
               const hace30 = new Date(now - 30 * 24 * 60 * 60 * 1000)
               const contactadosReciente = actors.filter(a => a.fecha_accion && new Date(a.fecha_accion) >= hace30).length
-              const sinContacto30 = actors.filter(a => !a.fecha_accion || new Date(a.fecha_accion) < hace30).length
+              // "Sin contacto" excluye Monitor — esos están mapeados a propósito, no requieren contacto activo
+              const sinContacto30 = actors.filter(a => a.semaforo !== 'monitor' && (!a.fecha_accion || new Date(a.fecha_accion) < hace30)).length
               const prioA = actors.filter(a => a.prioridad === 'A' || a.prioridad === 1)
               const prioAContactados = prioA.filter(a => a.fecha_accion && new Date(a.fecha_accion) >= hace30).length
               const verdes = actors.filter(a => a.semaforo === 'verde').length
@@ -1284,7 +1287,7 @@ export default function App() {
                     <select value={newActor.semaforo} onChange={e => setNewActor({ ...newActor, semaforo: e.target.value })}
                       style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
                         fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
-                      {['verde', 'amarillo', 'naranja', 'rojo'].map(s => (
+                      {['verde', 'amarillo', 'naranja', 'rojo', 'monitor'].map(s => (
                         <option key={s} value={s}>{SEMAFORO[s].dot} {SEMAFORO[s].label}</option>
                       ))}
                     </select>
@@ -1479,6 +1482,7 @@ export default function App() {
                 { key: 'amarillo', label: 'Requiere atención', count: stats.amarillo, color: SEMAFORO.amarillo.color, bg: '#fef9c3' },
                 { key: 'naranja', label: 'Riesgo moderado', count: stats.naranja, color: SEMAFORO.naranja.color, bg: '#ffedd5' },
                 { key: 'rojo', label: 'Por iniciar', count: stats.rojo, color: SEMAFORO.rojo.color, bg: '#fee2e2' },
+                { key: 'monitor', label: 'Mapeado · Monitor', count: stats.monitor, color: SEMAFORO.monitor.color, bg: '#E2E8F0' },
               ].map(chip => {
                 const active = filterS === chip.key
                 return (
