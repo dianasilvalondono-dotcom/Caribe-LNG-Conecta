@@ -593,6 +593,80 @@ function Grid2({ children }) {
   return <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
 }
 
+// ── Helpers de subida de archivos a OneDrive vía /api/upload-onedrive ──
+
+const MAX_UPLOAD_BYTES = 4_400_000 // Vercel hobby ≈ 4.5MB platform limit
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result
+      const comma = result.indexOf(',')
+      resolve(comma >= 0 ? result.slice(comma + 1) : result)
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+async function uploadFileToOneDrive(file, { type, territorio }) {
+  if (!file) throw new Error('Selecciona un archivo primero.')
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error(`El archivo pesa ${(file.size / 1024 / 1024).toFixed(1)}MB. Bridge solo admite hasta ~4.4MB por la API. Súbelo directo a OneDrive y pega el link en el campo URL.`)
+  }
+  const fileBase64 = await fileToBase64(file)
+  const res = await fetch('/api/upload-onedrive', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fileName: file.name,
+      fileBase64,
+      type,
+      territorio: territorio || null,
+      contentType: file.type || 'application/octet-stream',
+    }),
+  })
+  const data = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }))
+  if (!res.ok) throw new Error(data.error || 'Falló la subida a OneDrive')
+  return data // { webUrl, path }
+}
+
+function FileUploadField({ label, type, territorio, onUploaded, C2 }) {
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState(null)
+  const [okMsg, setOkMsg] = useState(null)
+  async function handleChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true); setError(null); setOkMsg(null)
+    try {
+      const data = await uploadFileToOneDrive(file, { type, territorio })
+      onUploaded(data.webUrl)
+      setOkMsg(`✓ Subido: ${file.name}`)
+    } catch (err) {
+      setError(err.message || 'Error al subir')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <FieldLabel>{label || 'Subir archivo (PDF, DOCX, XLSX, imagen)'}</FieldLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <input type="file" onChange={handleChange} disabled={uploading}
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.txt,.csv"
+          style={{ fontSize: 12, fontFamily: 'Montserrat, sans-serif' }} />
+        {uploading && <div style={{ fontSize: 11, color: C2.blue, fontWeight: 600 }}>Subiendo a OneDrive...</div>}
+        {okMsg && <div style={{ fontSize: 11, color: C2.green, fontWeight: 600 }}>{okMsg}</div>}
+        {error && <div style={{ fontSize: 11, color: C2.red, fontWeight: 600 }}>⚠ {error}</div>}
+        <div style={{ fontSize: 10, color: C2.muted }}>Límite ~4.4MB. Para archivos más grandes, súbelos directo a OneDrive y pega el link en el campo URL.</div>
+      </div>
+    </div>
+  )
+}
+
 function DocModal({ row, saving, onCancel, onSave, C2 }) {
   const [f, setF] = useState(() => row ? { ...row, tags: (row.tags || []).join(', ') } : {
     titulo: '', tipo: 'concepto', autor: '', fecha: '', version: '1.0',
@@ -626,6 +700,8 @@ function DocModal({ row, saving, onCancel, onSave, C2 }) {
         </Field>
         <Field label="URL (OneDrive/SharePoint)"><input value={f.url} onChange={e => u('url', e.target.value)} style={inputStyle} placeholder="https://..." /></Field>
       </Grid2>
+      <FileUploadField type="ambiental" territorio={f.territorio}
+        onUploaded={webUrl => u('url', webUrl)} C2={C2} />
       <Field label="Descripción"><textarea value={f.descripcion} onChange={e => u('descripcion', e.target.value)} style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} /></Field>
       <Field label="Tags (separados por coma)"><input value={f.tags} onChange={e => u('tags', e.target.value)} style={inputStyle} placeholder="marpol, off-shore, licencia" /></Field>
     </ModalShell>
@@ -669,6 +745,8 @@ function PGRDModal({ row, saving, onCancel, onSave, C2 }) {
       </Grid2>
       <Field label="Descripción"><textarea value={f.descripcion} onChange={e => u('descripcion', e.target.value)} style={{ ...inputStyle, minHeight: 60 }} /></Field>
       <Field label="URL evidencia"><input value={f.evidencia_url} onChange={e => u('evidencia_url', e.target.value)} style={inputStyle} /></Field>
+      <FileUploadField type="pgrd" territorio={null}
+        onUploaded={webUrl => u('evidencia_url', webUrl)} C2={C2} />
     </ModalShell>
   )
 }
@@ -720,6 +798,8 @@ function CompromisoModal({ row, saving, onCancel, onSave, C2 }) {
         <Field label="ID acuerdo (si aplica)"><input value={f.acuerdo_id} onChange={e => u('acuerdo_id', e.target.value)} style={inputStyle} placeholder="B1, B2, T1..." /></Field>
       </Grid2>
       <Field label="URL evidencia"><input value={f.evidencia_url} onChange={e => u('evidencia_url', e.target.value)} style={inputStyle} /></Field>
+      <FileUploadField type="compromiso" territorio={f.territorio}
+        onUploaded={webUrl => u('evidencia_url', webUrl)} C2={C2} />
       <Field label="Notas"><textarea value={f.notas} onChange={e => u('notas', e.target.value)} style={{ ...inputStyle, minHeight: 60 }} /></Field>
     </ModalShell>
   )

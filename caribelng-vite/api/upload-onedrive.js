@@ -40,6 +40,9 @@ export default async function handler(req, res) {
     if (type === 'reporte') folder = `Conecta/Reportes/${t}`
     else if (type === 'registro') folder = `Conecta/Registros/${t}/${month}`
     else if (type === 'acta') folder = `Conecta/Actas Comite Social/${now.getFullYear()}`
+    else if (type === 'ambiental') folder = `Conecta/Ambiental/Documentos/${t}/${month}`
+    else if (type === 'pgrd') folder = `Conecta/Ambiental/PGRD/${t}/${month}`
+    else if (type === 'compromiso') folder = `Conecta/Ambiental/Compromisos/${t}/${month}`
     else folder = `Conecta/Evidencias/${t}/${month}`
     const filePath = `${folder}/${fileName}`
 
@@ -78,5 +81,5 @@ export default async function handler(req, res) {
 }
 
 export const config = {
-  api: { bodyParser: { sizeLimit: '4mb' } }
+  api: { bodyParser: { sizeLimit: '10mb' } }
 }
