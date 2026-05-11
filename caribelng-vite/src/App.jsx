@@ -2388,7 +2388,8 @@ export default function App() {
             isAdmin={isAdmin} onDeleted={loadData} agreements={agreements}
             kpisDac={kpisDac} onKpiDacSaved={loadData} actors={actors}
             registrosDiarios={registrosDiarios} evidencias={evidencias}
-            allInteractions={allInteractions} cronograma={cronograma} />
+            allInteractions={allInteractions} cronograma={cronograma}
+            comiteActas={comiteActas} />
         )}
 
         {view === 'riesgos' && (

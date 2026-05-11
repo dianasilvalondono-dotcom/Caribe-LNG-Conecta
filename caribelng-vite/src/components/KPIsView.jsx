@@ -3,7 +3,7 @@ import { C } from '../lib/constants'
 import { Bar, Tag, StatCard } from './ui'
 import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 
-export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [], allInteractions = [], cronograma = [] }) {
+export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [], allInteractions = [], cronograma = [], comiteActas = [] }) {
   const [mainTab, setMainTab] = useState('dac')
   const [terrFilter, setTerrFilter] = useState('Todos')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
@@ -22,12 +22,30 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   const compromisosCumplidosD = seguimiento.filter(s => s.estado === 'Cumplido').length
   const compromisosVencidos = seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada && new Date(s.fecha_pactada) < new Date()).length
   const compromisosPct = totalCompromisos ? Math.round((compromisosCumplidosD / totalCompromisos) * 100) : 0
-  const totalEventosD = reportes.reduce((s, r) => s + (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0), 0)
+
+  // ── Movimiento real (registros_diarios + comite_actas + interactions + evidencias) ──
+  // Cuenta lo que las gestoras ya están subiendo a la app, sin depender del reporte semanal manual.
+  const totalRegistrosCampo = registrosDiarios.length
+  const regSocializaciones = registrosDiarios.filter(r => r.tipo_reunion === 'Socialización').length
+  const regInstitucionales = registrosDiarios.filter(r => r.tipo_reunion === 'Institucional').length
+  const regComunidad = registrosDiarios.filter(r => r.tipo_reunion === 'Comunidad').length
+  const regVecindad = registrosDiarios.filter(r => r.tipo_reunion === 'Vecindad').length
+  const regLlamadas = registrosDiarios.filter(r => r.tipo_reunion === 'Llamada').length
+  const totalActasComite = comiteActas.length
+  const totalEvidencias = evidencias.length
+  const totalNovedadesActores = allInteractions.length
+
+  // Eventos totales = registros_diarios + reportes semanales (fallback de input manual histórico)
+  const eventosReportadosManual = reportes.reduce((s, r) => s + (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0), 0)
+  const totalEventosD = totalRegistrosCampo + eventosReportadosManual
+
   const totalIncidentesD = reportes.reduce((s, r) => s + (r.incidentes || 0), 0)
   const totalPqrs = reportes.reduce((s, r) => s + (r.pqrs_recibidas || 0), 0)
   const pqrsCerradas = reportes.reduce((s, r) => s + (r.pqrs_cerradas || 0), 0)
   const pqrsPct = totalPqrs ? Math.round((pqrsCerradas / totalPqrs) * 100) : 0
-  const actoresGestionados = reportes.reduce((s, r) => s + (r.actores_gestionados || 0), 0)
+  // Actores gestionados = únicos tocados en interactions + reportes manuales
+  const actoresUnicos = new Set(allInteractions.map(i => i.actor_id).filter(Boolean)).size
+  const actoresGestionados = actoresUnicos + reportes.reduce((s, r) => s + (r.actores_gestionados || 0), 0)
   const actoresVerdes = (actors || []).filter(a => a.semaforo === 'verde').length
   const actoresTotal = (actors || []).length
   const relacionamientoPct = actoresTotal ? Math.round((actoresVerdes / actoresTotal) * 100) : 0
@@ -405,6 +423,35 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
           <div style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: '1px solid #93c5fd', borderRadius: 12, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#1e40af', lineHeight: 1.5 }}>
             Estos indicadores se calculan automáticamente desde los datos de las gestoras territoriales. Se actualizan en tiempo real.
+          </div>
+
+          {/* ── Movimiento real (suma de registros de campo, actas, evidencias y novedades) ── */}
+          <div style={{ background: 'white', border: '1px solid #e8ecf0', borderRadius: 16, padding: '16px 18px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.subtle, textTransform: 'uppercase', letterSpacing: 0.5 }}>Movimiento real registrado</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.text, marginTop: 2 }}>Todo lo que las gestoras ya subieron a la app</div>
+              </div>
+              <div style={{ fontSize: 11, color: C.subtle }}>Lectura directa de la base · sin depender del reporte semanal</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 10 }}>
+              {[
+                { label: 'Registros de campo', val: totalRegistrosCampo, sub: `Socializaciones: ${regSocializaciones} · Institucionales: ${regInstitucionales}`, color: C.navy, bg: '#EEF4FF' },
+                { label: 'Comunidad / Vecindad', val: regComunidad + regVecindad, sub: `Comunidad: ${regComunidad} · Vecindad: ${regVecindad}`, color: C.tolu, bg: '#E6F4F5' },
+                { label: 'Llamadas', val: regLlamadas, sub: 'Gestión remota registrada', color: C.barbosa, bg: '#E0F7F6' },
+                { label: 'Actas comité PGS', val: totalActasComite, sub: 'Subidas a Conecta', color: '#7C3AED', bg: '#F3E8FF' },
+                { label: 'Evidencias', val: totalEvidencias, sub: 'Fotos y archivos georreferenciados', color: '#0891B2', bg: '#E0F2FE' },
+                { label: 'Novedades sobre actores', val: totalNovedadesActores, sub: `${actoresUnicos} actores únicos tocados`, color: '#059669', bg: '#D1FAE5' },
+                { label: 'Reportes semanales', val: reportes.length, sub: 'Input manual (cuando aplica)', color: C.subtle, bg: '#F1F5F9' },
+                { label: 'Total eventos (suma)', val: totalEventosD, sub: 'Registros + reportes semanales', color: C.blue, bg: '#DBEAFE' },
+              ].map((m, i) => (
+                <div key={i} style={{ background: m.bg, borderRadius: 10, padding: '12px 12px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.label}</div>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: m.color, lineHeight: 1.1, marginTop: 4 }}>{m.val}</div>
+                  <div style={{ fontSize: 10, color: C.muted, marginTop: 4, lineHeight: 1.3 }}>{m.sub}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {DAC_KPIS.map(kpi => (
