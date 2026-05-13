@@ -39,33 +39,41 @@ export default function AmbientalView({ profile }) {
   const [pgrd, setPgrd] = useState([])
   const [commitments, setCommitments] = useState([])
   const [advisorLog, setAdvisorLog] = useState([])
+  const [tracker, setTracker] = useState([])
+  const [terrFilter, setTerrFilter] = useState('Todos')
   const [loading, setLoading] = useState(true)
 
   const canEdit = profile?.role === 'admin' || profile?.ambiental_access === 'full'
 
   async function loadAll() {
     setLoading(true)
-    const [d, p, c, a] = await Promise.all([
+    const [d, p, c, a, t] = await Promise.all([
       supabase.from('ambiental_documents').select('*').order('fecha', { ascending: false, nullsFirst: false }),
       supabase.from('ambiental_pgrd').select('*').order('fecha_estimada', { ascending: true, nullsFirst: false }),
       supabase.from('ambiental_commitments').select('*').order('fecha_limite', { ascending: true, nullsFirst: false }),
       supabase.from('ambiental_advisor_log').select('*').order('fecha', { ascending: false }),
+      supabase.from('ambiental_workstream_tracker').select('*').order('workstream').order('orden'),
     ])
     setDocs(d.data || [])
     setPgrd(p.data || [])
     setCommitments(c.data || [])
     setAdvisorLog(a.data || [])
+    setTracker(t.data || [])
     setLoading(false)
   }
 
   useEffect(() => { loadAll() }, [])
 
+  // Filtrado por territorio (solo afecta docs y commitments que tienen territorio)
+  const docsF = useMemo(() => terrFilter === 'Todos' ? docs : docs.filter(d => !d.territorio || d.territorio === terrFilter), [docs, terrFilter])
+  const commitmentsF = useMemo(() => terrFilter === 'Todos' ? commitments : commitments.filter(c => !c.territorio || c.territorio === terrFilter), [commitments, terrFilter])
+
   const stats = useMemo(() => ({
-    docs: docs.length,
-    compromisosAbiertos: commitments.filter(c => c.status === 'abierto' || c.status === 'en_progreso').length,
-    compromisosVencidos: commitments.filter(c => c.status === 'vencido').length,
+    docs: docsF.length,
+    compromisosAbiertos: commitmentsF.filter(c => c.status === 'abierto' || c.status === 'en_progreso').length,
+    compromisosVencidos: commitmentsF.filter(c => c.status === 'vencido').length,
     pgrdVigente: pgrd.some(p => p.componente === 'plan_maestro' && (p.status === 'aprobado' || p.status === 'vigente')),
-  }), [docs, commitments, pgrd])
+  }), [docsF, commitmentsF, pgrd])
 
   return (
     <div style={{ animation: 'fadeIn 0.4s ease' }}>
@@ -78,11 +86,24 @@ export default function AmbientalView({ profile }) {
             Workspace Diana + Leonardo Cárdenas (GAA) · Lectura para gestoras
           </p>
         </div>
-        {!canEdit && (
-          <span style={{ padding: '4px 10px', background: '#F1F5F9', color: '#64748B', borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>
-            VISTA DE LECTURA
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {/* Filtro de territorio */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: C2.subtle, textTransform: 'uppercase', letterSpacing: 0.5 }}>Territorio</span>
+            <select value={terrFilter} onChange={e => setTerrFilter(e.target.value)}
+              style={{ padding: '6px 10px', border: `1px solid ${C2.border}`, borderRadius: 8, fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: C2.navy, background: 'white', cursor: 'pointer' }}>
+              <option value="Todos">Todos</option>
+              <option value="Tolú">Tolú</option>
+              <option value="Barbosa">Barbosa</option>
+              <option value="Nacional">Nacional</option>
+            </select>
+          </div>
+          {!canEdit && (
+            <span style={{ padding: '4px 10px', background: '#F1F5F9', color: '#64748B', borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>
+              VISTA DE LECTURA
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Sub-tabs */}
@@ -108,7 +129,7 @@ export default function AmbientalView({ profile }) {
       {loading && <div style={{ padding: 40, textAlign: 'center', color: C2.muted }}>Cargando ambiental...</div>}
 
       {!loading && subtab === 'dashboard' && (
-        <DashboardAmbiental docs={docs} pgrd={pgrd} commitments={commitments} advisorLog={advisorLog} stats={stats} C2={C2} onNavigate={setSubtab} />
+        <DashboardAmbiental docs={docsF} pgrd={pgrd} commitments={commitmentsF} advisorLog={advisorLog} tracker={tracker} terrFilter={terrFilter} stats={stats} C2={C2} canEdit={canEdit} reload={loadAll} onNavigate={setSubtab} />
       )}
       {!loading && subtab === 'documentos' && (
         <DocumentosSection docs={docs} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
@@ -127,19 +148,95 @@ export default function AmbientalView({ profile }) {
 }
 
 // ── Dashboard ──
-function DashboardAmbiental({ docs, pgrd, commitments, advisorLog, stats, C2, onNavigate }) {
+const TRACKER_STATUS = {
+  pendiente:   { label: 'Pendiente',   color: '#64748B', bg: '#F1F5F9', dot: '○' },
+  en_curso:    { label: 'En curso',    color: '#1D4ED8', bg: '#DBEAFE', dot: '◐' },
+  completado:  { label: 'Completado',  color: '#047857', bg: '#D1FAE5', dot: '●' },
+  vencido:     { label: 'Vencido',     color: '#B91C1C', bg: '#FEE2E2', dot: '⚠' },
+  bloqueado:   { label: 'Bloqueado',   color: '#92400E', bg: '#FEF3C7', dot: '⛔' },
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null
+  const today = new Date(); today.setHours(0,0,0,0)
+  const target = new Date(dateStr + 'T00:00:00')
+  return Math.round((target - today) / (1000 * 60 * 60 * 24))
+}
+
+function DashboardAmbiental({ docs, pgrd, commitments, advisorLog, tracker, terrFilter, stats, C2, canEdit, reload, onNavigate }) {
   const recentDocs = docs.slice(0, 4)
   const openCompromisos = commitments.filter(c => c.status === 'abierto' || c.status === 'en_progreso').slice(0, 5)
+  const vencidos = commitments.filter(c => c.status === 'vencido')
   const pgrdKey = pgrd.find(p => p.componente === 'plan_maestro')
+
+  // Cronograma 60 días: une compromisos + PGRD + tracker que vencen pronto
+  const horizonte = useMemo(() => {
+    const items = []
+    commitments.forEach(c => {
+      if (!c.fecha_limite || c.status === 'cumplido') return
+      const d = daysUntil(c.fecha_limite)
+      if (d === null || d > 60 || d < -30) return
+      items.push({ tipo: 'Compromiso', titulo: c.compromiso, contraparte: c.contraparte, fecha: c.fecha_limite, dias: d, territorio: c.territorio })
+    })
+    pgrd.forEach(p => {
+      if (!p.fecha_estimada || p.status === 'aprobado' || p.status === 'vigente') return
+      const d = daysUntil(p.fecha_estimada)
+      if (d === null || d > 60 || d < -30) return
+      items.push({ tipo: 'PGRD', titulo: p.titulo, contraparte: p.autoridad_aprueba || '—', fecha: p.fecha_estimada, dias: d, territorio: null })
+    })
+    tracker.forEach(t => {
+      if (!t.fecha_target || t.status === 'completado') return
+      const d = daysUntil(t.fecha_target)
+      if (d === null || d > 60 || d < -30) return
+      items.push({ tipo: t.workstream === 'eia' ? 'EIA' : t.workstream === 'err' ? 'ERR' : 'Riesgos', titulo: t.titulo, contraparte: t.responsable || '—', fecha: t.fecha_target, dias: d, territorio: t.territorio })
+    })
+    return items.sort((a, b) => a.dias - b.dias).slice(0, 10)
+  }, [commitments, pgrd, tracker])
+
+  // Distribución documentos por tipo
+  const docsByType = useMemo(() => {
+    const m = {}
+    docs.forEach(d => { m[d.tipo] = (m[d.tipo] || 0) + 1 })
+    return Object.entries(m).sort((a, b) => b[1] - a[1])
+  }, [docs])
+
+  const eiaHitos = tracker.filter(t => t.workstream === 'eia')
+  const errHitos = tracker.filter(t => t.workstream === 'err')
+  const riesgosHitos = tracker.filter(t => t.workstream === 'riesgos')
+
+  const eiaCompletados = eiaHitos.filter(t => t.status === 'completado').length
+  const eiaEnCurso = eiaHitos.filter(t => t.status === 'en_curso').length
+  const errCompletados = errHitos.filter(t => t.status === 'completado').length
+  const errEnCurso = errHitos.filter(t => t.status === 'en_curso').length
+
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       {/* Stats grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
         <StatBox label="Documentos" value={stats.docs} color={C2.navy} />
         <StatBox label="Compromisos abiertos" value={stats.compromisosAbiertos} color="#B45309" />
         <StatBox label="Compromisos vencidos" value={stats.compromisosVencidos} color={C2.red} />
+        <StatBox label="EIA · avance" value={`${eiaCompletados}/${eiaHitos.length}`} color={C2.navy} small />
+        <StatBox label="ERR · avance" value={`${errCompletados}/${errHitos.length}`} color="#047857" small />
         <StatBox label="PGRD status" value={stats.pgrdVigente ? '✓ Vigente' : 'En gestión'} color={stats.pgrdVigente ? '#047857' : '#B45309'} small />
       </div>
+
+      {/* Alerta compromisos vencidos */}
+      {vencidos.length > 0 && (
+        <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10, padding: '12px 16px' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', marginBottom: 6 }}>⚠ {vencidos.length} compromiso{vencidos.length > 1 ? 's' : ''} vencido{vencidos.length > 1 ? 's' : ''}</div>
+          {vencidos.slice(0, 4).map(c => (
+            <div key={c.id} style={{ fontSize: 12, color: '#7F1D1D', lineHeight: 1.5, padding: '4px 0', borderBottom: '1px solid #FECACA' }}>
+              <strong>{c.compromiso}</strong> · {c.contraparte} · {c.territorio || 'Nacional'} · venció {c.fecha_limite}
+            </div>
+          ))}
+          {vencidos.length > 4 && (
+            <button onClick={() => onNavigate('compromisos')} style={{ marginTop: 8, background: '#B91C1C', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+              Ver los {vencidos.length} compromisos vencidos →
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Alerta PGRD */}
       {!stats.pgrdVigente && (
@@ -154,6 +251,80 @@ function DashboardAmbiental({ docs, pgrd, commitments, advisorLog, stats, C2, on
             padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
           }}>Ir a PGRD →</button>
         </div>
+      )}
+
+      {/* ─── Tracker EIA — 12 semanas con Leonardo Cárdenas ─── */}
+      <TrackerSection
+        title="Tracker EIA — Estudio de Impacto Ambiental"
+        subtitle="12 semanas con Leonardo Cárdenas (GAA) · arrancó 5 mayo 2026 · entrega final 27 julio 2026"
+        items={eiaHitos}
+        canEdit={canEdit}
+        reload={reload}
+        C2={C2}
+        accentColor={C2.navy}
+        accentBg="#EEF4FF"
+      />
+
+      {/* ─── Seguimiento ERR ─── */}
+      <TrackerSection
+        title="Embedded Responsibility Report (ERR)"
+        subtitle="Workflow con Nadim · GRI + IFRS S2 · target aprobación junio 2026 (soporte ronda de financiamiento)"
+        items={errHitos}
+        canEdit={canEdit}
+        reload={reload}
+        C2={C2}
+        accentColor="#047857"
+        accentBg="#D1FAE5"
+      />
+
+      {/* ─── Matriz de Riesgos Ambientales — placeholder ─── */}
+      <div style={{ background: 'white', border: `2px dashed ${C2.border}`, borderRadius: 12, padding: '20px 24px' }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: C2.text, marginBottom: 6 }}>🌱 Matriz de Riesgos Ambientales</div>
+        <div style={{ fontSize: 12, color: C2.muted, lineHeight: 1.6 }}>
+          Esta matriz se activa cuando Leonardo Cárdenas entregue el <strong>EIA final con el Plan de Manejo Ambiental</strong> y los riesgos identificados (target {riesgosHitos[0]?.fecha_target || '27 julio 2026'}).
+          Hasta entonces los riesgos sociales viven en <em>Actores</em> y los institucionales/legislativos en <em>Riesgos Sociales</em>.
+        </div>
+        {riesgosHitos[0] && (
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: TRACKER_STATUS[riesgosHitos[0].status]?.color || C2.muted }}>
+            <span>{TRACKER_STATUS[riesgosHitos[0].status]?.dot}</span>
+            <span>{TRACKER_STATUS[riesgosHitos[0].status]?.label}</span>
+            <span style={{ color: C2.muted, fontWeight: 400 }}>· responsable: {riesgosHitos[0].responsable}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Cronograma 60 días */}
+      <Card C2={C2} title={`Cronograma próximo · 60 días (${horizonte.length})`} onMore={() => onNavigate('compromisos')}>
+        {horizonte.length === 0 ? (
+          <Empty msg="Sin hitos ni compromisos en los próximos 60 días." C2={C2} />
+        ) : horizonte.map((h, i) => {
+          const urgencyColor = h.dias < 0 ? '#B91C1C' : h.dias <= 15 ? '#DC2626' : h.dias <= 30 ? '#D97706' : '#059669'
+          return (
+            <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${C2.border}`, display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: urgencyColor, marginBottom: 2 }}>
+                  {h.tipo} · {h.dias < 0 ? `vencido hace ${-h.dias}d` : h.dias === 0 ? 'hoy' : `en ${h.dias}d`}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C2.text }}>{h.titulo}</div>
+                <div style={{ fontSize: 11, color: C2.muted, marginTop: 2 }}>{h.contraparte} · {h.fecha}</div>
+              </div>
+            </div>
+          )
+        })}
+      </Card>
+
+      {/* Distribución documentos */}
+      {docsByType.length > 0 && (
+        <Card C2={C2} title="Documentos por tipo">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
+            {docsByType.map(([tipo, n]) => (
+              <div key={tipo} style={{ background: '#F8FAFC', borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: C2.navy }}>{n}</div>
+                <div style={{ fontSize: 11, color: C2.muted, fontWeight: 600 }}>{TIPO_LABEL[tipo] || tipo}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
       {/* Últimos documentos */}
@@ -186,6 +357,62 @@ function DashboardAmbiental({ docs, pgrd, commitments, advisorLog, stats, C2, on
           </div>
         ))}
       </Card>
+    </div>
+  )
+}
+
+// ── Tracker reusable section (EIA, ERR) ──
+function TrackerSection({ title, subtitle, items, canEdit, reload, C2, accentColor, accentBg }) {
+  const [savingId, setSavingId] = useState(null)
+  async function cycleStatus(item) {
+    const order = ['pendiente', 'en_curso', 'completado']
+    const idx = order.indexOf(item.status)
+    const next = order[(idx + 1) % order.length]
+    setSavingId(item.id)
+    await supabase.from('ambiental_workstream_tracker').update({ status: next, updated_at: new Date().toISOString() }).eq('id', item.id)
+    setSavingId(null)
+    reload()
+  }
+  const completados = items.filter(i => i.status === 'completado').length
+  const pct = items.length ? Math.round((completados / items.length) * 100) : 0
+  return (
+    <div style={{ background: 'white', border: `1px solid ${C2.border}`, borderRadius: 12, padding: '16px 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, flexWrap: 'wrap', gap: 6 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: accentColor }}>{title}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: C2.muted }}>{completados}/{items.length} hitos · {pct}%</div>
+      </div>
+      <div style={{ fontSize: 11, color: C2.muted, marginBottom: 12, lineHeight: 1.5 }}>{subtitle}</div>
+      {/* Barra de progreso */}
+      <div style={{ height: 6, background: accentBg, borderRadius: 100, marginBottom: 14, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: accentColor, borderRadius: 100, transition: 'width 0.4s' }} />
+      </div>
+      {items.map(it => {
+        const sc = TRACKER_STATUS[it.status] || TRACKER_STATUS.pendiente
+        const dias = daysUntil(it.fecha_target)
+        const urgency = it.status === 'completado' ? null : (dias === null ? null : dias < 0 ? 'vencido' : dias <= 15 ? 'urgente' : null)
+        return (
+          <div key={it.id} style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto', gap: 10, padding: '10px 0', borderTop: `1px solid ${C2.border}`, alignItems: 'start' }}>
+            <button onClick={canEdit ? () => cycleStatus(it) : undefined} disabled={!canEdit || savingId === it.id}
+              title={canEdit ? `Click para avanzar status (actual: ${sc.label})` : sc.label}
+              style={{
+                width: 28, height: 28, borderRadius: '50%', border: `2px solid ${sc.color}`, background: sc.bg, color: sc.color,
+                fontSize: 13, fontWeight: 900, cursor: canEdit ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                fontFamily: 'Montserrat, sans-serif',
+              }}>{sc.dot}</button>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C2.text }}>{it.titulo}</div>
+              {it.descripcion && <div style={{ fontSize: 11, color: C2.muted, marginTop: 3, lineHeight: 1.5 }}>{it.descripcion}</div>}
+              <div style={{ fontSize: 10, color: C2.subtle, marginTop: 4, fontWeight: 600 }}>
+                {it.responsable && <span>👤 {it.responsable}</span>}
+                {it.fecha_target && <span style={{ marginLeft: 8 }}>📅 {it.fecha_target}</span>}
+                {urgency === 'vencido' && <span style={{ marginLeft: 8, color: '#B91C1C', fontWeight: 800 }}>· vencido hace {-dias}d</span>}
+                {urgency === 'urgente' && <span style={{ marginLeft: 8, color: '#D97706', fontWeight: 800 }}>· en {dias}d</span>}
+              </div>
+            </div>
+            <span style={{ padding: '3px 8px', background: sc.bg, color: sc.color, borderRadius: 6, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.3, whiteSpace: 'nowrap' }}>{sc.label}</span>
+          </div>
+        )
+      })}
     </div>
   )
 }
