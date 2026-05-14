@@ -1,4 +1,5 @@
 import { C } from '../lib/constants'
+import AppLauncher from './AppLauncher'
 
 // ── Sidebar Conecta (estilo Bridge/Financiera) ──
 
@@ -71,9 +72,10 @@ export default function Sidebar({ activeView, onNavigate, profile, session, onSi
       position: 'fixed', left: 0, top: 0, zIndex: 100,
       overflowY: 'auto',
     }}>
-      {/* Logo */}
-      <div style={{ padding: '20px 18px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      {/* Logo + App Launcher */}
+      <div style={{ padding: '20px 18px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 12 }}>
         <img src="/logo-conecta-white.svg" alt="Caribe LNG Conecta" style={{ height: 48, maxWidth: '100%' }} />
+        <AppLauncher current="conecta" variant="dark" compact />
       </div>
 
       {/* Global search */}
