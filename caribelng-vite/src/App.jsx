@@ -741,6 +741,8 @@ export default function App() {
   const [editingActor, setEditingActor] = useState(null)
   const [registrosDiarios, setRegistrosDiarios] = useState([])
   const [comiteActas, setComiteActas] = useState([])
+  const [contratistas, setContratistas] = useState([])
+  const [capacitaciones, setCapacitaciones] = useState([])
   const [selectedActa, setSelectedActa] = useState(null)
   const [inputSubTab, setInputSubTab] = useState('diario')
   const [showGuia, setShowGuia] = useState(false)
@@ -775,9 +777,11 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, rp, sg, ri, ae] = await Promise.all([
+      const [a, ag, rp, sg, ri, ae, ct, cp] = await Promise.all([
         getActors(), getAgreements(), getReportesSemanales(),
-        getSeguimientoAcuerdos(), getRiesgos(), getActorEdits()
+        getSeguimientoAcuerdos(), getRiesgos(), getActorEdits(),
+        supabase.from('contratistas').select('*').order('nombre'),
+        supabase.from('capacitaciones_contratistas').select('*').order('fecha', { ascending: false }),
       ])
       setActors(a || [])
       setAgreements(ag || [])
@@ -785,6 +789,8 @@ export default function App() {
       setSeguimiento(sg || [])
       setRiesgos(ri || [])
       setActorEdits(ae || [])
+      setContratistas(ct?.data || [])
+      setCapacitaciones(cp?.data || [])
     } finally { setDataLoading(false) }
   }, [session])
 
@@ -1095,6 +1101,8 @@ export default function App() {
             seguimiento={seguimiento}
             reportes={reportes}
             cronograma={cronograma}
+            contratistas={contratistas}
+            capacitaciones={capacitaciones}
             isMobile={isMobile}
             isAdmin={isAdmin}
             profile={profile}
@@ -2432,7 +2440,8 @@ export default function App() {
             kpisDac={kpisDac} onKpiDacSaved={loadData} actors={actors}
             registrosDiarios={registrosDiarios} evidencias={evidencias}
             allInteractions={allInteractions} cronograma={cronograma}
-            comiteActas={comiteActas} />
+            comiteActas={comiteActas}
+            contratistas={contratistas} capacitaciones={capacitaciones} />
         )}
 
         {view === 'riesgos' && (
@@ -2765,6 +2774,47 @@ export default function App() {
                         <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Estables</div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* ── Contratistas y proveedores en mi territorio ── */}
+            {(() => {
+              const terr = myTerritorio
+              if (!terr) return null
+              const enTerritorio = contratistas.filter(c => (c.territorios || []).includes(terr) && c.estado === 'activo')
+              if (enTerritorio.length === 0) return null
+              const capByCont = {}
+              capacitaciones.forEach(k => { if (!capByCont[k.contratista_id]) capByCont[k.contratista_id] = 0; capByCont[k.contratista_id] += 1 })
+              return (
+                <div style={{ background: 'white', borderRadius: 14, padding: '16px 18px', marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Contratistas activos en {terr} ({enTerritorio.length})
+                    </div>
+                    <button onClick={() => setView('contratistas')}
+                      style={{ background: 'transparent', color: C.navy, border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+                      Ver todos →
+                    </button>
+                  </div>
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    {enTerritorio.slice(0, 6).map(c => {
+                      const ncap = capByCont[c.id] || 0
+                      return (
+                        <div key={c.id} onClick={() => setView('contratistas')}
+                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F8FAFC', borderRadius: 8, cursor: 'pointer', borderLeft: `3px solid ${terr === 'Tolú' ? C.tolu : C.barbosa}` }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{c.nombre}</div>
+                            {c.servicio && <div style={{ fontSize: 11, color: C.muted, marginTop: 2, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{c.servicio}</div>}
+                          </div>
+                          <div style={{ textAlign: 'right', marginLeft: 12 }}>
+                            <div style={{ fontSize: 16, fontWeight: 900, color: ncap > 0 ? '#047857' : '#B91C1C' }}>{ncap}</div>
+                            <div style={{ fontSize: 9, color: C.subtle, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>capac.</div>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )

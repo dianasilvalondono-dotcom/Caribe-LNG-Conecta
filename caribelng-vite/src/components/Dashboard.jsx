@@ -94,7 +94,7 @@ function GaugeSVG({ pct = 0, color = '#10b981', size = 88 }) {
   )
 }
 
-export default function Dashboard({ stats, actors, agreements, riesgos, seguimiento, reportes, cronograma, isMobile, isAdmin, profile, session, actorEdits, setView, setFilterS, setFilterT, setSelectedActor, loadData, exportToExcel, approveActorEdit, rejectActorEdit, sendPushNotification, auditLog, setAuditLog, showAudit, setShowAudit, getAuditLog, registrosDiarios, subscribeToPush }) {
+export default function Dashboard({ stats, actors, agreements, riesgos, seguimiento, reportes, cronograma, contratistas = [], capacitaciones = [], isMobile, isAdmin, profile, session, actorEdits, setView, setFilterS, setFilterT, setSelectedActor, loadData, exportToExcel, approveActorEdit, rejectActorEdit, sendPushNotification, auditLog, setAuditLog, showAudit, setShowAudit, getAuditLog, registrosDiarios, subscribeToPush }) {
   const today = new Date()
   const weekNum = Math.ceil((((today - new Date(today.getFullYear(), 0, 1)) / 86400000) + 1) / 7)
   const weekLabel = `Semana ${weekNum} · ${today.getFullYear()}`
@@ -334,6 +334,41 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               </div>
             </div>
           </div>
+
+          {/* Contratistas y Capacitaciones */}
+          {(() => {
+            const activos = contratistas.filter(c => c.estado === 'activo').length
+            const hace30 = new Date(); hace30.setDate(hace30.getDate() - 30)
+            const capUlt30 = capacitaciones.filter(k => new Date(k.fecha + 'T00:00:00') >= hace30).length
+            const capIds = new Set(capacitaciones.map(k => k.contratista_id))
+            const sinCapacitar = contratistas.filter(c => c.estado === 'activo' && !capIds.has(c.id)).length
+            return (
+              <div style={{ ...card, padding: 0, overflow: 'hidden', cursor: 'pointer' }} onClick={() => setView('contratistas')}>
+                <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <STitle label="Contratistas y capacitaciones" color="#1565C0" />
+                  <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>Ver todo →</span>
+                </div>
+                <div style={{ padding: '14px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ background: '#EEF4FF', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: C_navy, lineHeight: 1 }}>{activos}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginTop: 4 }}>Activos</div>
+                  </div>
+                  <div style={{ background: '#F3E8FF', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: '#7C3AED', lineHeight: 1 }}>{capacitaciones.length}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginTop: 4 }}>Capacitaciones</div>
+                  </div>
+                  <div style={{ background: '#D1FAE5', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: '#047857', lineHeight: 1 }}>{capUlt30}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginTop: 4 }}>Últimos 30d</div>
+                  </div>
+                  <div style={{ background: sinCapacitar > 0 ? '#FEE2E2' : '#F1F5F9', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: sinCapacitar > 0 ? '#B91C1C' : '#64748B', lineHeight: 1 }}>{sinCapacitar}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginTop: 4 }}>Sin capacitar</div>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* PGS Gauge */}
           <div style={card}>

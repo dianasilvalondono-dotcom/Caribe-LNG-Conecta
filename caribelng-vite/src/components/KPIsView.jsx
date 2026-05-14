@@ -3,7 +3,7 @@ import { C } from '../lib/constants'
 import { Bar, Tag, StatCard } from './ui'
 import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 
-export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [], allInteractions = [], cronograma = [], comiteActas = [] }) {
+export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [], allInteractions = [], cronograma = [], comiteActas = [], contratistas = [], capacitaciones = [] }) {
   const [mainTab, setMainTab] = useState('dac')
   const [terrFilter, setTerrFilter] = useState('Todos')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
@@ -444,6 +444,8 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                 { label: 'Novedades sobre actores', val: totalNovedadesActores, sub: `${actoresUnicos} actores únicos tocados`, color: '#059669', bg: '#D1FAE5' },
                 { label: 'Reportes semanales', val: reportes.length, sub: 'Input manual (cuando aplica)', color: C.subtle, bg: '#F1F5F9' },
                 { label: 'Total eventos (suma)', val: totalEventosD, sub: 'Registros + reportes semanales', color: C.blue, bg: '#DBEAFE' },
+                { label: 'Contratistas activos', val: contratistas.filter(c => c.estado === 'activo').length, sub: `${contratistas.length} en total · Suragas, CargoVolco, etc.`, color: C.navy, bg: '#EEF4FF' },
+                { label: 'Capacitaciones a contratistas', val: capacitaciones.length, sub: capacitaciones.length > 0 ? `Último tema: ${capacitaciones[0]?.tema || '—'}` : 'Sin capacitaciones registradas', color: '#7C3AED', bg: '#F3E8FF' },
               ].map((m, i) => (
                 <div key={i} style={{ background: m.bg, borderRadius: 10, padding: '12px 12px' }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.label}</div>
