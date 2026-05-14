@@ -2196,7 +2196,7 @@ export default function App() {
                   <div>
                     {/* Upload card */}
                     <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
-                      <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: 'none' }} />
+                      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple onChange={handleFiles} style={{ display: 'none' }} />
                       {total === 0 ? (
                         <div onClick={() => fileRef.current?.click()}
                           style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
@@ -2317,17 +2317,33 @@ export default function App() {
                           )}
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-                          {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => (
-                            <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
-                              style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
-                              <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
-                              <div style={{ padding: '10px 12px' }}>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
-                                <div style={{ fontSize: 12, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
-                                {ev.lugar && <div style={{ fontSize: 12, color: C.accent }}>· {ev.lugar}</div>}
+                          {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => {
+                            const url = ev.foto_url || ''
+                            const ext = url.split('.').pop()?.toLowerCase().split('?')[0] || ''
+                            const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
+                            const isPdf = ext === 'pdf'
+                            const isDoc = /^(doc|docx|xls|xlsx|ppt|pptx|txt|csv)$/.test(ext)
+                            const docIcon = isPdf ? '📄' : isDoc ? '📎' : '📁'
+                            const docLabel = isPdf ? 'PDF' : ext ? ext.toUpperCase() : 'Archivo'
+                            return (
+                              <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
+                                style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
+                                {isImg ? (
+                                  <img src={url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover', background: '#F1F5F9' }} />
+                                ) : (
+                                  <div style={{ width: '100%', height: 140, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                                    <div style={{ fontSize: 42, lineHeight: 1 }}>{docIcon}</div>
+                                    <div style={{ fontSize: 11, fontWeight: 800, marginTop: 6, letterSpacing: 1 }}>{docLabel}</div>
+                                  </div>
+                                )}
+                                <div style={{ padding: '10px 12px' }}>
+                                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
+                                  <div style={{ fontSize: 12, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
+                                  {ev.lugar && <div style={{ fontSize: 12, color: C.accent }}>· {ev.lugar}</div>}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       </div>
                     )}

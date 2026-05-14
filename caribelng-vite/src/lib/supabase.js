@@ -466,18 +466,32 @@ async function compressImage(file, maxWidth = 1200, quality = 0.75) {
 }
 
 export async function uploadEvidenciaPhoto(file, territorio) {
-  const compressed = await compressImage(file)
   const timestamp = Date.now()
-  const fileName = `foto_${timestamp}.jpg`
+  const isImage = file.type?.startsWith('image/')
+  let body, fileName, contentType
+
+  if (isImage) {
+    // Imagen: comprimir y guardar como jpg
+    body = await compressImage(file)
+    fileName = `foto_${timestamp}.jpg`
+    contentType = 'image/jpeg'
+  } else {
+    // PDF u otro documento: subir tal cual respetando extensión y mime
+    body = file
+    const ext = (file.name?.split('.').pop() || 'bin').toLowerCase().slice(0, 8)
+    fileName = `doc_${timestamp}.${ext}`
+    contentType = file.type || 'application/octet-stream'
+  }
+
   const path = `evidencias/${fileName}`
 
   // 1. Upload to Supabase Storage
-  const { error } = await supabase.storage.from('archivos').upload(path, compressed, { contentType: 'image/jpeg' })
+  const { error } = await supabase.storage.from('archivos').upload(path, body, { contentType })
   if (error) throw error
   const { data } = supabase.storage.from('archivos').getPublicUrl(path)
 
   // 2. Upload to OneDrive (async, non-blocking)
-  uploadToOneDrive(compressed, fileName, territorio, 'evidencia').catch(() => {})
+  uploadToOneDrive(body, fileName, territorio, 'evidencia').catch(() => {})
 
   return data.publicUrl
 }
