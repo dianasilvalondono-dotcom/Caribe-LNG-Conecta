@@ -1964,7 +1964,8 @@ export default function App() {
                   const f = e.target.files?.[0]
                   if (!f) return
                   setFile(f)
-                  setPreview(URL.createObjectURL(f))
+                  // Solo generar preview blob para imágenes; para PDFs/docs no se renderiza <img>
+                  setPreview(f.type?.startsWith('image/') ? URL.createObjectURL(f) : null)
                   if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                       async (pos) => {
@@ -2067,23 +2068,31 @@ export default function App() {
                           rows={3}
                           style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
                       </div>
-                      {/* Foto */}
-                      <input ref={fileRef} type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
+                      {/* Foto o documento */}
+                      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={handlePhoto} style={{ display: 'none' }} />
                       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
-                        {!preview ? (
+                        {!file ? (
                           <button onClick={() => fileRef.current?.click()}
                             style={{ background: `${C.accent}10`, border: `1.5px dashed ${C.accent}`, borderRadius: 10,
                               padding: '12px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-                            <span style={{ fontSize: 20 }}></span>
+                            <span style={{ fontSize: 20 }}>📎</span>
                             <div style={{ textAlign: 'left' }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Adjuntar foto o documento (PDF, Word, Excel)</div>
                               <div style={{ fontSize: 12, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
                             </div>
                           </button>
                         ) : (
                           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 1 }}>
-                            <img src={preview} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} />
+                            {preview ? (
+                              <img src={preview} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{ width: 60, height: 60, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
+                                <span style={{ fontSize: 22, lineHeight: 1 }}>📄</span>
+                                <span style={{ marginTop: 2 }}>{(file.name?.split('.').pop() || 'DOC').toUpperCase().slice(0, 5)}</span>
+                              </div>
+                            )}
                             <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
                               {geo && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
                               {geoLugar && <div style={{ fontSize: 12, color: C.muted }}>{geoLugar}</div>}
                             </div>
@@ -2109,7 +2118,17 @@ export default function App() {
                             style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
                             boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 12, alignItems: 'flex-start',
                             borderLeft: `3px solid ${r.territorio === 'Tolú' ? C.tolu : C.barbosa}`, cursor: 'pointer' }}>
-                            {r.foto_url && <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />}
+                            {r.foto_url && (() => {
+                              const ext = (r.foto_url.split('.').pop() || '').toLowerCase().split('?')[0]
+                              const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
+                              if (isImg) return <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                              return (
+                                <div style={{ width: 56, height: 56, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, flexShrink: 0 }}>
+                                  <span style={{ fontSize: 20, lineHeight: 1 }}>📄</span>
+                                  <span style={{ marginTop: 2 }}>{ext.toUpperCase().slice(0, 4) || 'DOC'}</span>
+                                </div>
+                              )
+                            })()}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' }}>
                                 <span style={{ fontSize: 12, fontWeight: 800, color: r.territorio === 'Tolú' ? C.tolu : C.barbosa }}>{r.territorio}</span>
@@ -3533,13 +3552,26 @@ export default function App() {
                     style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
                 </div>
               </div>
-              {/* Foto si existe */}
-              {r.foto_url && !registroEditMode && (
-                <a href={r.foto_url} target="_blank" rel="noopener noreferrer">
-                  <img src={r.foto_url} alt=""
-                    style={{ width: '100%', maxHeight: 320, objectFit: 'cover', display: 'block' }} />
-                </a>
-              )}
+              {/* Foto o documento adjunto */}
+              {r.foto_url && !registroEditMode && (() => {
+                const ext = (r.foto_url.split('.').pop() || '').toLowerCase().split('?')[0]
+                const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
+                if (isImg) return (
+                  <a href={r.foto_url} target="_blank" rel="noopener noreferrer">
+                    <img src={r.foto_url} alt="" style={{ width: '100%', maxHeight: 320, objectFit: 'cover', display: 'block' }} />
+                  </a>
+                )
+                return (
+                  <a href={r.foto_url} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '20px 24px', background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', color: 'white', textDecoration: 'none' }}>
+                    <span style={{ fontSize: 36, lineHeight: 1 }}>📄</span>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 800 }}>Documento adjunto · {ext.toUpperCase() || 'archivo'}</div>
+                      <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>Click para abrir</div>
+                    </div>
+                  </a>
+                )
+              })()}
               {/* Detalle */}
               <div style={{ padding: 20 }}>
                 {registroEditMode ? (
