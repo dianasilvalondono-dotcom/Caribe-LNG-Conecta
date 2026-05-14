@@ -40,6 +40,7 @@ import RiesgosView from './components/RiesgosView'
 import KPIsView from './components/KPIsView'
 import KnowledgeBaseView from './components/KnowledgeBaseView'
 import AmbientalView from './components/AmbientalView'
+import ContratistasView from './components/ContratistasView'
 import ChatBot from './components/ChatBot'
 import OnboardingTour from './components/OnboardingTour'
 import Sidebar from './components/Sidebar'
@@ -2441,6 +2442,10 @@ export default function App() {
 
         {view === 'knowledge' && isAdmin && (
           <KnowledgeBaseView docs={knowledgeBase} onReload={loadData} isMobile={isMobile} />
+        )}
+
+        {view === 'contratistas' && (
+          <ContratistasView profile={profile} isAdmin={isAdmin} />
         )}
 
         {view === 'ambiental' && (
