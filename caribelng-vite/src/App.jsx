@@ -917,6 +917,9 @@ export default function App() {
   }, [])
 
   const isAdmin = profile?.role === 'admin'
+  const isCoordinator = profile?.role === 'supervisor'
+  // Coordinadores ven todos los territorios (igual que admin), pero NO pueden borrar lo estratégico (eso sigue siendo solo admin)
+  const seesAllTerritorios = isAdmin || isCoordinator
   const isGestora = profile?.role === 'gestora' || isAdmin
   const myTerritorio = profile?.territorio
 
@@ -2331,7 +2334,7 @@ export default function App() {
                       )}
                     </div>
                     {/* Gallery */}
-                    {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
+                    {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                           <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidencias recientes</div>
@@ -2345,7 +2348,7 @@ export default function App() {
                           )}
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-                          {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => {
+                          {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => {
                             const url = ev.foto_url || ''
                             const ext = url.split('.').pop()?.toLowerCase().split('?')[0] || ''
                             const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
@@ -2717,7 +2720,7 @@ export default function App() {
               const heroSub = isTolu ? 'Terminal marítima · Sucre · Costa Caribe'
                 : isBarbosa ? 'Planta de regasificación · Antioquia · Magdalena Medio'
                 : 'Todos los territorios'
-              const actoresT = actors.filter(a => myTerritorio ? a.territorio === myTerritorio : true)
+              const actoresT = actors.filter(a => seesAllTerritorios ? true : (myTerritorio ? a.territorio === myTerritorio : true))
               const rojos = actoresT.filter(a => a.semaforo === 'rojo' || a.semaforo === 'naranja').length
               const verdes = actoresT.filter(a => a.semaforo === 'verde').length
               return (
@@ -2779,11 +2782,14 @@ export default function App() {
               )
             })()}
 
-            {/* ── Contratistas y proveedores en mi territorio ── */}
+            {/* ── Contratistas y proveedores ── */}
             {(() => {
-              const terr = myTerritorio
-              if (!terr) return null
-              const enTerritorio = contratistas.filter(c => (c.territorios || []).includes(terr) && c.estado === 'activo')
+              const terrLabel = seesAllTerritorios ? 'todos los territorios' : myTerritorio
+              const enTerritorio = contratistas.filter(c => {
+                if (c.estado !== 'activo') return false
+                if (seesAllTerritorios) return true
+                return (c.territorios || []).includes(myTerritorio)
+              })
               if (enTerritorio.length === 0) return null
               const capByCont = {}
               capacitaciones.forEach(k => { if (!capByCont[k.contratista_id]) capByCont[k.contratista_id] = 0; capByCont[k.contratista_id] += 1 })
@@ -2791,7 +2797,7 @@ export default function App() {
                 <div style={{ background: 'white', borderRadius: 14, padding: '16px 18px', marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                      Contratistas activos en {terr} ({enTerritorio.length})
+                      Contratistas activos en {terrLabel} ({enTerritorio.length})
                     </div>
                     <button onClick={() => setView('contratistas')}
                       style={{ background: 'transparent', color: C.navy, border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
@@ -2801,9 +2807,13 @@ export default function App() {
                   <div style={{ display: 'grid', gap: 8 }}>
                     {enTerritorio.slice(0, 6).map(c => {
                       const ncap = capByCont[c.id] || 0
+                      const terrs = c.territorios || []
+                      const borderColor = terrs.includes('Tolú') && !terrs.includes('Barbosa') ? C.tolu
+                        : terrs.includes('Barbosa') && !terrs.includes('Tolú') ? C.barbosa
+                        : C.navy
                       return (
                         <div key={c.id} onClick={() => setView('contratistas')}
-                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F8FAFC', borderRadius: 8, cursor: 'pointer', borderLeft: `3px solid ${terr === 'Tolú' ? C.tolu : C.barbosa}` }}>
+                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F8FAFC', borderRadius: 8, cursor: 'pointer', borderLeft: `3px solid ${borderColor}` }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{c.nombre}</div>
                             {c.servicio && <div style={{ fontSize: 11, color: C.muted, marginTop: 2, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{c.servicio}</div>}
@@ -2920,7 +2930,7 @@ export default function App() {
             )}
             {/* ── Contenido por territorio ── */}
             {(() => {
-              const territorios = myTerritorio ? [myTerritorio] : ['Tolú', 'Barbosa']
+              const territorios = seesAllTerritorios ? ['Tolú', 'Barbosa'] : (myTerritorio ? [myTerritorio] : ['Tolú', 'Barbosa'])
               const tColors = { 'Tolú': { accent: '#007A87', border: '#99d5db', bg: '#f0fafa' }, 'Barbosa': { accent: '#00BFB3', border: '#99e6e0', bg: '#f0fdfb' } }
               const renderTerritorioCol = (terr) => {
                 const tc = tColors[terr] || tColors['Tolú']
@@ -3210,10 +3220,10 @@ export default function App() {
             })()}
 
             {/* ── Galería de evidencias recientes ── */}
-            {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
+            {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
               <div style={{ background: C.card, borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 12 }}>
                 <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>Evidencias recientes</h3>
-                {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 10).map(ev => (
+                {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 10).map(ev => (
                   <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
                     style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start', cursor: 'pointer' }}>
                     <img src={ev.foto_url} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />

@@ -34,6 +34,7 @@ export default function ContratistasView({ profile, isAdmin }) {
   const [savingCapac, setSavingCapac] = useState(false)
 
   const canEdit = profile?.role === 'admin' || profile?.role === 'supervisor' || profile?.role === 'gestora' || profile?.role === 'employee'
+  const canDelete = profile?.role === 'admin'
 
   async function loadAll() {
     setLoading(true)
@@ -241,6 +242,7 @@ export default function ContratistasView({ profile, isAdmin }) {
         <DetalleModal contratista={selected}
           capacitaciones={(capsByContratista[selected.id] || [])}
           canEdit={canEdit}
+          canDelete={canDelete}
           onClose={() => setSelected(null)}
           onEdit={() => { setEditing(selected); setSelected(null) }}
           onDelete={() => { deleteContratista(selected); setSelected(null) }}
@@ -372,7 +374,7 @@ function CapacitacionModal({ contratista_nombre, onCancel, onSave, saving }) {
   )
 }
 
-function DetalleModal({ contratista, capacitaciones, canEdit, onClose, onEdit, onDelete, onAddCapac, onDeleteCapac }) {
+function DetalleModal({ contratista, capacitaciones, canEdit, canDelete, onClose, onEdit, onDelete, onAddCapac, onDeleteCapac }) {
   const c = contratista
   const est = ESTADOS[c.estado] || ESTADOS.activo
   return (
@@ -451,8 +453,8 @@ function DetalleModal({ contratista, capacitaciones, canEdit, onClose, onEdit, o
                   </a>
                 )}
               </div>
-              {canEdit && (
-                <button onClick={() => onDeleteCapac(k)} title="Borrar capacitación"
+              {canDelete && (
+                <button onClick={() => onDeleteCapac(k)} title="Borrar capacitación (solo Dirección)"
                   style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 14, padding: 4 }}>🗑</button>
               )}
             </div>
@@ -464,9 +466,11 @@ function DetalleModal({ contratista, capacitaciones, canEdit, onClose, onEdit, o
             <button onClick={onEdit} style={{ flex: 1, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}44`, borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
               ✎ Editar contratista
             </button>
-            <button onClick={onDelete} style={{ background: '#FEF2F2', color: C.red, border: `1px solid ${C.red}44`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
-              🗑 Borrar
-            </button>
+            {canDelete && (
+              <button onClick={onDelete} style={{ background: '#FEF2F2', color: C.red, border: `1px solid ${C.red}44`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+                🗑 Borrar
+              </button>
+            )}
           </div>
         )}
       </div>
