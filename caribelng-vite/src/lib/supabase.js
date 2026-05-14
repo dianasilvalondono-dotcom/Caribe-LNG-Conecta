@@ -426,18 +426,42 @@ export async function uploadReporteToOneDrive(reporteData, territorio, semana) {
 // ── Image compression ────────────────────────────────────────────────────────
 
 async function compressImage(file, maxWidth = 1200, quality = 0.75) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    // Timeout de 30s para evitar trabes silenciosas (HEIC iPhone, archivos corruptos, formatos raros)
+    const url = URL.createObjectURL(file)
+    const timer = setTimeout(() => {
+      URL.revokeObjectURL(url)
+      reject(new Error(`No se pudo procesar la imagen "${file.name}". Formato no soportado o archivo dañado. Si es HEIC del iPhone, conviértelo a JPG.`))
+    }, 30000)
     const img = new Image()
     img.onload = () => {
-      const scale = Math.min(1, maxWidth / Math.max(img.width, img.height))
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.round(img.width * scale)
-      canvas.height = Math.round(img.height * scale)
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      canvas.toBlob(resolve, 'image/jpeg', quality)
+      clearTimeout(timer)
+      try {
+        const scale = Math.min(1, maxWidth / Math.max(img.width, img.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url)
+          if (!blob) {
+            reject(new Error(`No se pudo comprimir "${file.name}".`))
+          } else {
+            resolve(blob)
+          }
+        }, 'image/jpeg', quality)
+      } catch (e) {
+        URL.revokeObjectURL(url)
+        reject(e)
+      }
     }
-    img.src = URL.createObjectURL(file)
+    img.onerror = () => {
+      clearTimeout(timer)
+      URL.revokeObjectURL(url)
+      reject(new Error(`No se pudo cargar la imagen "${file.name}". Verifica que sea JPG o PNG. Las fotos HEIC de iPhone no se soportan — actívalas como JPG en Ajustes → Cámara → Formato → Más compatible.`))
+    }
+    img.src = url
   })
 }
 

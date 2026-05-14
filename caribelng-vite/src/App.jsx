@@ -2261,6 +2261,7 @@ export default function App() {
                               setUploading(true)
                               setProgress({ done: 0, total, failed: 0 })
                               let failed = 0
+                              const errores = []
                               for (let i = 0; i < files.length; i++) {
                                 try {
                                   const foto_url = await uploadEvidenciaPhoto(files[i], myTerritorio)
@@ -2275,7 +2276,9 @@ export default function App() {
                                   })
                                 } catch (err) {
                                   failed++
+                                  const msg = err?.message || String(err)
                                   console.error('Evidencia falló:', files[i]?.name, err)
+                                  errores.push(`• ${files[i]?.name || 'archivo'}: ${msg}`)
                                 }
                                 setProgress({ done: i + 1, total, failed })
                               }
@@ -2284,7 +2287,7 @@ export default function App() {
                               if (failed === 0) {
                                 reset()
                               } else {
-                                alert(`${total - failed} evidencias subidas, ${failed} con error. Revisa la consola.`)
+                                alert(`${total - failed} de ${total} evidencias subidas correctamente.\n\n${failed} fallaron:\n\n${errores.join('\n\n')}`)
                               }
                             }}
                               disabled={uploading || !desc.trim() || total === 0}
@@ -2314,7 +2317,7 @@ export default function App() {
                           )}
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-                          {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 20).map(ev => (
+                          {evidencias.filter(e => isAdmin ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => (
                             <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
                               style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
                               <img src={ev.foto_url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
