@@ -23,6 +23,7 @@ function detectCurrent() {
 
 export default function AppLauncher({ current, compact = false, variant = 'light' }) {
   const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
   const ref = useRef(null)
   const activeKey = current || detectCurrent()
   const activeApp = CLNG_APPS.find(a => a.key === activeKey)
@@ -33,13 +34,28 @@ export default function AppLauncher({ current, compact = false, variant = 'light
     return () => document.removeEventListener('mousedown', onDoc)
   }, [])
 
+  function toggle() {
+    if (!open && ref.current) {
+      const r = ref.current.getBoundingClientRect()
+      const dropW = 320
+      // Si el trigger está pegado a la izquierda (sidebar), abrir a la derecha
+      // Si no hay espacio a la derecha, abrir a la izquierda
+      const spaceRight = window.innerWidth - r.left
+      const left = spaceRight >= dropW + 16
+        ? r.left
+        : Math.max(8, window.innerWidth - dropW - 8)
+      setPos({ top: r.bottom + 6, left })
+    }
+    setOpen(o => !o)
+  }
+
   const triggerBg = variant === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(13,71,161,0.06)'
   const triggerColor = variant === 'dark' ? 'white' : '#0D47A1'
   const triggerBorder = variant === 'dark' ? 'rgba(255,255,255,0.16)' : 'rgba(13,71,161,0.12)'
 
   return (
     <div ref={ref} style={{ position: 'relative', fontFamily: 'Montserrat, system-ui, sans-serif', display: 'inline-block' }}>
-      <button onClick={() => setOpen(o => !o)}
+      <button onClick={toggle}
         title="Cambiar de app"
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -63,10 +79,11 @@ export default function AppLauncher({ current, compact = false, variant = 'light
 
       {open && (
         <div style={{
-          position: 'absolute', top: 'calc(100% + 6px)', right: 0,
+          position: 'fixed', top: pos.top, left: pos.left,
           background: 'white', borderRadius: 14, boxShadow: '0 12px 40px rgba(13,71,161,0.18)',
-          padding: 8, width: 320, zIndex: 9999,
+          padding: 8, width: 320, zIndex: 99999,
           border: '1px solid #E2E8F0',
+          maxHeight: 'calc(100vh - 100px)', overflowY: 'auto',
         }}>
           <div style={{ padding: '8px 10px 6px', fontSize: 10, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: 0.8 }}>
             Apps Caribe LNG
