@@ -820,7 +820,7 @@ function Grid2({ children }) {
   return <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
 }
 
-// ── Helpers de subida de archivos a OneDrive vía /api/upload-onedrive ──
+// ── Helpers de subida de archivos a SharePoint vía /api/upload-sharepoint ──
 
 const MAX_UPLOAD_BYTES = 4_400_000 // Vercel hobby ≈ 4.5MB platform limit
 
@@ -840,10 +840,10 @@ function fileToBase64(file) {
 async function uploadFileToOneDrive(file, { type, territorio }) {
   if (!file) throw new Error('Selecciona un archivo primero.')
   if (file.size > MAX_UPLOAD_BYTES) {
-    throw new Error(`El archivo pesa ${(file.size / 1024 / 1024).toFixed(1)}MB. Bridge solo admite hasta ~4.4MB por la API. Súbelo directo a OneDrive y pega el link en el campo URL.`)
+    throw new Error(`El archivo pesa ${(file.size / 1024 / 1024).toFixed(1)}MB. Bridge solo admite hasta ~4.4MB por la API. Súbelo directo al SharePoint y pega el link en el campo URL.`)
   }
   const fileBase64 = await fileToBase64(file)
-  const res = await fetch('/api/upload-onedrive', {
+  const res = await fetch('/api/upload-sharepoint', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
