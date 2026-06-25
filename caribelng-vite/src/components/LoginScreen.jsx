@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { C } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 
-// Login OTP · código al correo (6 dígitos)
-// SSO Microsoft temporalmente oculto — pendiente de config Azure AD redirect URI de Supabase
-// Reactivar cambiando SHOW_MICROSOFT_SSO a true cuando Pablo ajuste el Azure Portal
+// Login OTP · código al correo (6 dígitos) + SSO Microsoft.
+// SSO Microsoft ACTIVADO (jun 2026). Requiere en Supabase: provider Azure habilitado +
+// redirect URI del proyecto registrado en Azure AD. Poner en false para volver a solo-OTP.
 
-const SHOW_MICROSOFT_SSO = false
+const SHOW_MICROSOFT_SSO = true
 
 export default function LoginScreen() {
   const [email, setEmail] = useState(() => {
