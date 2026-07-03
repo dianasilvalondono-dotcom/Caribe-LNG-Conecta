@@ -94,7 +94,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       const nuevoEstado = nuevoAvance >= 100 ? 'cumplido' : 'en_curso'
       await addSeguimientoAcuerdo({
         acuerdo_id: ag.id, acuerdo: ag.nombre, territorio: ag.territorio,
-        compromiso: actividad, fecha_pactada: fecha, estado: 'Cumplido',
+        compromiso: actividad, fecha_pactada: fecha, estado: nuevoEstado,
         notas: notas, avance_porcentaje: pct,
       })
       await updateAgreementAvance(ag.id, nuevoAvance, notas || ag.notas)
