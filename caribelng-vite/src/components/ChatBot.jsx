@@ -55,9 +55,13 @@ export default function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
     setMessages(prev => [...prev, { role: 'user', text: q }])
     setLoading(true)
     try {
+      const { data: { session: authSession } } = await supabase.auth.getSession()
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + authSession?.access_token,
+        },
         body: JSON.stringify({ question: q, context: buildContext(), userId: session?.user?.id })
       })
       const data = await res.json()

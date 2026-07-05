@@ -597,9 +597,13 @@ export async function sendAlerta({ gestora, territorio, mensaje, urgencia }) {
   }).select().single()
   if (error) throw error
   // Enviar email en background — no bloquea si falla
+  const { data: { session } } = await supabase.auth.getSession()
   fetch('/api/send-alert-email', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + session?.access_token,
+    },
     body: JSON.stringify({ gestora, territorio, mensaje, urgencia })
   }).catch(() => {})
   return data
@@ -690,9 +694,13 @@ export async function updateRegistroDiario(id, fields) {
 export async function sendNotificationEmail({ to, subject, html, replyTo }) {
   // Best-effort: si falla, no bloquea el flujo principal.
   try {
+    const { data: { session } } = await supabase.auth.getSession()
     const r = await fetch('/api/send-notification-email', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session?.access_token,
+      },
       body: JSON.stringify({ to, subject, html, replyTo }),
     })
     return r.ok

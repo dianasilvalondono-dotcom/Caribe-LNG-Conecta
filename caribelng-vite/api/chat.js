@@ -9,8 +9,29 @@ const MONTHLY_BUDGET = parseFloat(process.env.CHAT_MONTHLY_BUDGET || '5')
 const INPUT_COST_PER_M = 0.80
 const OUTPUT_COST_PER_M = 4.00
 
+// Auth: exige un JWT válido de Supabase en Authorization: Bearer <token>
+async function requireAuth(req) {
+  const authHeader = req.headers.authorization || ''
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+  if (!token) return null
+  const supabaseUrl = process.env.VITE_SUPABASE_URL
+  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) return null
+  try {
+    const authClient = createClient(supabaseUrl, supabaseAnonKey)
+    const { data: { user }, error } = await authClient.auth.getUser(token)
+    if (error || !user) return null
+    return user
+  } catch {
+    return null
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  const user = await requireAuth(req)
+  if (!user) return res.status(401).json({ error: 'No autorizado' })
 
   const { question, context, userId } = req.body
   if (!question?.trim()) return res.status(400).json({ error: 'No question provided' })
