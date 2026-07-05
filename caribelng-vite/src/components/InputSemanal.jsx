@@ -91,6 +91,8 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
           user_ids: admins.map(a => a.id)
         }).catch(() => {})
       }
+    } catch (e) {
+      alert('No se pudo guardar el reporte: ' + (e?.message || e))
     } finally { setSaving(false) }
   }
 

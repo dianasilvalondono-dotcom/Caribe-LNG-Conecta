@@ -8,6 +8,11 @@ const URGENCIA_LABELS = {
   baja: { emoji: '🟢', label: 'BAJA' },
 }
 
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
   if (!RESEND_API_KEY) return res.status(500).json({ error: 'RESEND_API_KEY no configurado' })
@@ -15,7 +20,7 @@ export default async function handler(req, res) {
   const { gestora, territorio, mensaje, urgencia } = req.body || {}
   if (!mensaje) return res.status(400).json({ error: 'Faltan datos de la alerta' })
 
-  const { emoji, label } = URGENCIA_LABELS[urgencia] || { emoji: '⚪', label: (urgencia || '').toUpperCase() }
+  const { emoji, label } = URGENCIA_LABELS[(urgencia || '').toLowerCase()] || { emoji: '⚪', label: (urgencia || '').toUpperCase() }
   const subject = `${emoji} Alerta ${label} — ${territorio || 'Sin territorio'}`
   const now = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota', dateStyle: 'short', timeStyle: 'short' })
 
@@ -28,11 +33,11 @@ export default async function handler(req, res) {
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
           <tr>
             <td style="padding: 8px 0; color: #5C6370; font-size: 13px; width: 120px;">Gestora</td>
-            <td style="padding: 8px 0; font-weight: 600; font-size: 13px;">${gestora || '—'}</td>
+            <td style="padding: 8px 0; font-weight: 600; font-size: 13px;">${escapeHtml(gestora) || '—'}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #5C6370; font-size: 13px;">Territorio</td>
-            <td style="padding: 8px 0; font-weight: 600; font-size: 13px;">${territorio || '—'}</td>
+            <td style="padding: 8px 0; font-weight: 600; font-size: 13px;">${escapeHtml(territorio) || '—'}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #5C6370; font-size: 13px;">Urgencia</td>
@@ -44,7 +49,7 @@ export default async function handler(req, res) {
           </tr>
         </table>
         <div style="background: #F8FAFC; border-left: 4px solid #0D47A1; padding: 16px; border-radius: 0 4px 4px 0;">
-          <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #2B2926;">${mensaje}</p>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #2B2926;">${escapeHtml(mensaje)}</p>
         </div>
         <p style="margin-top: 24px; font-size: 12px; color: #8D95A0; text-align: center;">
           Caribe LNG Conecta · Dirección de Asuntos Corporativos

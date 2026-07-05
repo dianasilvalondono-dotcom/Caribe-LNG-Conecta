@@ -102,8 +102,8 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
   const C_navy = '#0D47A1', C_tolu = '#007A87', C_barbosa = '#00BFB3', C_muted = '#5C6370', C_text = '#2B2926'
 
   const riesgosAltos = riesgos.filter(r => r.semaforo && (r.semaforo.toLowerCase().includes('alto') || r.semaforo.toLowerCase().includes('urgente') || r.semaforo.toLowerCase().includes('critico')))
-  const compromisosPendientes = seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada)
-  const compromisosVencidos = compromisosPendientes.filter(s => new Date(s.fecha_pactada) < today)
+  const compromisosPendientes = seguimiento.filter(s => (s.estado || '').toLowerCase() !== 'cumplido' && s.fecha_pactada)
+  const compromisosVencidos = compromisosPendientes.filter(s => new Date(s.fecha_pactada + 'T23:59:59') < today)
   const compromisosProximos = compromisosPendientes.filter(s => { const d = new Date(s.fecha_pactada); const diff = (d - today) / 86400000; return diff >= 0 && diff <= 7 }).sort((a, b) => new Date(a.fecha_pactada) - new Date(b.fecha_pactada))
 
   const recentActivity = [

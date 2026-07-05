@@ -87,9 +87,10 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
 
   async function handleGuardar() {
     if (!actividad || !porcentaje) return
+    if (100 - localAvance <= 0) return alert('El acuerdo ya está al 100%. No se puede registrar más avance.')
     setSaving(true)
     try {
-      const pct = Math.min(parseInt(porcentaje) || 0, 100)
+      const pct = Math.max(1, Math.min(parseInt(porcentaje) || 0, 100 - localAvance))
       const nuevoAvance = Math.min((localAvance) + pct, 100)
       const nuevoEstado = nuevoAvance >= 100 ? 'cumplido' : 'en_curso'
       await addSeguimientoAcuerdo({
@@ -1586,7 +1587,7 @@ export default function App() {
                   <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cumplidos</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 14px', flex: 1, textAlign: 'center' }}>
-                  <div style={{ fontSize: 20, fontWeight: 900, color: '#fbbf24' }}>{seguimiento.filter(s => s.estado === 'Pendiente').length}</div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#fbbf24' }}>{seguimiento.filter(s => (s.estado || '').toLowerCase() !== 'cumplido').length}</div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pendientes</div>
                 </div>
               </div>
@@ -2288,7 +2289,6 @@ export default function App() {
                               style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.5 : 1 }}>Cancelar</button>
                             <button onClick={async () => {
                               if (!desc.trim()) return alert('Agrega una descripción')
-                              if (!geo) return alert('Esperando GPS...')
                               setUploading(true)
                               setProgress({ done: 0, total, failed: 0 })
                               let failed = 0
@@ -2300,7 +2300,7 @@ export default function App() {
                                     user_id: session.user.id,
                                     territorio: myTerritorio || 'Nacional',
                                     foto_url,
-                                    latitud: geo.lat, longitud: geo.lng, precision_m: geo.accuracy,
+                                    latitud: geo?.lat ?? null, longitud: geo?.lng ?? null, precision_m: geo?.accuracy ?? null,
                                     descripcion: desc.trim(),
                                     capturada_at: captureTime,
                                     lugar

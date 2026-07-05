@@ -19,8 +19,8 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   const acuerdosCumplidos = agreements.filter(a => a.estado_code === 'cumplido' || a.avance >= 100).length
   const acuerdosAvgPct = totalAcuerdos ? Math.round(agreements.reduce((s, a) => s + (a.avance || 0), 0) / totalAcuerdos) : 0
   const totalCompromisos = seguimiento.length
-  const compromisosCumplidosD = seguimiento.filter(s => s.estado === 'Cumplido').length
-  const compromisosVencidos = seguimiento.filter(s => s.estado === 'Pendiente' && s.fecha_pactada && new Date(s.fecha_pactada) < new Date()).length
+  const compromisosCumplidosD = seguimiento.filter(s => (s.estado || '').toLowerCase() === 'cumplido').length
+  const compromisosVencidos = seguimiento.filter(s => (s.estado || '').toLowerCase() !== 'cumplido' && s.fecha_pactada && new Date(s.fecha_pactada + 'T23:59:59') < new Date()).length
   const compromisosPct = totalCompromisos ? Math.round((compromisosCumplidosD / totalCompromisos) * 100) : 0
 
   // ── Movimiento real (registros_diarios + comite_actas + interactions + evidencias) ──
@@ -366,7 +366,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   const totalReportes = reportes.length
   const totalEventos = reportes.reduce((s, r) => s + (r.eventos_aid || 0) + (r.eventos_aii || 0) + (r.eventos_institucional || 0), 0)
   const totalIncidentes = reportes.reduce((s, r) => s + (r.incidentes || 0), 0)
-  const compromisosCumplidos = seguimiento.filter(s => s.estado === 'Cumplido').length
+  const compromisosCumplidos = seguimiento.filter(s => (s.estado || '').toLowerCase() === 'cumplido').length
 
   return (
     <div>

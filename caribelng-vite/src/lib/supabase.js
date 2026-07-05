@@ -87,7 +87,8 @@ export async function getInteractions(actorId) {
 }
 
 export async function getAllInteractions() {
-  const { data } = await supabase.from('interactions').select('actor_id, created_at, tipo').order('created_at', { ascending: false })
+  const { data, error } = await supabase.from('interactions').select('actor_id, created_at, tipo').order('created_at', { ascending: false })
+  if (error) console.error('[supabase] getAllInteractions:', error.message)
   return data || []
 }
 
@@ -180,12 +181,14 @@ export async function upsertProfile(userId, { full_name, avatar_url, email }) {
   }
 }
 export async function getCronograma() {
-  const { data } = await supabase.from('cronograma').select('*').order('territorio').order('numero')
+  const { data, error } = await supabase.from('cronograma').select('*').order('territorio').order('numero')
+  if (error) console.error('[supabase] getCronograma:', error.message)
   return data
 }
 
 export async function getHuellaSocial() {
-  const { data } = await supabase.from('huella_social').select('*').order('territorio').order('id')
+  const { data, error } = await supabase.from('huella_social').select('*').order('territorio').order('id')
+  if (error) console.error('[supabase] getHuellaSocial:', error.message)
   return data
 }
 
@@ -197,19 +200,22 @@ export async function updateCronogramaEstado(id, estado) {
 export async function getReportesSemanales(territorio) {
   let q = supabase.from('reportes_semanales').select('*').order('semana', { ascending: false })
   if (territorio) q = q.eq('territorio', territorio)
-  const { data } = await q
+  const { data, error } = await q
+  if (error) console.error('[supabase] getReportesSemanales:', error.message)
   return data
 }
 
 export async function addReporteSemanal(reporte) {
-  const { data } = await supabase.from('reportes_semanales').insert(reporte)
+  const { data, error } = await supabase.from('reportes_semanales').insert(reporte)
+  if (error) throw error
   return data
 }
 
 export async function getSeguimientoAcuerdos(territorio) {
   let q = supabase.from('seguimiento_acuerdos').select('*').order('id')
   if (territorio) q = q.eq('territorio', territorio)
-  const { data } = await q
+  const { data, error } = await q
+  if (error) console.error('[supabase] getSeguimientoAcuerdos:', error.message)
   return data
 }
 
@@ -220,26 +226,31 @@ export async function addSeguimientoAcuerdo(acuerdo) {
 }
 
 export async function updateSeguimientoAcuerdo(id, updates) {
-  const { data } = await supabase.from('seguimiento_acuerdos').update(updates).eq('id', id)
+  const { data, error } = await supabase.from('seguimiento_acuerdos').update(updates).eq('id', id)
+  if (error) console.error('[supabase] updateSeguimientoAcuerdo:', error.message)
   return data
 }
 export async function getRiesgos() {
-  const { data } = await supabase.from('riesgos').select('*').order('id')
+  const { data, error } = await supabase.from('riesgos').select('*').order('id')
+  if (error) console.error('[supabase] getRiesgos:', error.message)
   return data
 }
 
 export async function getBowTie(riesgoId) {
-  const { data } = await supabase.from('bow_tie').select('*').eq('riesgo_id', riesgoId)
+  const { data, error } = await supabase.from('bow_tie').select('*').eq('riesgo_id', riesgoId)
+  if (error) console.error('[supabase] getBowTie:', error.message)
   return data
 }
 
 export async function getRiesgosLegislativos() {
-  const { data } = await supabase.from('riesgos_legislativos').select('*').order('id')
+  const { data, error } = await supabase.from('riesgos_legislativos').select('*').order('id')
+  if (error) console.error('[supabase] getRiesgosLegislativos:', error.message)
   return data
 }
 
 export async function getCronogramaLegislativo() {
-  const { data } = await supabase.from('cronograma_legislativo').select('*').order('id')
+  const { data, error } = await supabase.from('cronograma_legislativo').select('*').order('id')
+  if (error) console.error('[supabase] getCronogramaLegislativo:', error.message)
   return data
 }
 
@@ -279,7 +290,8 @@ export async function deleteRiesgo(id) {
 // ── KPIs DAC Director ─────────────────────────────────────────────────────────
 
 export async function getKpisDac() {
-  const { data } = await supabase.from('kpis_dac').select('*')
+  const { data, error } = await supabase.from('kpis_dac').select('*')
+  if (error) console.error('[supabase] getKpisDac:', error.message)
   return data || []
 }
 
@@ -292,7 +304,8 @@ export async function upsertKpiDac(id, { valor, estado, notas }) {
 // ── Knowledge Base (Base de Conocimiento) ────────────────────────────────────
 
 export async function getKnowledgeBase() {
-  const { data } = await supabase.from('knowledge_base').select('*').order('categoria').order('titulo')
+  const { data, error } = await supabase.from('knowledge_base').select('*').order('categoria').order('titulo')
+  if (error) console.error('[supabase] getKnowledgeBase:', error.message)
   return data || []
 }
 
@@ -341,7 +354,8 @@ export async function addRegistroDiario(registro) {
 export async function getRegistrosDiarios(territorio) {
   let q = supabase.from('registros_diarios').select('*').order('fecha', { ascending: false }).order('created_at', { ascending: false })
   if (territorio) q = q.eq('territorio', territorio)
-  const { data } = await q
+  const { data, error } = await q
+  if (error) console.error('[supabase] getRegistrosDiarios:', error.message)
   return data || []
 }
 
@@ -358,11 +372,12 @@ export async function submitActorEdit({ actor_id, user_id, user_name, campos }) 
 }
 
 export async function getActorEdits() {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('actor_edits')
     .select('*')
     .eq('estado', 'pendiente')
     .order('created_at', { ascending: false })
+  if (error) console.error('[supabase] getActorEdits:', error.message)
   return data || []
 }
 
@@ -509,7 +524,8 @@ export async function addEvidencia({ user_id, territorio, foto_url, latitud, lon
 export async function getEvidencias(territorio) {
   let q = supabase.from('evidencias').select('*').order('capturada_at', { ascending: false })
   if (territorio) q = q.eq('territorio', territorio)
-  const { data } = await q
+  const { data, error } = await q
+  if (error) console.error('[supabase] getEvidencias:', error.message)
   return data || []
 }
 
@@ -525,11 +541,12 @@ export async function deleteEvidencia(id) {
 // ── Audit Log ────────────────────────────────────────────────────────────────
 
 export async function getAuditLog(limit = 50) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('audit_log')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(limit)
+  if (error) console.error('[supabase] getAuditLog:', error.message)
   return data || []
 }
 
