@@ -41,6 +41,7 @@ import KPIsView from './components/KPIsView'
 import KnowledgeBaseView from './components/KnowledgeBaseView'
 import AmbientalView from './components/AmbientalView'
 import ContratistasView from './components/ContratistasView'
+import PqrsView from './components/PqrsView'
 import ChatBot from './components/ChatBot'
 import OnboardingTour from './components/OnboardingTour'
 import Sidebar from './components/Sidebar'
@@ -944,6 +945,7 @@ export default function App() {
       { id: 'kpis', label: 'Indicadores', icon: <IconTarget size={16} /> },
     ]},
     { id: 'riesgos', label: 'Riesgos Sociales', icon: <IconAlert size={16} /> },
+    { id: 'pqrs', label: 'PQRS', icon: <IconClipboard size={16} /> },
     ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
     ...(isAdmin ? [{ id: 'dac', label: 'Dirección', icon: <IconBell size={16} /> }] : []),
   ]
@@ -2450,6 +2452,10 @@ export default function App() {
         {view === 'riesgos' && (
           <RiesgosView riesgos={riesgos} riesgosLeg={riesgosLeg} cronoLeg={cronoLeg}
             isAdmin={isAdmin} onDeleted={loadData} />
+        )}
+
+        {view === 'pqrs' && (
+          <PqrsView profile={profile} isAdmin={isAdmin} />
         )}
 
         {view === 'knowledge' && isAdmin && (
