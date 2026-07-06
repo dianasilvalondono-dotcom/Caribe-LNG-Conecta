@@ -339,6 +339,21 @@ export async function uploadKnowledgeFile(file) {
   return data.publicUrl
 }
 
+// ── PQRSF documents (petición / respuesta firmada) ────────────────────────────
+
+// type: 'peticion' | 'respuesta'. Guarda en pqrs/{codigo}/{type}_{timestamp}.{ext}
+export async function uploadPqrsDoc(file, codigo, type) {
+  const timestamp = Date.now()
+  const ext = (file.name?.split('.').pop() || 'pdf').toLowerCase().slice(0, 8)
+  const safeCodigo = String(codigo || 'sin-codigo').replace(/[^a-zA-Z0-9._-]/g, '_')
+  const path = `pqrs/${safeCodigo}/${type}_${timestamp}.${ext}`
+  const contentType = file.type || 'application/pdf'
+  const { error } = await supabase.storage.from('archivos').upload(path, file, { contentType })
+  if (error) throw error
+  const { data } = supabase.storage.from('archivos').getPublicUrl(path)
+  return { url: data.publicUrl, nombre: file.name || `${type}.${ext}` }
+}
+
 // ── Registros Diarios ────────────────────────────────────────────────────────
 
 export async function addRegistroDiario(registro) {
