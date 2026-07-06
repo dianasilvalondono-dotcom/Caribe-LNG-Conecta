@@ -70,7 +70,7 @@ export default function Sidebar({ activeView, onNavigate, profile, session, onSi
     <aside style={{
       width: 240, minHeight: '100vh', background: C.navy,
       display: 'flex', flexDirection: 'column',
-      fontFamily: "'Montserrat', sans-serif",
+      fontFamily: "Georgia, 'Times New Roman', serif",
       position: 'fixed', left: 0, top: 0, zIndex: 100,
       overflowY: 'auto',
     }}>

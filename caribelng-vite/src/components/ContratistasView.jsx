@@ -150,7 +150,7 @@ export default function ContratistasView({ profile, isAdmin }) {
           </p>
         </div>
         {canEdit && (
-          <button onClick={() => setEditing('new')} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+          <button onClick={() => setEditing('new')} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
             + Nuevo contratista
           </button>
         )}
@@ -167,7 +167,7 @@ export default function ContratistasView({ profile, isAdmin }) {
       {/* Filtros */}
       <div style={{ background: 'white', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px', marginBottom: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nombre o servicio..."
-          style={{ flex: '1 1 220px', padding: '8px 12px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: 'Montserrat, sans-serif' }} />
+          style={{ flex: '1 1 220px', padding: '8px 12px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: "Georgia, 'Times New Roman', serif" }} />
         <select value={terrFilter} onChange={e => setTerrFilter(e.target.value)}
           style={selectStyle()}>
           <option value="Todos">Territorio: Todos</option>
@@ -273,11 +273,11 @@ function KpiBox({ label, value, color }) {
 }
 
 function selectStyle() {
-  return { padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, fontWeight: 700, color: C.navy, background: 'white', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }
+  return { padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, fontWeight: 700, color: C.navy, background: 'white', cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }
 }
 
 function inputStyle() {
-  return { width: '100%', padding: '8px 11px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, fontFamily: 'Montserrat, sans-serif', outline: 'none', boxSizing: 'border-box' }
+  return { width: '100%', padding: '8px 11px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, fontFamily: "Georgia, 'Times New Roman', serif", outline: 'none', boxSizing: 'border-box' }
 }
 
 function ContratistaModal({ row, onCancel, onSave, saving }) {
@@ -315,7 +315,7 @@ function ContratistaModal({ row, onCancel, onSave, saving }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {TERRITORIOS.map(t => (
             <button key={t} type="button" onClick={() => toggleTerr(t)}
-              style={{ padding: '6px 12px', border: `1.5px solid ${f.territorios.includes(t) ? C.navy : C.border}`, background: f.territorios.includes(t) ? C.navy : 'white', color: f.territorios.includes(t) ? 'white' : C.text, borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+              style={{ padding: '6px 12px', border: `1.5px solid ${f.territorios.includes(t) ? C.navy : C.border}`, background: f.territorios.includes(t) ? C.navy : 'white', color: f.territorios.includes(t) ? 'white' : C.text, borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
               {t}
             </button>
           ))}
@@ -422,7 +422,7 @@ function DetalleModal({ contratista, capacitaciones, canEdit, canDelete, onClose
           </h3>
           {canEdit && (
             <button onClick={onAddCapac}
-              style={{ background: '#047857', color: 'white', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+              style={{ background: '#047857', color: 'white', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
               + Registrar capacitación
             </button>
           )}
@@ -463,11 +463,11 @@ function DetalleModal({ contratista, capacitaciones, canEdit, canDelete, onClose
 
         {canEdit && (
           <div style={{ display: 'flex', gap: 10, marginTop: 18, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
-            <button onClick={onEdit} style={{ flex: 1, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}44`, borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+            <button onClick={onEdit} style={{ flex: 1, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}44`, borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
               ✎ Editar contratista
             </button>
             {canDelete && (
-              <button onClick={onDelete} style={{ background: '#FEF2F2', color: C.red, border: `1px solid ${C.red}44`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+              <button onClick={onDelete} style={{ background: '#FEF2F2', color: C.red, border: `1px solid ${C.red}44`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
                 🗑 Borrar
               </button>
             )}
@@ -489,9 +489,9 @@ function Modal({ title, children, onCancel, onSave, saving, canSave }) {
         </div>
         {children}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
-          <button onClick={onCancel} style={{ padding: '9px 18px', background: 'transparent', color: C.muted, border: `1px solid ${C.border}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>Cancelar</button>
+          <button onClick={onCancel} style={{ padding: '9px 18px', background: 'transparent', color: C.muted, border: `1px solid ${C.border}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>Cancelar</button>
           <button onClick={onSave} disabled={!canSave || saving}
-            style={{ padding: '9px 20px', background: C.navy, color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: (canSave && !saving) ? 'pointer' : 'not-allowed', fontFamily: 'Montserrat, sans-serif', opacity: (canSave && !saving) ? 1 : 0.5 }}>
+            style={{ padding: '9px 20px', background: C.navy, color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: (canSave && !saving) ? 'pointer' : 'not-allowed', fontFamily: "Georgia, 'Times New Roman', serif", opacity: (canSave && !saving) ? 1 : 0.5 }}>
             {saving ? 'Guardando...' : 'Guardar'}
           </button>
         </div>

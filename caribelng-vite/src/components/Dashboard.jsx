@@ -89,7 +89,7 @@ function GaugeSVG({ pct = 0, color = '#10b981', size = 88 }) {
     <svg width={size} height={size} viewBox="0 0 90 90" style={{ transform: 'rotate(-135deg)' }}>
       <circle cx="45" cy="45" r={r} fill="none" stroke="#e2e8f0" strokeWidth="8" strokeDasharray={`${circ * 0.75} ${circ * 0.25}`} strokeLinecap="round" />
       <circle cx="45" cy="45" r={r} fill="none" stroke={color} strokeWidth="8" strokeDasharray={`${filled} ${circ - filled}`} strokeLinecap="round" />
-      <text x="45" y="50" textAnchor="middle" fontFamily="Montserrat,sans-serif" fontSize="14" fontWeight="900" fill="#2B2926" style={{ transform: 'rotate(135deg)', transformOrigin: '45px 45px' }}>{pct}%</text>
+      <text x="45" y="50" textAnchor="middle" fontFamily="Georgia, 'Times New Roman', serif" fontSize="14" fontWeight="900" fill="#2B2926" style={{ transform: 'rotate(135deg)', transformOrigin: '45px 45px' }}>{pct}%</text>
     </svg>
   )
 }

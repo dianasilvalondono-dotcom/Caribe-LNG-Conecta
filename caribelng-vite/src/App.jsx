@@ -953,7 +953,7 @@ export default function App() {
   const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
 
   if (isMobile && isPortrait) return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    <div style={{ fontFamily: "Georgia, 'Times New Roman', serif",
       minHeight: '100vh', background: C.navy, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
       <div style={{ fontSize: 64, marginBottom: 24, animation: 'spin90 1.5s ease-in-out infinite alternate' }}>📱</div>
@@ -966,7 +966,7 @@ export default function App() {
   )
 
   return (
-    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: '100vh', background: C.bg, color: C.text }}>
+    <div style={{ fontFamily: "Georgia, 'Times New Roman', serif", minHeight: '100vh', background: C.bg, color: C.text }}>
       {navOpen && <div onClick={() => setNavOpen(null)} style={{ position: 'fixed', top: 60, left: 0, right: 0, bottom: 0, zIndex: 99 }} />}
       <style>{`
         .clng-mobile-topbar { display: none; }
@@ -2806,7 +2806,7 @@ export default function App() {
                       Contratistas activos en {terrLabel} ({enTerritorio.length})
                     </div>
                     <button onClick={() => setView('contratistas')}
-                      style={{ background: 'transparent', color: C.navy, border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+                      style={{ background: 'transparent', color: C.navy, border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
                       Ver todos →
                     </button>
                   </div>

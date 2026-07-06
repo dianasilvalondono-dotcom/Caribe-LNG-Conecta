@@ -68,7 +68,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(135deg, ${C.navy} 0%, ${C.barbosa || '#00BFB3'} 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, fontFamily: 'Montserrat, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: `linear-gradient(135deg, ${C.navy} 0%, ${C.barbosa || '#00BFB3'} 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, fontFamily: "Georgia, 'Times New Roman', serif" }}>
       <div style={{ background: 'white', borderRadius: 20, padding: 40, maxWidth: 400, width: '100%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
         <img src="/logo-conecta.svg" alt="Caribe LNG Conecta" style={{ width: '100%', maxWidth: 260, margin: '0 auto 12px', display: 'block' }} onError={e => e.target.style.display = 'none'} />
         <p style={{ margin: '0 0 4px', color: C.muted, fontSize: 14, fontWeight: 600 }}>Plan de Gestión Social 2026</p>

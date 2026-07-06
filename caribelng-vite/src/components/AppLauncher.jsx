@@ -54,7 +54,7 @@ export default function AppLauncher({ current, compact = false, variant = 'light
   const triggerBorder = variant === 'dark' ? 'rgba(255,255,255,0.16)' : 'rgba(13,71,161,0.12)'
 
   return (
-    <div ref={ref} style={{ position: 'relative', fontFamily: 'Montserrat, system-ui, sans-serif', display: 'inline-block' }}>
+    <div ref={ref} style={{ position: 'relative', fontFamily: "Georgia, 'Times New Roman', serif", display: 'inline-block' }}>
       <button onClick={toggle}
         title="Cambiar de app"
         style={{

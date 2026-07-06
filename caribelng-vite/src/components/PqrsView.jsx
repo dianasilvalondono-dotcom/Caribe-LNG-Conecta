@@ -194,7 +194,7 @@ export default function PqrsView({ profile, isAdmin }) {
             {!seesAll && myTerritorio ? ` · ${myTerritorio}` : ''}
           </p>
         </div>
-        <button onClick={() => setEditing('new')} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+        <button onClick={() => setEditing('new')} style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
           + Registrar PQRSF
         </button>
       </div>
@@ -210,7 +210,7 @@ export default function PqrsView({ profile, isAdmin }) {
       {/* Filtros */}
       <div style={{ background: 'white', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px', marginBottom: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por radicado, solicitante, tema..."
-          style={{ flex: '1 1 220px', padding: '8px 12px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: 'Montserrat, sans-serif' }} />
+          style={{ flex: '1 1 220px', padding: '8px 12px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: "Georgia, 'Times New Roman', serif" }} />
         <select value={estadoFilter} onChange={e => setEstadoFilter(e.target.value)} style={selectStyle()}>
           <option value="abiertos">Estado: Abiertos</option>
           <option value="cerrados">Estado: Cerrados</option>
@@ -317,10 +317,10 @@ function KpiBox({ label, value, color, onClick, active }) {
 }
 
 function selectStyle() {
-  return { padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, fontWeight: 700, color: C.navy, background: 'white', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }
+  return { padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, fontWeight: 700, color: C.navy, background: 'white', cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }
 }
 function inputStyle() {
-  return { width: '100%', padding: '8px 11px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, fontFamily: 'Montserrat, sans-serif', outline: 'none', boxSizing: 'border-box' }
+  return { width: '100%', padding: '8px 11px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, fontFamily: "Georgia, 'Times New Roman', serif", outline: 'none', boxSizing: 'border-box' }
 }
 
 const emptyForm = (seesAll, myTerritorio) => ({
@@ -511,7 +511,7 @@ function SelNivel({ value, onChange }) {
 function Chk({ label, checked, onChange }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
-      style={{ padding: '6px 12px', border: `1.5px solid ${checked ? C.navy : C.border}`, background: checked ? C.navy : 'white', color: checked ? 'white' : C.text, borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+      style={{ padding: '6px 12px', border: `1.5px solid ${checked ? C.navy : C.border}`, background: checked ? C.navy : 'white', color: checked ? 'white' : C.text, borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
       {checked ? '✓ ' : ''}{label}
     </button>
   )
@@ -521,7 +521,7 @@ function Seccion({ titulo, abierta, onToggle, children }) {
   return (
     <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, marginBottom: 10, overflow: 'hidden' }}>
       <button type="button" onClick={onToggle}
-        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', border: 'none', padding: '10px 14px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', border: 'none', padding: '10px 14px', cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
         <span style={{ fontSize: 12, fontWeight: 800, color: C.navy, textTransform: 'uppercase', letterSpacing: 0.5 }}>{titulo}</span>
         <span style={{ fontSize: 13, color: C.muted }}>{abierta ? '▲' : '▼'}</span>
       </button>
@@ -613,14 +613,14 @@ function DetalleModal({ p, canDelete, onClose, onEdit, onDelete, onRespuesta, on
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 18, paddingTop: 14, borderTop: `1px solid ${C.border}`, flexWrap: 'wrap' }}>
-          <button onClick={onEdit} style={{ flex: '1 1 140px', background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+          <button onClick={onEdit} style={{ flex: '1 1 140px', background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
             ✎ Editar
           </button>
-          <button onClick={onRespuesta} style={{ flex: '1 1 140px', background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+          <button onClick={onRespuesta} style={{ flex: '1 1 140px', background: C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
             📄 Generar respuesta
           </button>
           {canDelete && (
-            <button onClick={onDelete} style={{ background: '#FEF2F2', color: C.red, border: `1px solid ${C.red}44`, borderRadius: 8, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+            <button onClick={onDelete} style={{ background: '#FEF2F2', color: C.red, border: `1px solid ${C.red}44`, borderRadius: 8, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
               🗑 Borrar
             </button>
           )}
@@ -660,7 +660,7 @@ function DocRow({ label, url, nombre, tipo, p, onSaveDoc }) {
           : <div style={{ fontSize: 11, color: C.subtle }}>Sin archivo</div>}
       </div>
       <label htmlFor={inputId}
-        style={{ background: url ? 'white' : C.navy, color: url ? C.navy : 'white', border: `1px solid ${url ? C.border : C.navy}`, borderRadius: 8, padding: '7px 12px', fontSize: 11, fontWeight: 700, cursor: uploading ? 'default' : 'pointer', fontFamily: 'Montserrat, sans-serif', opacity: uploading ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+        style={{ background: url ? 'white' : C.navy, color: url ? C.navy : 'white', border: `1px solid ${url ? C.border : C.navy}`, borderRadius: 8, padding: '7px 12px', fontSize: 11, fontWeight: 700, cursor: uploading ? 'default' : 'pointer', fontFamily: "Georgia, 'Times New Roman', serif", opacity: uploading ? 0.6 : 1, whiteSpace: 'nowrap' }}>
         {uploading ? 'Subiendo...' : (url ? 'Reemplazar' : 'Subir PDF')}
         <input id={inputId} type="file" accept=".pdf,image/*" onChange={handleFile} disabled={uploading} style={{ display: 'none' }} />
       </label>
@@ -693,9 +693,9 @@ function Modal({ title, children, onCancel, onSave, saving, canSave }) {
         </div>
         {children}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
-          <button onClick={onCancel} style={{ padding: '9px 18px', background: 'transparent', color: C.muted, border: `1px solid ${C.border}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>Cancelar</button>
+          <button onClick={onCancel} style={{ padding: '9px 18px', background: 'transparent', color: C.muted, border: `1px solid ${C.border}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>Cancelar</button>
           <button onClick={onSave} disabled={!canSave || saving}
-            style={{ padding: '9px 20px', background: C.navy, color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: (canSave && !saving) ? 'pointer' : 'not-allowed', fontFamily: 'Montserrat, sans-serif', opacity: (canSave && !saving) ? 1 : 0.5 }}>
+            style={{ padding: '9px 20px', background: C.navy, color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: (canSave && !saving) ? 'pointer' : 'not-allowed', fontFamily: "Georgia, 'Times New Roman', serif", opacity: (canSave && !saving) ? 1 : 0.5 }}>
             {saving ? 'Guardando...' : 'Guardar'}
           </button>
         </div>

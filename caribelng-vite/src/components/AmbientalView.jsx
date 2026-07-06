@@ -91,7 +91,7 @@ export default function AmbientalView({ profile }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: C2.subtle, textTransform: 'uppercase', letterSpacing: 0.5 }}>Territorio</span>
             <select value={terrFilter} onChange={e => setTerrFilter(e.target.value)}
-              style={{ padding: '6px 10px', border: `1px solid ${C2.border}`, borderRadius: 8, fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: C2.navy, background: 'white', cursor: 'pointer' }}>
+              style={{ padding: '6px 10px', border: `1px solid ${C2.border}`, borderRadius: 8, fontSize: 12, fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 700, color: C2.navy, background: 'white', cursor: 'pointer' }}>
               <option value="Todos">Todos</option>
               <option value="Tolú">Tolú</option>
               <option value="Barbosa">Barbosa</option>
@@ -120,7 +120,7 @@ export default function AmbientalView({ profile }) {
             border: 'none', borderBottom: subtab === k ? `3px solid ${C2.navy}` : '3px solid transparent',
             color: subtab === k ? C2.navy : C2.muted,
             fontSize: 13, fontWeight: subtab === k ? 800 : 600,
-            cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
+            cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif",
             whiteSpace: 'nowrap',
           }}>{l}</button>
         ))}
@@ -231,7 +231,7 @@ function DashboardAmbiental({ docs, pgrd, commitments, advisorLog, tracker, terr
             </div>
           ))}
           {vencidos.length > 4 && (
-            <button onClick={() => onNavigate('compromisos')} style={{ marginTop: 8, background: '#B91C1C', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+            <button onClick={() => onNavigate('compromisos')} style={{ marginTop: 8, background: '#B91C1C', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
               Ver los {vencidos.length} compromisos vencidos →
             </button>
           )}
@@ -248,7 +248,7 @@ function DashboardAmbiental({ docs, pgrd, commitments, advisorLog, tracker, terr
           </div>
           <button onClick={() => onNavigate('pgrd')} style={{
             marginTop: 8, background: '#92400E', color: 'white', border: 'none', borderRadius: 6,
-            padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
+            padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif",
           }}>Ir a PGRD →</button>
         </div>
       )}
@@ -397,7 +397,7 @@ function TrackerSection({ title, subtitle, items, canEdit, reload, C2, accentCol
               style={{
                 width: 28, height: 28, borderRadius: '50%', border: `2px solid ${sc.color}`, background: sc.bg, color: sc.color,
                 fontSize: 13, fontWeight: 900, cursor: canEdit ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                fontFamily: 'Montserrat, sans-serif',
+                fontFamily: "Georgia, 'Times New Roman', serif",
               }}>{sc.dot}</button>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, color: C2.text }}>{it.titulo}</div>
@@ -629,7 +629,7 @@ function CompromisosSection({ items, canEdit, profile, reload, C2 }) {
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{
           padding: '6px 10px', border: `1px solid ${C2.border}`, borderRadius: 8,
-          fontSize: 12, fontFamily: 'Montserrat, sans-serif', background: 'white', cursor: 'pointer',
+          fontSize: 12, fontFamily: "Georgia, 'Times New Roman', serif", background: 'white', cursor: 'pointer',
         }}>
           <option value="all">Todos</option>
           {Object.entries(STATUS_COMP).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
@@ -770,7 +770,7 @@ function Card({ title, onMore, children, C2 }) {
     <div style={{ background: 'white', border: `1px solid ${C2.border}`, borderRadius: 12, padding: '14px 18px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <div style={{ fontSize: 13, fontWeight: 800, color: C2.text }}>{title}</div>
-        {onMore && <button onClick={onMore} style={{ background: 'transparent', border: 'none', color: C2.blue, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>Ver todo →</button>}
+        {onMore && <button onClick={onMore} style={{ background: 'transparent', border: 'none', color: C2.blue, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>Ver todo →</button>}
       </div>
       {children}
     </div>
@@ -787,24 +787,24 @@ function Badge({ status }) {
 }
 const primaryBtn = (C2) => ({
   background: C2.navy, color: 'white', border: 'none', borderRadius: 8,
-  padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
+  padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif",
 })
 const ghostBtn = (C2) => ({
   background: 'transparent', border: 'none', color: C2.blue,
-  fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', padding: '4px 6px',
+  fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif", padding: '4px 6px',
 })
-const inputStyle = { width: '100%', padding: '9px 11px', border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 13, fontFamily: 'Montserrat, sans-serif', outline: 'none', boxSizing: 'border-box' }
+const inputStyle = { width: '100%', padding: '9px 11px', border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 13, fontFamily: "Georgia, 'Times New Roman', serif", outline: 'none', boxSizing: 'border-box' }
 
 // ── Modales ──
 function ModalShell({ title, children, onCancel, onSave, saving, canSave, C2 }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
-      <div style={{ background: 'white', borderRadius: 14, width: '100%', maxWidth: 620, maxHeight: '92vh', overflow: 'auto', padding: '24px 28px', fontFamily: 'Montserrat, sans-serif' }}>
+      <div style={{ background: 'white', borderRadius: 14, width: '100%', maxWidth: 620, maxHeight: '92vh', overflow: 'auto', padding: '24px 28px', fontFamily: "Georgia, 'Times New Roman', serif" }}>
         <h2 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 800, color: C2.navy }}>{title}</h2>
         {children}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
-          <button onClick={onCancel} style={{ padding: '10px 18px', background: 'white', border: '1px solid #E2E8F0', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', color: C2.text }}>Cancelar</button>
-          <button onClick={onSave} disabled={!canSave || saving} style={{ padding: '10px 22px', background: C2.navy, color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: (canSave && !saving) ? 'pointer' : 'not-allowed', fontFamily: 'Montserrat, sans-serif', opacity: (canSave && !saving) ? 1 : 0.5 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
+          <button onClick={onCancel} style={{ padding: '10px 18px', background: 'white', border: '1px solid #E2E8F0', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif", color: C2.text }}>Cancelar</button>
+          <button onClick={onSave} disabled={!canSave || saving} style={{ padding: '10px 22px', background: C2.navy, color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: (canSave && !saving) ? 'pointer' : 'not-allowed', fontFamily: "Georgia, 'Times New Roman', serif", opacity: (canSave && !saving) ? 1 : 0.5 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
         </div>
       </div>
     </div>
@@ -884,7 +884,7 @@ function FileUploadField({ label, type, territorio, onUploaded, C2 }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <input type="file" onChange={handleChange} disabled={uploading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.txt,.csv"
-          style={{ fontSize: 12, fontFamily: 'Montserrat, sans-serif' }} />
+          style={{ fontSize: 12, fontFamily: "Georgia, 'Times New Roman', serif" }} />
         {uploading && <div style={{ fontSize: 11, color: C2.blue, fontWeight: 600 }}>Subiendo a OneDrive...</div>}
         {okMsg && <div style={{ fontSize: 11, color: C2.green, fontWeight: 600 }}>{okMsg}</div>}
         {error && <div style={{ fontSize: 11, color: C2.red, fontWeight: 600 }}>⚠ {error}</div>}

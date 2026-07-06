@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { supabase, uploadPqrsDoc } from '../lib/supabase'
 import { C } from '../lib/constants'
 
-// Documento de marca (Brand Book v2): tipografía Georgia, NO Montserrat.
+// Documento de marca (Brand Book v2): tipografía Georgia, NO Georgia.
 const SERIF = "Georgia, 'Times New Roman', serif"
 const NAVY = '#0D47A1'
 
@@ -105,25 +105,25 @@ export default function PqrsRespuesta({ p, onClose, onSaved, onSaveDoc }) {
 
       {/* Barra de acciones (no se imprime) */}
       <div className="pqrs-noprint" style={{ maxWidth: 800, margin: '0 auto 12px', display: 'flex', gap: 10, justifyContent: 'flex-end', alignItems: 'center' }}>
-        <span style={{ marginRight: 'auto', color: 'white', fontSize: 12, fontFamily: 'Montserrat, sans-serif', opacity: 0.9 }}>
+        <span style={{ marginRight: 'auto', color: 'white', fontSize: 12, fontFamily: "Georgia, 'Times New Roman', serif", opacity: 0.9 }}>
           Documento editable · ajusta el texto antes de imprimir
         </span>
         <button onClick={guardarCuerpo} disabled={saving}
-          style={{ background: '#047857', color: 'white', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: saving ? 'default' : 'pointer', fontFamily: 'Montserrat, sans-serif', opacity: saving ? 0.6 : 1 }}>
+          style={{ background: '#047857', color: 'white', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: saving ? 'default' : 'pointer', fontFamily: "Georgia, 'Times New Roman', serif", opacity: saving ? 0.6 : 1 }}>
           {saving ? 'Guardando…' : '💾 Guardar cuerpo'}
         </button>
         <button onClick={() => window.print()}
-          style={{ background: NAVY, color: 'white', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+          style={{ background: NAVY, color: 'white', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
           🖨 Imprimir / Guardar PDF
         </button>
         <label
-          style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 9, padding: '9px 14px', fontSize: 13, fontWeight: 700, cursor: uploading ? 'default' : 'pointer', fontFamily: 'Montserrat, sans-serif', opacity: uploading ? 0.6 : 1, whiteSpace: 'nowrap' }}
+          style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 9, padding: '9px 14px', fontSize: 13, fontWeight: 700, cursor: uploading ? 'default' : 'pointer', fontFamily: "Georgia, 'Times New Roman', serif", opacity: uploading ? 0.6 : 1, whiteSpace: 'nowrap' }}
           title="Sube el PDF ya firmado como Respuesta firmada del caso">
           {uploading ? 'Subiendo...' : (respNombre ? '📎 Reemplazar firmada' : '📎 Subir firmada')}
           <input type="file" accept=".pdf,image/*" onChange={subirRespuestaFirmada} disabled={uploading} style={{ display: 'none' }} />
         </label>
         <button onClick={onClose}
-          style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 9, padding: '9px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif' }}>
+          style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 9, padding: '9px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'Times New Roman', serif" }}>
           ✕ Cerrar
         </button>
       </div>

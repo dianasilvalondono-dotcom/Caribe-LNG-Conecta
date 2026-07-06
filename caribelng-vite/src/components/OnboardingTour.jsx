@@ -82,7 +82,7 @@ export default function OnboardingTour({ profile, onComplete }) {
       <div style={{
         background: 'white', borderRadius: 20, maxWidth: 520, width: '100%',
         padding: '32px 36px', boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-        fontFamily: 'Montserrat, sans-serif',
+        fontFamily: "Georgia, 'Times New Roman', serif",
       }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
           {steps.map((_, i) => (
