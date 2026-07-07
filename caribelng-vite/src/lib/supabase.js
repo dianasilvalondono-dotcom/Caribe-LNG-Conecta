@@ -439,9 +439,13 @@ export async function uploadToOneDrive(fileOrBlob, fileName, territorio, type, c
     else if (type === 'acta') ct = fileOrBlob.type || 'application/pdf'
     else ct = 'image/jpeg'
   }
+  const { data: { session } } = await supabase.auth.getSession()
   return fetch('/api/upload-sharepoint', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + (session?.access_token || '')
+    },
     body: JSON.stringify({ fileName, territorio: territorio || 'General', fileBase64: base64, type, contentType: ct })
   })
 }

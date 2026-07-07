@@ -843,9 +843,13 @@ async function uploadFileToOneDrive(file, { type, territorio }) {
     throw new Error(`El archivo pesa ${(file.size / 1024 / 1024).toFixed(1)}MB. Bridge solo admite hasta ~4.4MB por la API. Súbelo directo al SharePoint y pega el link en el campo URL.`)
   }
   const fileBase64 = await fileToBase64(file)
+  const { data: { session } } = await supabase.auth.getSession()
   const res = await fetch('/api/upload-sharepoint', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + (session?.access_token || ''),
+    },
     body: JSON.stringify({
       fileName: file.name,
       fileBase64,

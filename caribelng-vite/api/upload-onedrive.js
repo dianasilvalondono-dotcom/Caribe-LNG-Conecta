@@ -1,4 +1,6 @@
 // Vercel Serverless Function: uploads file to OneDrive via Microsoft Graph API
+import { createClient } from '@supabase/supabase-js'
+
 const TENANT_ID = process.env.AZURE_TENANT_ID
 const CLIENT_ID = process.env.AZURE_CLIENT_ID
 const CLIENT_SECRET = process.env.AZURE_CLIENT_SECRET
@@ -20,8 +22,29 @@ async function getAccessToken() {
   return data.access_token
 }
 
+// Auth: exige un JWT válido de Supabase en Authorization: Bearer <token>
+async function requireAuth(req) {
+  const authHeader = req.headers.authorization || ''
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+  if (!token) return null
+  const supabaseUrl = process.env.VITE_SUPABASE_URL
+  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) return null
+  try {
+    const authClient = createClient(supabaseUrl, supabaseAnonKey)
+    const { data: { user }, error } = await authClient.auth.getUser(token)
+    if (error || !user) return null
+    return user
+  } catch {
+    return null
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  const user = await requireAuth(req)
+  if (!user) return res.status(401).json({ error: 'No autorizado' })
 
   try {
     const { fileName, territorio, fileBase64, type, contentType } = req.body
