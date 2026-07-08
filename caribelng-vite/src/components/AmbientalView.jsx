@@ -110,7 +110,7 @@ export default function AmbientalView({ profile }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 18, borderBottom: `1px solid ${C2.border}`, overflowX: 'auto' }}>
         {[
           ['dashboard', 'Dashboard'],
-          ['documentos', `Documentos (${docs.length})`],
+          ['documentos', `Documentos (${docsF.length})`],
           ['pgrd', 'PGRD + PEC'],
           ['compromisos', `Compromisos (${stats.compromisosAbiertos})`],
           ['asesor', 'Asesor externo'],
@@ -132,16 +132,16 @@ export default function AmbientalView({ profile }) {
         <DashboardAmbiental docs={docsF} pgrd={pgrd} commitments={commitmentsF} advisorLog={advisorLog} tracker={tracker} terrFilter={terrFilter} stats={stats} C2={C2} canEdit={canEdit} reload={loadAll} onNavigate={setSubtab} />
       )}
       {!loading && subtab === 'documentos' && (
-        <DocumentosSection docs={docs} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
+        <DocumentosSection docs={docsF} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
       )}
       {!loading && subtab === 'pgrd' && (
         <PGRDSection items={pgrd} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
       )}
       {!loading && subtab === 'compromisos' && (
-        <CompromisosSection items={commitments} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
+        <CompromisosSection items={commitmentsF} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
       )}
       {!loading && subtab === 'asesor' && (
-        <AsesorSection log={advisorLog} docs={docs} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
+        <AsesorSection log={advisorLog} docs={docsF} canEdit={canEdit} profile={profile} reload={loadAll} C2={C2} />
       )}
     </div>
   )
@@ -367,7 +367,8 @@ function TrackerSection({ title, subtitle, items, canEdit, reload, C2, accentCol
   async function cycleStatus(item) {
     const order = ['pendiente', 'en_curso', 'completado']
     const idx = order.indexOf(item.status)
-    const next = order[(idx + 1) % order.length]
+    // Estados fuera del ciclo (vencido/bloqueado) → avanzan a 'en_curso' en vez de resetear a 'pendiente'
+    const next = idx < 0 ? 'en_curso' : order[(idx + 1) % order.length]
     setSavingId(item.id)
     await supabase.from('ambiental_workstream_tracker').update({ status: next, updated_at: new Date().toISOString() }).eq('id', item.id)
     setSavingId(null)

@@ -673,6 +673,583 @@ function ComiteUploader({ session, onSaved, isMobile }) {
   )
 }
 
+// ── Registro Diario (nivel de módulo: no se remonta en cada render de App) ──────
+function DailyForm({ myTerritorio, session, loadData, isMobile, registrosDiarios, setSelectedRegistro }) {
+                const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+                const [territorio, setTerritorio] = useState(myTerritorio || 'Tolú')
+                const [tipoReunion, setTipoReunion] = useState('Comunidad')
+                const [lugarR, setLugarR] = useState('')
+                const [asistentes, setAsistentes] = useState('')
+                const [descripcion, setDescripcion] = useState('')
+                const [file, setFile] = useState(null)
+                const [preview, setPreview] = useState(null)
+                const [geo, setGeo] = useState(null)
+                const [geoLugar, setGeoLugar] = useState(null)
+                const [saving, setSaving] = useState(false)
+                const [saved, setSaved] = useState(false)
+                const fileRef = useRef(null)
+
+                const handlePhoto = (e) => {
+                  const f = e.target.files?.[0]
+                  if (!f) return
+                  setFile(f)
+                  // Solo generar preview blob para imágenes; para PDFs/docs no se renderiza <img>
+                  setPreview(f.type?.startsWith('image/') ? URL.createObjectURL(f) : null)
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      async (pos) => {
+                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+                        try {
+                          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=es&zoom=16`)
+                          const data = await res.json()
+                          const a = data.address || {}
+                          const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
+                          setGeoLugar(parts.join(', ') || data.display_name)
+                          if (!lugarR) setLugarR(parts[0] || '')
+                        } catch {}
+                      },
+                      () => {},
+                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    )
+                  }
+                }
+
+                const handleSubmit = async () => {
+                  if (!descripcion.trim()) return alert('La descripción es obligatoria')
+                  setSaving(true)
+                  try {
+                    let foto_url = null
+                    if (file) foto_url = await uploadEvidenciaPhoto(file, territorio)
+                    await addRegistroDiario({
+                      user_id: session.user.id,
+                      territorio, fecha, tipo_reunion: tipoReunion,
+                      lugar: lugarR || geoLugar || null,
+                      asistentes: parseInt(asistentes) || 0,
+                      descripcion: descripcion.trim(),
+                      foto_url, latitud: geo?.lat || null, longitud: geo?.lng || null,
+                      precision_m: geo?.accuracy || null, geo_lugar: geoLugar || null
+                    })
+                    await loadData()
+                    setSaved(true)
+                    // Notificar a admins
+                    const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+                    if (admins?.length) {
+                      sendPushNotification({
+                        title: `Registro — ${territorio}`,
+                        body: `${tipoReunion}: ${descripcion.trim().substring(0, 80)}`,
+                        user_ids: admins.map(a => a.id)
+                      }).catch(() => {})
+                    }
+                    setTimeout(() => {
+                      setSaved(false)
+                      setDescripcion(''); setLugarR(''); setAsistentes(''); setFile(null); setPreview(null); setGeo(null); setGeoLugar(null)
+                    }, 2000)
+                  } catch (err) { alert('Error: ' + err.message) }
+                  finally { setSaving(false) }
+                }
+
+                if (saved) return (
+                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: "#dcfce7", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#10b981" }}>✓</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: C.green }}>Registro guardado</div>
+                    <div style={{ fontSize: 14, color: C.muted, marginTop: 6 }}>Con trazabilidad completa</div>
+                  </div>
+                )
+
+                return (
+                  <div>
+                    <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Fecha</label>
+                          <input type="date" value={fecha} onChange={e => setFecha(e.target.value)}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Territorio</label>
+                          <select value={territorio} onChange={e => setTerritorio(e.target.value)}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                            {['Tolú', 'Barbosa'].map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Tipo de reunión</label>
+                          <select value={tipoReunion} onChange={e => setTipoReunion(e.target.value)}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
+                            {['Comunidad', 'Pescadores', 'JAC', 'Institucional', 'Socialización', 'Vecindad', 'Diagnóstico', 'Llamada', 'Visita', 'Otro'].map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Lugar / Vereda</label>
+                          <input value={lugarR} onChange={e => setLugarR(e.target.value)} placeholder="Ej: Vereda El Progreso"
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Asistentes</label>
+                          <input type="number" value={asistentes} onChange={e => setAsistentes(e.target.value)} placeholder="0"
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Descripción *</label>
+                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)}
+                          placeholder="¿Qué se habló? ¿Qué se acordó? ¿Hay algo que escalar?"
+                          rows={3}
+                          style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                      </div>
+                      {/* Foto o documento */}
+                      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={handlePhoto} style={{ display: 'none' }} />
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
+                        {!file ? (
+                          <button onClick={() => fileRef.current?.click()}
+                            style={{ background: `${C.accent}10`, border: `1.5px dashed ${C.accent}`, borderRadius: 10,
+                              padding: '12px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                            <span style={{ fontSize: 20 }}>📎</span>
+                            <div style={{ textAlign: 'left' }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Adjuntar foto o documento (PDF, Word, Excel)</div>
+                              <div style={{ fontSize: 12, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
+                            </div>
+                          </button>
+                        ) : (
+                          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 1 }}>
+                            {preview ? (
+                              <img src={preview} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{ width: 60, height: 60, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
+                                <span style={{ fontSize: 22, lineHeight: 1 }}>📄</span>
+                                <span style={{ marginTop: 2 }}>{(file.name?.split('.').pop() || 'DOC').toUpperCase().slice(0, 5)}</span>
+                              </div>
+                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
+                              {geo && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              {geoLugar && <div style={{ fontSize: 12, color: C.muted }}>{geoLugar}</div>}
+                            </div>
+                            <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setGeoLugar(null) }}
+                              style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>✕</button>
+                          </div>
+                        )}
+                      </div>
+                      <button onClick={handleSubmit} disabled={saving || !descripcion.trim()}
+                        style={{ width: '100%', background: saving || !descripcion.trim() ? '#cbd5e1' : C.navy,
+                          color: 'white', border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
+                          cursor: saving || !descripcion.trim() ? 'not-allowed' : 'pointer' }}>
+                        {saving ? 'Guardando...' : 'Guardar registro'}
+                      </button>
+                    </div>
+
+                    {/* Timeline de registros recientes */}
+                    {registrosDiarios.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registros recientes</div>
+                        {registrosDiarios.slice(0, 15).map(r => (
+                          <div key={r.id} onClick={() => setSelectedRegistro(r)}
+                            style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 12, alignItems: 'flex-start',
+                            borderLeft: `3px solid ${r.territorio === 'Tolú' ? C.tolu : C.barbosa}`, cursor: 'pointer' }}>
+                            {r.foto_url && (() => {
+                              const ext = (r.foto_url.split('.').pop() || '').toLowerCase().split('?')[0]
+                              const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
+                              if (isImg) return <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                              return (
+                                <div style={{ width: 56, height: 56, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, flexShrink: 0 }}>
+                                  <span style={{ fontSize: 20, lineHeight: 1 }}>📄</span>
+                                  <span style={{ marginTop: 2 }}>{ext.toUpperCase().slice(0, 4) || 'DOC'}</span>
+                                </div>
+                              )
+                            })()}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 12, fontWeight: 800, color: r.territorio === 'Tolú' ? C.tolu : C.barbosa }}>{r.territorio}</span>
+                                <span style={{ fontSize: 12, color: C.subtle }}>·</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{r.tipo_reunion}</span>
+                                {r.asistentes > 0 && <span style={{ fontSize: 12, color: C.subtle }}>· {r.asistentes} asistentes</span>}
+                              </div>
+                              <div style={{ fontSize: 13, color: C.text, marginBottom: 3, lineHeight: 1.4 }}>{r.descripcion}</div>
+                              <div style={{ fontSize: 12, color: C.subtle }}>
+                                {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                {r.lugar && <span> · · {r.lugar}</span>}
+                                {r.geo_lugar && !r.lugar && <span> · · {r.geo_lugar}</span>}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+}
+
+// ── Evidencias (subida múltiple) — nivel de módulo para no remontar ─────────────
+function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTerritorios, isAdmin, setSelectedEvidencia, loadData }) {
+                const [files, setFiles] = useState([])
+                const [previews, setPreviews] = useState([])
+                const [desc, setDesc] = useState('')
+                const [geo, setGeo] = useState(null)
+                const [lugar, setLugar] = useState(null)
+                const [captureTime, setCaptureTime] = useState(null)
+                const [uploading, setUploading] = useState(false)
+                const [progress, setProgress] = useState(null) // { done, total, failed }
+                const fileRef = useRef(null)
+
+                const handleFiles = (e) => {
+                  const fs = Array.from(e.target.files || [])
+                  if (fs.length === 0) return
+                  // Liberar URLs previas
+                  previews.forEach(u => { try { URL.revokeObjectURL(u) } catch {} })
+                  setFiles(fs)
+                  setPreviews(fs.map(f => URL.createObjectURL(f)))
+                  setCaptureTime(new Date().toISOString())
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      async (pos) => {
+                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+                        try {
+                          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=es&zoom=16`)
+                          const data = await res.json()
+                          const a = data.address || {}
+                          const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
+                          setLugar(parts.join(', ') || data.display_name)
+                        } catch {}
+                      },
+                      () => {},
+                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    )
+                  }
+                }
+
+                const removeFile = (idx) => {
+                  try { URL.revokeObjectURL(previews[idx]) } catch {}
+                  setFiles(files.filter((_, i) => i !== idx))
+                  setPreviews(previews.filter((_, i) => i !== idx))
+                }
+
+                const reset = () => {
+                  previews.forEach(u => { try { URL.revokeObjectURL(u) } catch {} })
+                  setFiles([]); setPreviews([]); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null); setProgress(null)
+                }
+
+                const total = files.length
+
+                return (
+                  <div>
+                    {/* Upload card */}
+                    <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
+                      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple onChange={handleFiles} style={{ display: 'none' }} />
+                      {total === 0 ? (
+                        <div onClick={() => fileRef.current?.click()}
+                          style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Subir una o varias evidencias</div>
+                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Selecciona varias fotos a la vez · GPS + hora + lugar automáticos</div>
+                        </div>
+                      ) : (
+                        <div>
+                          {/* Grid de previews con botón ✕ por foto */}
+                          <div style={{ display: 'grid', gridTemplateColumns: total === 1 ? '1fr' : 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8, marginBottom: 10 }}>
+                            {previews.map((src, i) => (
+                              <div key={i} style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', aspectRatio: '1', background: '#f1f5f9' }}>
+                                <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                {!uploading && (
+                                  <button onClick={() => removeFile(i)} aria-label="Quitar"
+                                    style={{ position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, lineHeight: 1, padding: 0 }}>
+                                    ✕
+                                  </button>
+                                )}
+                                <div style={{ position: 'absolute', bottom: 4, left: 6, fontSize: 10, color: 'white', fontWeight: 700, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{i + 1}</div>
+                              </div>
+                            ))}
+                            {/* Botón + para agregar más */}
+                            {!uploading && (
+                              <div onClick={() => fileRef.current?.click()}
+                                style={{ aspectRatio: '1', border: `2px dashed ${C.accent}66`, borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: C.accent, background: `${C.accent}05` }}>
+                                <div style={{ fontSize: 22, fontWeight: 800 }}>+</div>
+                                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 2 }}>Agregar</div>
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: C.muted, marginBottom: 8, fontWeight: 700 }}>
+                            {total} {total === 1 ? 'foto seleccionada' : 'fotos seleccionadas'}
+                          </div>
+                          {captureTime && (
+                            <div style={{ background: '#f8fafc', borderRadius: 8, padding: 10, marginBottom: 10, fontSize: 13 }}>
+                              <div>📅 {new Date(captureTime).toLocaleString('es-CO')}</div>
+                              {geo && <div>📍 GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
+                              {lugar && <div>· {lugar}</div>}
+                            </div>
+                          )}
+                          <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder={total > 1 ? `Descripción común para las ${total} evidencias *` : 'Descripción de la evidencia *'} rows={2}
+                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
+                          {progress && (
+                            <div style={{ marginBottom: 10 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.muted, marginBottom: 4, fontWeight: 700 }}>
+                                <span>Subiendo {progress.done}/{progress.total}{progress.failed ? ` · ${progress.failed} con error` : ''}</span>
+                                <span>{Math.round((progress.done / progress.total) * 100)}%</span>
+                              </div>
+                              <div style={{ height: 6, borderRadius: 4, background: '#e2e8f0', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', background: progress.failed ? C.orange : C.green, width: `${(progress.done / progress.total) * 100}%`, transition: 'width 0.3s' }} />
+                              </div>
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button onClick={reset} disabled={uploading}
+                              style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.5 : 1 }}>Cancelar</button>
+                            <button onClick={async () => {
+                              if (!desc.trim()) return alert('Agrega una descripción')
+                              setUploading(true)
+                              setProgress({ done: 0, total, failed: 0 })
+                              let failed = 0
+                              const errores = []
+                              for (let i = 0; i < files.length; i++) {
+                                try {
+                                  const foto_url = await uploadEvidenciaPhoto(files[i], myTerritorio)
+                                  await addEvidencia({
+                                    user_id: session.user.id,
+                                    territorio: myTerritorio || 'Nacional',
+                                    foto_url,
+                                    latitud: geo?.lat ?? null, longitud: geo?.lng ?? null, precision_m: geo?.accuracy ?? null,
+                                    descripcion: desc.trim(),
+                                    capturada_at: captureTime,
+                                    lugar
+                                  })
+                                } catch (err) {
+                                  failed++
+                                  const msg = err?.message || String(err)
+                                  console.error('Evidencia falló:', files[i]?.name, err)
+                                  errores.push(`• ${files[i]?.name || 'archivo'}: ${msg}`)
+                                }
+                                setProgress({ done: i + 1, total, failed })
+                              }
+                              await loadData()
+                              setUploading(false)
+                              if (failed === 0) {
+                                reset()
+                              } else {
+                                alert(`${total - failed} de ${total} evidencias subidas correctamente.\n\n${failed} fallaron:\n\n${errores.join('\n\n')}`)
+                              }
+                            }}
+                              disabled={uploading || !desc.trim() || total === 0}
+                              style={{ flex: 2, background: uploading || !desc.trim() ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
+                              {uploading
+                                ? `Subiendo ${progress?.done || 0}/${total}…`
+                                : total > 1
+                                  ? `Guardar ${total} evidencias${geo ? '' : ' sin GPS'}`
+                                  : (geo ? 'Guardar' : 'Guardar sin GPS')}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* Gallery */}
+                    {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidencias recientes</div>
+                          {isAdmin && (
+                            <a href="https://course2.sharepoint.com/sites/CaribeLNG/Documentos/Forms/AllItems.aspx?id=%2Fsites%2FCaribeLNG%2FDocumentos%2FConecta%2FEvidencias"
+                              target="_blank" rel="noopener noreferrer"
+                              style={{ fontSize: 12, fontWeight: 700, color: C.navy, background: '#EEF2FF', border: `1px solid ${C.navy}`,
+                                borderRadius: 6, padding: '4px 10px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                              Ver en SharePoint →
+                            </a>
+                          )}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
+                          {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => {
+                            const url = ev.foto_url || ''
+                            const ext = url.split('.').pop()?.toLowerCase().split('?')[0] || ''
+                            const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
+                            const isPdf = ext === 'pdf'
+                            const isDoc = /^(doc|docx|xls|xlsx|ppt|pptx|txt|csv)$/.test(ext)
+                            const docIcon = isPdf ? '📄' : isDoc ? '📎' : '📁'
+                            const docLabel = isPdf ? 'PDF' : ext ? ext.toUpperCase() : 'Archivo'
+                            return (
+                              <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
+                                style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
+                                {isImg ? (
+                                  <img src={url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover', background: '#F1F5F9' }} />
+                                ) : (
+                                  <div style={{ width: '100%', height: 140, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                                    <div style={{ fontSize: 42, lineHeight: 1 }}>{docIcon}</div>
+                                    <div style={{ fontSize: 11, fontWeight: 800, marginTop: 6, letterSpacing: 1 }}>{docLabel}</div>
+                                  </div>
+                                )}
+                                <div style={{ padding: '10px 12px' }}>
+                                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
+                                  <div style={{ fontSize: 12, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
+                                  {ev.lugar && <div style={{ fontSize: 12, color: C.accent }}>· {ev.lugar}</div>}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+}
+
+// ── Modal Captura de Evidencia — nivel de módulo para no remontar ───────────────
+function CaptureForm({ myTerritorio, session, loadData, setShowEvidenciaCapture }) {
+                const [file, setFile] = useState(null)
+                const [preview, setPreview] = useState(null)
+                const [desc, setDesc] = useState('')
+                const [geo, setGeo] = useState(null)
+                const [geoError, setGeoError] = useState(null)
+                const [lugar, setLugar] = useState(null)
+                const [captureTime, setCaptureTime] = useState(null)
+                const [uploading, setUploading] = useState(false)
+                const fileRef = useRef(null)
+
+                const reverseGeocode = async (lat, lng) => {
+                  try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es&zoom=16`)
+                    const data = await res.json()
+                    const a = data.address || {}
+                    const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
+                    setLugar(parts.join(', ') || data.display_name || 'Ubicación desconocida')
+                  } catch { setLugar(null) }
+                }
+
+                const handleFile = (e) => {
+                  const f = e.target.files?.[0]
+                  if (!f) return
+                  setFile(f)
+                  setPreview(URL.createObjectURL(f))
+                  setCaptureTime(new Date().toISOString())
+                  // Capturar GPS inmediatamente
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => {
+                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+                        reverseGeocode(pos.coords.latitude, pos.coords.longitude)
+                      },
+                      (err) => setGeoError('No se pudo obtener ubicación: ' + err.message),
+                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    )
+                  } else {
+                    setGeoError('Geolocalización no disponible en este dispositivo')
+                  }
+                }
+
+                const handleSubmit = async () => {
+                  if (!file || !desc.trim() || !geo) return
+                  setUploading(true)
+                  try {
+                    const foto_url = await uploadEvidenciaPhoto(file, myTerritorio)
+                    await addEvidencia({
+                      user_id: session.user.id,
+                      territorio: myTerritorio || 'Nacional',
+                      foto_url,
+                      latitud: geo.lat,
+                      longitud: geo.lng,
+                      precision_m: geo.accuracy,
+                      descripcion: desc.trim(),
+                      capturada_at: captureTime,
+                      lugar: lugar || null
+                    })
+                    await loadData()
+                    setFile(null); setPreview(null); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null)
+                    setShowEvidenciaCapture(false)
+                  } catch (err) {
+                    alert('Error subiendo evidencia: ' + err.message)
+                  } finally { setUploading(false) }
+                }
+
+                return (
+                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+                    onClick={(e) => { if (e.target === e.currentTarget) setShowEvidenciaCapture(false) }}>
+                    <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480,
+                      maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>Capturar Evidencia</h3>
+                        <button onClick={() => setShowEvidenciaCapture(false)}
+                          style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
+                      </div>
+
+                      {/* Botón cámara */}
+                      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile}
+                        style={{ display: 'none' }} />
+                      {!preview ? (
+                        <div onClick={() => fileRef.current?.click()}
+                          style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '32px 16px',
+                            textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: `${C.accent}08` }}>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}></div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
+                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Se capturará ubicación GPS y hora automáticamente</div>
+                        </div>
+                      ) : (
+                        <div style={{ marginBottom: 16 }}>
+                          <img src={preview} alt="Evidencia" style={{ width: '100%', borderRadius: 10, maxHeight: 200, objectFit: 'cover' }} />
+                          <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setCaptureTime(null) }}
+                            style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6,
+                              padding: '4px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
+                            Volver a tomar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Metadata GPS + hora */}
+                      {captureTime && (
+                        <div style={{ background: '#f8fafc', borderRadius: 10, padding: 12, marginBottom: 16, fontSize: 13 }}>
+                          <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+                            <span style={{ fontWeight: 700, color: C.text }}>— Hora:</span>
+                            <span style={{ color: C.muted }}>{new Date(captureTime).toLocaleString('es-CO')}</span>
+                          </div>
+                          {geo ? (
+                            <>
+                              <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontWeight: 700, color: C.text }}>GPS GPS:</span>
+                                <span style={{ color: C.muted }}>{geo.lat.toFixed(6)}, {geo.lng.toFixed(6)}</span>
+                              </div>
+                              <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontWeight: 700, color: C.text }}>Precisión:</span>
+                                <span style={{ color: geo.accuracy > 50 ? C.orange : C.green, fontWeight: 600 }}>
+                                  ±{Math.round(geo.accuracy)}m {geo.accuracy > 50 ? '(baja)' : '(buena)'}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: 8 }}>
+                                <span style={{ fontWeight: 700, color: C.text }}>· Lugar:</span>
+                                <span style={{ color: C.muted }}>{lugar || 'Resolviendo...'}</span>
+                              </div>
+                            </>
+                          ) : geoError ? (
+                            <div style={{ color: C.red, fontWeight: 600 }}>{geoError}</div>
+                          ) : (
+                            <div style={{ color: C.accent }}>📡 Obteniendo ubicación...</div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Descripción */}
+                      <div style={{ marginBottom: 16 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Descripción de la evidencia *</label>
+                        <textarea value={desc} onChange={e => setDesc(e.target.value)}
+                          placeholder="Ej: Acta de reunión con JAC vereda El Progreso, firma de acuerdo de socialización"
+                          rows={3}
+                          style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
+                            fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                      </div>
+
+                      {/* Territorio */}
+                      <div style={{ fontSize: 13, color: C.muted, marginBottom: 16 }}>
+                        Territorio: <strong style={{ color: C.text }}>{myTerritorio || 'Nacional'}</strong>
+                      </div>
+
+                      {/* Enviar */}
+                      <button onClick={handleSubmit}
+                        disabled={!file || !desc.trim() || !geo || uploading}
+                        style={{ width: '100%', background: (!file || !desc.trim() || !geo || uploading) ? '#cbd5e1' : C.navy,
+                          color: 'white', border: 'none', borderRadius: 10, padding: '12px 20px',
+                          fontSize: 15, fontWeight: 700, cursor: (!file || !desc.trim() || !geo || uploading) ? 'not-allowed' : 'pointer' }}>
+                        {uploading ? 'Subiendo...' : 'Guardar evidencia'}
+                      </button>
+                    </div>
+                  </div>
+                )
+}
+
 export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -901,6 +1478,8 @@ export default function App() {
       if (filterS !== 'Todos' && a.semaforo !== filterS) return false
       if (filterR !== 'Todos' && a.riesgo?.toLowerCase() !== filterR.toLowerCase()) return false
       if (filterContacto === 'reciente' && (!a.fecha_accion || new Date(a.fecha_accion) < hace30)) return false
+      // "Sin contacto 30+" excluye Monitor (mapeados a propósito), igual que la tarjeta del dashboard
+      if (filterContacto === 'sin_contacto' && a.semaforo === 'monitor') return false
       if (filterContacto === 'sin_contacto' && a.fecha_accion && new Date(a.fecha_accion) >= hace30) return false
       if (filterPrioridad !== 'Todos' && String(a.prioridad) !== filterPrioridad) return false
       return true
@@ -1959,214 +2538,10 @@ export default function App() {
             </div>
 
             {/* ── SUB-TAB: REGISTRO DIARIO ── */}
-            {inputSubTab === 'diario' && (() => {
-              const DailyForm = () => {
-                const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
-                const [territorio, setTerritorio] = useState(myTerritorio || 'Tolú')
-                const [tipoReunion, setTipoReunion] = useState('Comunidad')
-                const [lugarR, setLugarR] = useState('')
-                const [asistentes, setAsistentes] = useState('')
-                const [descripcion, setDescripcion] = useState('')
-                const [file, setFile] = useState(null)
-                const [preview, setPreview] = useState(null)
-                const [geo, setGeo] = useState(null)
-                const [geoLugar, setGeoLugar] = useState(null)
-                const [saving, setSaving] = useState(false)
-                const [saved, setSaved] = useState(false)
-                const fileRef = useRef(null)
-
-                const handlePhoto = (e) => {
-                  const f = e.target.files?.[0]
-                  if (!f) return
-                  setFile(f)
-                  // Solo generar preview blob para imágenes; para PDFs/docs no se renderiza <img>
-                  setPreview(f.type?.startsWith('image/') ? URL.createObjectURL(f) : null)
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                      async (pos) => {
-                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
-                        try {
-                          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=es&zoom=16`)
-                          const data = await res.json()
-                          const a = data.address || {}
-                          const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
-                          setGeoLugar(parts.join(', ') || data.display_name)
-                          if (!lugarR) setLugarR(parts[0] || '')
-                        } catch {}
-                      },
-                      () => {},
-                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-                    )
-                  }
-                }
-
-                const handleSubmit = async () => {
-                  if (!descripcion.trim()) return alert('La descripción es obligatoria')
-                  setSaving(true)
-                  try {
-                    let foto_url = null
-                    if (file) foto_url = await uploadEvidenciaPhoto(file, territorio)
-                    await addRegistroDiario({
-                      user_id: session.user.id,
-                      territorio, fecha, tipo_reunion: tipoReunion,
-                      lugar: lugarR || geoLugar || null,
-                      asistentes: parseInt(asistentes) || 0,
-                      descripcion: descripcion.trim(),
-                      foto_url, latitud: geo?.lat || null, longitud: geo?.lng || null,
-                      precision_m: geo?.accuracy || null, geo_lugar: geoLugar || null
-                    })
-                    await loadData()
-                    setSaved(true)
-                    // Notificar a admins
-                    const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
-                    if (admins?.length) {
-                      sendPushNotification({
-                        title: `Registro — ${territorio}`,
-                        body: `${tipoReunion}: ${descripcion.trim().substring(0, 80)}`,
-                        user_ids: admins.map(a => a.id)
-                      }).catch(() => {})
-                    }
-                    setTimeout(() => {
-                      setSaved(false)
-                      setDescripcion(''); setLugarR(''); setAsistentes(''); setFile(null); setPreview(null); setGeo(null); setGeoLugar(null)
-                    }, 2000)
-                  } catch (err) { alert('Error: ' + err.message) }
-                  finally { setSaving(false) }
-                }
-
-                if (saved) return (
-                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: "#dcfce7", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#10b981" }}>✓</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: C.green }}>Registro guardado</div>
-                    <div style={{ fontSize: 14, color: C.muted, marginTop: 6 }}>Con trazabilidad completa</div>
-                  </div>
-                )
-
-                return (
-                  <div>
-                    <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Fecha</label>
-                          <input type="date" value={fecha} onChange={e => setFecha(e.target.value)}
-                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
-                        </div>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Territorio</label>
-                          <select value={territorio} onChange={e => setTerritorio(e.target.value)}
-                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
-                            {['Tolú', 'Barbosa'].map(t => <option key={t} value={t}>{t}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Tipo de reunión</label>
-                          <select value={tipoReunion} onChange={e => setTipoReunion(e.target.value)}
-                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', background: 'white', boxSizing: 'border-box' }}>
-                            {['Comunidad', 'Pescadores', 'JAC', 'Institucional', 'Socialización', 'Vecindad', 'Diagnóstico', 'Llamada', 'Visita', 'Otro'].map(t => <option key={t} value={t}>{t}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Lugar / Vereda</label>
-                          <input value={lugarR} onChange={e => setLugarR(e.target.value)} placeholder="Ej: Vereda El Progreso"
-                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
-                        </div>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Asistentes</label>
-                          <input type="number" value={asistentes} onChange={e => setAsistentes(e.target.value)} placeholder="0"
-                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
-                        </div>
-                      </div>
-                      <div style={{ marginBottom: 12 }}>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Descripción *</label>
-                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)}
-                          placeholder="¿Qué se habló? ¿Qué se acordó? ¿Hay algo que escalar?"
-                          rows={3}
-                          style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
-                      </div>
-                      {/* Foto o documento */}
-                      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={handlePhoto} style={{ display: 'none' }} />
-                      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
-                        {!file ? (
-                          <button onClick={() => fileRef.current?.click()}
-                            style={{ background: `${C.accent}10`, border: `1.5px dashed ${C.accent}`, borderRadius: 10,
-                              padding: '12px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-                            <span style={{ fontSize: 20 }}>📎</span>
-                            <div style={{ textAlign: 'left' }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Adjuntar foto o documento (PDF, Word, Excel)</div>
-                              <div style={{ fontSize: 12, color: C.subtle }}>GPS + hora automáticos (opcional)</div>
-                            </div>
-                          </button>
-                        ) : (
-                          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 1 }}>
-                            {preview ? (
-                              <img src={preview} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} />
-                            ) : (
-                              <div style={{ width: 60, height: 60, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
-                                <span style={{ fontSize: 22, lineHeight: 1 }}>📄</span>
-                                <span style={{ marginTop: 2 }}>{(file.name?.split('.').pop() || 'DOC').toUpperCase().slice(0, 5)}</span>
-                              </div>
-                            )}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 12, fontWeight: 700, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
-                              {geo && <div style={{ fontSize: 12, color: C.accent, fontWeight: 600 }}>GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
-                              {geoLugar && <div style={{ fontSize: 12, color: C.muted }}>{geoLugar}</div>}
-                            </div>
-                            <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setGeoLugar(null) }}
-                              style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>✕</button>
-                          </div>
-                        )}
-                      </div>
-                      <button onClick={handleSubmit} disabled={saving || !descripcion.trim()}
-                        style={{ width: '100%', background: saving || !descripcion.trim() ? '#cbd5e1' : C.navy,
-                          color: 'white', border: 'none', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 700,
-                          cursor: saving || !descripcion.trim() ? 'not-allowed' : 'pointer' }}>
-                        {saving ? 'Guardando...' : 'Guardar registro'}
-                      </button>
-                    </div>
-
-                    {/* Timeline de registros recientes */}
-                    {registrosDiarios.length > 0 && (
-                      <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Registros recientes</div>
-                        {registrosDiarios.slice(0, 15).map(r => (
-                          <div key={r.id} onClick={() => setSelectedRegistro(r)}
-                            style={{ background: C.card, borderRadius: 10, padding: '12px 14px', marginBottom: 8,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', gap: 12, alignItems: 'flex-start',
-                            borderLeft: `3px solid ${r.territorio === 'Tolú' ? C.tolu : C.barbosa}`, cursor: 'pointer' }}>
-                            {r.foto_url && (() => {
-                              const ext = (r.foto_url.split('.').pop() || '').toLowerCase().split('?')[0]
-                              const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
-                              if (isImg) return <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
-                              return (
-                                <div style={{ width: 56, height: 56, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, flexShrink: 0 }}>
-                                  <span style={{ fontSize: 20, lineHeight: 1 }}>📄</span>
-                                  <span style={{ marginTop: 2 }}>{ext.toUpperCase().slice(0, 4) || 'DOC'}</span>
-                                </div>
-                              )
-                            })()}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: 12, fontWeight: 800, color: r.territorio === 'Tolú' ? C.tolu : C.barbosa }}>{r.territorio}</span>
-                                <span style={{ fontSize: 12, color: C.subtle }}>·</span>
-                                <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{r.tipo_reunion}</span>
-                                {r.asistentes > 0 && <span style={{ fontSize: 12, color: C.subtle }}>· {r.asistentes} asistentes</span>}
-                              </div>
-                              <div style={{ fontSize: 13, color: C.text, marginBottom: 3, lineHeight: 1.4 }}>{r.descripcion}</div>
-                              <div style={{ fontSize: 12, color: C.subtle }}>
-                                {new Date(r.fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
-                                {r.lugar && <span> · · {r.lugar}</span>}
-                                {r.geo_lugar && !r.lugar && <span> · · {r.geo_lugar}</span>}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              }
-              return <DailyForm />
-            })()}
+            {inputSubTab === 'diario' && (
+              <DailyForm myTerritorio={myTerritorio} session={session} loadData={loadData}
+                isMobile={isMobile} registrosDiarios={registrosDiarios} setSelectedRegistro={setSelectedRegistro} />
+            )}
 
             {/* ── SUB-TAB: REPORTE SEMANAL ── */}
             {inputSubTab === 'semanal' && (
@@ -2175,216 +2550,11 @@ export default function App() {
             )}
 
             {/* ── SUB-TAB: EVIDENCIAS (subida múltiple) ── */}
-            {inputSubTab === 'evidencias' && (() => {
-              const EvidenciasTab = () => {
-                const [files, setFiles] = useState([])
-                const [previews, setPreviews] = useState([])
-                const [desc, setDesc] = useState('')
-                const [geo, setGeo] = useState(null)
-                const [lugar, setLugar] = useState(null)
-                const [captureTime, setCaptureTime] = useState(null)
-                const [uploading, setUploading] = useState(false)
-                const [progress, setProgress] = useState(null) // { done, total, failed }
-                const fileRef = useRef(null)
-
-                const handleFiles = (e) => {
-                  const fs = Array.from(e.target.files || [])
-                  if (fs.length === 0) return
-                  // Liberar URLs previas
-                  previews.forEach(u => { try { URL.revokeObjectURL(u) } catch {} })
-                  setFiles(fs)
-                  setPreviews(fs.map(f => URL.createObjectURL(f)))
-                  setCaptureTime(new Date().toISOString())
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                      async (pos) => {
-                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
-                        try {
-                          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=es&zoom=16`)
-                          const data = await res.json()
-                          const a = data.address || {}
-                          const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
-                          setLugar(parts.join(', ') || data.display_name)
-                        } catch {}
-                      },
-                      () => {},
-                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-                    )
-                  }
-                }
-
-                const removeFile = (idx) => {
-                  try { URL.revokeObjectURL(previews[idx]) } catch {}
-                  setFiles(files.filter((_, i) => i !== idx))
-                  setPreviews(previews.filter((_, i) => i !== idx))
-                }
-
-                const reset = () => {
-                  previews.forEach(u => { try { URL.revokeObjectURL(u) } catch {} })
-                  setFiles([]); setPreviews([]); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null); setProgress(null)
-                }
-
-                const total = files.length
-
-                return (
-                  <div>
-                    {/* Upload card */}
-                    <div style={{ background: C.card, borderRadius: 12, padding: isMobile ? 14 : 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
-                      <input ref={fileRef} type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple onChange={handleFiles} style={{ display: 'none' }} />
-                      {total === 0 ? (
-                        <div onClick={() => fileRef.current?.click()}
-                          style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '28px 16px', textAlign: 'center', cursor: 'pointer', background: `${C.accent}08` }}>
-                          <div style={{ fontSize: 40, marginBottom: 8 }}>📷</div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Subir una o varias evidencias</div>
-                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Selecciona varias fotos a la vez · GPS + hora + lugar automáticos</div>
-                        </div>
-                      ) : (
-                        <div>
-                          {/* Grid de previews con botón ✕ por foto */}
-                          <div style={{ display: 'grid', gridTemplateColumns: total === 1 ? '1fr' : 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8, marginBottom: 10 }}>
-                            {previews.map((src, i) => (
-                              <div key={i} style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', aspectRatio: '1', background: '#f1f5f9' }}>
-                                <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                {!uploading && (
-                                  <button onClick={() => removeFile(i)} aria-label="Quitar"
-                                    style={{ position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, lineHeight: 1, padding: 0 }}>
-                                    ✕
-                                  </button>
-                                )}
-                                <div style={{ position: 'absolute', bottom: 4, left: 6, fontSize: 10, color: 'white', fontWeight: 700, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{i + 1}</div>
-                              </div>
-                            ))}
-                            {/* Botón + para agregar más */}
-                            {!uploading && (
-                              <div onClick={() => fileRef.current?.click()}
-                                style={{ aspectRatio: '1', border: `2px dashed ${C.accent}66`, borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: C.accent, background: `${C.accent}05` }}>
-                                <div style={{ fontSize: 22, fontWeight: 800 }}>+</div>
-                                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 2 }}>Agregar</div>
-                              </div>
-                            )}
-                          </div>
-                          <div style={{ fontSize: 12, color: C.muted, marginBottom: 8, fontWeight: 700 }}>
-                            {total} {total === 1 ? 'foto seleccionada' : 'fotos seleccionadas'}
-                          </div>
-                          {captureTime && (
-                            <div style={{ background: '#f8fafc', borderRadius: 8, padding: 10, marginBottom: 10, fontSize: 13 }}>
-                              <div>📅 {new Date(captureTime).toLocaleString('es-CO')}</div>
-                              {geo && <div>📍 GPS {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)} ±{Math.round(geo.accuracy)}m</div>}
-                              {lugar && <div>· {lugar}</div>}
-                            </div>
-                          )}
-                          <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder={total > 1 ? `Descripción común para las ${total} evidencias *` : 'Descripción de la evidencia *'} rows={2}
-                            style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
-                          {progress && (
-                            <div style={{ marginBottom: 10 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.muted, marginBottom: 4, fontWeight: 700 }}>
-                                <span>Subiendo {progress.done}/{progress.total}{progress.failed ? ` · ${progress.failed} con error` : ''}</span>
-                                <span>{Math.round((progress.done / progress.total) * 100)}%</span>
-                              </div>
-                              <div style={{ height: 6, borderRadius: 4, background: '#e2e8f0', overflow: 'hidden' }}>
-                                <div style={{ height: '100%', background: progress.failed ? C.orange : C.green, width: `${(progress.done / progress.total) * 100}%`, transition: 'width 0.3s' }} />
-                              </div>
-                            </div>
-                          )}
-                          <div style={{ display: 'flex', gap: 8 }}>
-                            <button onClick={reset} disabled={uploading}
-                              style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.5 : 1 }}>Cancelar</button>
-                            <button onClick={async () => {
-                              if (!desc.trim()) return alert('Agrega una descripción')
-                              setUploading(true)
-                              setProgress({ done: 0, total, failed: 0 })
-                              let failed = 0
-                              const errores = []
-                              for (let i = 0; i < files.length; i++) {
-                                try {
-                                  const foto_url = await uploadEvidenciaPhoto(files[i], myTerritorio)
-                                  await addEvidencia({
-                                    user_id: session.user.id,
-                                    territorio: myTerritorio || 'Nacional',
-                                    foto_url,
-                                    latitud: geo?.lat ?? null, longitud: geo?.lng ?? null, precision_m: geo?.accuracy ?? null,
-                                    descripcion: desc.trim(),
-                                    capturada_at: captureTime,
-                                    lugar
-                                  })
-                                } catch (err) {
-                                  failed++
-                                  const msg = err?.message || String(err)
-                                  console.error('Evidencia falló:', files[i]?.name, err)
-                                  errores.push(`• ${files[i]?.name || 'archivo'}: ${msg}`)
-                                }
-                                setProgress({ done: i + 1, total, failed })
-                              }
-                              await loadData()
-                              setUploading(false)
-                              if (failed === 0) {
-                                reset()
-                              } else {
-                                alert(`${total - failed} de ${total} evidencias subidas correctamente.\n\n${failed} fallaron:\n\n${errores.join('\n\n')}`)
-                              }
-                            }}
-                              disabled={uploading || !desc.trim() || total === 0}
-                              style={{ flex: 2, background: uploading || !desc.trim() ? '#cbd5e1' : C.navy, color: 'white', border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 700, cursor: uploading ? 'wait' : 'pointer' }}>
-                              {uploading
-                                ? `Subiendo ${progress?.done || 0}/${total}…`
-                                : total > 1
-                                  ? `Guardar ${total} evidencias${geo ? '' : ' sin GPS'}`
-                                  : (geo ? 'Guardar' : 'Guardar sin GPS')}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    {/* Gallery */}
-                    {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                          <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidencias recientes</div>
-                          {isAdmin && (
-                            <a href="https://course2.sharepoint.com/sites/CaribeLNG/Documentos/Forms/AllItems.aspx?id=%2Fsites%2FCaribeLNG%2FDocumentos%2FConecta%2FEvidencias"
-                              target="_blank" rel="noopener noreferrer"
-                              style={{ fontSize: 12, fontWeight: 700, color: C.navy, background: '#EEF2FF', border: `1px solid ${C.navy}`,
-                                borderRadius: 6, padding: '4px 10px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                              Ver en SharePoint →
-                            </a>
-                          )}
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-                          {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).map(ev => {
-                            const url = ev.foto_url || ''
-                            const ext = url.split('.').pop()?.toLowerCase().split('?')[0] || ''
-                            const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
-                            const isPdf = ext === 'pdf'
-                            const isDoc = /^(doc|docx|xls|xlsx|ppt|pptx|txt|csv)$/.test(ext)
-                            const docIcon = isPdf ? '📄' : isDoc ? '📎' : '📁'
-                            const docLabel = isPdf ? 'PDF' : ext ? ext.toUpperCase() : 'Archivo'
-                            return (
-                              <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
-                                style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
-                                {isImg ? (
-                                  <img src={url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover', background: '#F1F5F9' }} />
-                                ) : (
-                                  <div style={{ width: '100%', height: 140, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                                    <div style={{ fontSize: 42, lineHeight: 1 }}>{docIcon}</div>
-                                    <div style={{ fontSize: 11, fontWeight: 800, marginTop: 6, letterSpacing: 1 }}>{docLabel}</div>
-                                  </div>
-                                )}
-                                <div style={{ padding: '10px 12px' }}>
-                                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>{ev.descripcion}</div>
-                                  <div style={{ fontSize: 12, color: C.subtle }}>— {new Date(ev.capturada_at).toLocaleString('es-CO')}</div>
-                                  {ev.lugar && <div style={{ fontSize: 12, color: C.accent }}>· {ev.lugar}</div>}
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )
-              }
-              return <EvidenciasTab />
-            })()}
+            {inputSubTab === 'evidencias' && (
+              <EvidenciasTab isMobile={isMobile} session={session} myTerritorio={myTerritorio}
+                evidencias={evidencias} seesAllTerritorios={seesAllTerritorios} isAdmin={isAdmin}
+                setSelectedEvidencia={setSelectedEvidencia} loadData={loadData} />
+            )}
 
             {inputSubTab === 'alerta' && (
               <div style={{ background: '#fff1f2', border: '1.5px solid #fecdd3', borderRadius: 12, padding: 20 }}>
@@ -2992,9 +3162,10 @@ export default function App() {
                       </div>
                       {(() => {
                         const today = new Date()
+                        today.setHours(0, 0, 0, 0)
                         const items = []
                         terrActors.filter(a => a.cumpleanos).forEach(a => {
-                          const d = new Date(a.cumpleanos)
+                          const d = new Date(a.cumpleanos + 'T12:00:00')
                           const next = new Date(today.getFullYear(), d.getMonth(), d.getDate())
                           if (next < today) next.setFullYear(today.getFullYear() + 1)
                           const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24))
@@ -3062,168 +3233,10 @@ export default function App() {
             })()}
 
             {/* ── Modal captura ── */}
-            {showEvidenciaCapture && (() => {
-              const CaptureForm = () => {
-                const [file, setFile] = useState(null)
-                const [preview, setPreview] = useState(null)
-                const [desc, setDesc] = useState('')
-                const [geo, setGeo] = useState(null)
-                const [geoError, setGeoError] = useState(null)
-                const [lugar, setLugar] = useState(null)
-                const [captureTime, setCaptureTime] = useState(null)
-                const [uploading, setUploading] = useState(false)
-                const fileRef = useRef(null)
-
-                const reverseGeocode = async (lat, lng) => {
-                  try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es&zoom=16`)
-                    const data = await res.json()
-                    const a = data.address || {}
-                    const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
-                    setLugar(parts.join(', ') || data.display_name || 'Ubicación desconocida')
-                  } catch { setLugar(null) }
-                }
-
-                const handleFile = (e) => {
-                  const f = e.target.files?.[0]
-                  if (!f) return
-                  setFile(f)
-                  setPreview(URL.createObjectURL(f))
-                  setCaptureTime(new Date().toISOString())
-                  // Capturar GPS inmediatamente
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                      (pos) => {
-                        setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
-                        reverseGeocode(pos.coords.latitude, pos.coords.longitude)
-                      },
-                      (err) => setGeoError('No se pudo obtener ubicación: ' + err.message),
-                      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-                    )
-                  } else {
-                    setGeoError('Geolocalización no disponible en este dispositivo')
-                  }
-                }
-
-                const handleSubmit = async () => {
-                  if (!file || !desc.trim() || !geo) return
-                  setUploading(true)
-                  try {
-                    const foto_url = await uploadEvidenciaPhoto(file, myTerritorio)
-                    await addEvidencia({
-                      user_id: session.user.id,
-                      territorio: myTerritorio || 'Nacional',
-                      foto_url,
-                      latitud: geo.lat,
-                      longitud: geo.lng,
-                      precision_m: geo.accuracy,
-                      descripcion: desc.trim(),
-                      capturada_at: captureTime,
-                      lugar: lugar || null
-                    })
-                    await loadData()
-                    setFile(null); setPreview(null); setDesc(''); setGeo(null); setLugar(null); setCaptureTime(null)
-                    setShowEvidenciaCapture(false)
-                  } catch (err) {
-                    alert('Error subiendo evidencia: ' + err.message)
-                  } finally { setUploading(false) }
-                }
-
-                return (
-                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-                    onClick={(e) => { if (e.target === e.currentTarget) setShowEvidenciaCapture(false) }}>
-                    <div style={{ background: 'white', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480,
-                      maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.navy }}>Capturar Evidencia</h3>
-                        <button onClick={() => setShowEvidenciaCapture(false)}
-                          style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: C.muted }}>✕</button>
-                      </div>
-
-                      {/* Botón cámara */}
-                      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile}
-                        style={{ display: 'none' }} />
-                      {!preview ? (
-                        <div onClick={() => fileRef.current?.click()}
-                          style={{ border: `2px dashed ${C.accent}`, borderRadius: 12, padding: '32px 16px',
-                            textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: `${C.accent}08` }}>
-                          <div style={{ fontSize: 40, marginBottom: 8 }}></div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: C.accent }}>Foto o subir de galería</div>
-                          <div style={{ fontSize: 12, color: C.subtle, marginTop: 4 }}>Se capturará ubicación GPS y hora automáticamente</div>
-                        </div>
-                      ) : (
-                        <div style={{ marginBottom: 16 }}>
-                          <img src={preview} alt="Evidencia" style={{ width: '100%', borderRadius: 10, maxHeight: 200, objectFit: 'cover' }} />
-                          <button onClick={() => { setFile(null); setPreview(null); setGeo(null); setCaptureTime(null) }}
-                            style={{ background: '#fee2e2', color: C.red, border: 'none', borderRadius: 6,
-                              padding: '4px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
-                            Volver a tomar
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Metadata GPS + hora */}
-                      {captureTime && (
-                        <div style={{ background: '#f8fafc', borderRadius: 10, padding: 12, marginBottom: 16, fontSize: 13 }}>
-                          <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
-                            <span style={{ fontWeight: 700, color: C.text }}>— Hora:</span>
-                            <span style={{ color: C.muted }}>{new Date(captureTime).toLocaleString('es-CO')}</span>
-                          </div>
-                          {geo ? (
-                            <>
-                              <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
-                                <span style={{ fontWeight: 700, color: C.text }}>GPS GPS:</span>
-                                <span style={{ color: C.muted }}>{geo.lat.toFixed(6)}, {geo.lng.toFixed(6)}</span>
-                              </div>
-                              <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
-                                <span style={{ fontWeight: 700, color: C.text }}>Precisión:</span>
-                                <span style={{ color: geo.accuracy > 50 ? C.orange : C.green, fontWeight: 600 }}>
-                                  ±{Math.round(geo.accuracy)}m {geo.accuracy > 50 ? '(baja)' : '(buena)'}
-                                </span>
-                              </div>
-                              <div style={{ display: 'flex', gap: 8 }}>
-                                <span style={{ fontWeight: 700, color: C.text }}>· Lugar:</span>
-                                <span style={{ color: C.muted }}>{lugar || 'Resolviendo...'}</span>
-                              </div>
-                            </>
-                          ) : geoError ? (
-                            <div style={{ color: C.red, fontWeight: 600 }}>{geoError}</div>
-                          ) : (
-                            <div style={{ color: C.accent }}>📡 Obteniendo ubicación...</div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Descripción */}
-                      <div style={{ marginBottom: 16 }}>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: 'block', marginBottom: 4 }}>Descripción de la evidencia *</label>
-                        <textarea value={desc} onChange={e => setDesc(e.target.value)}
-                          placeholder="Ej: Acta de reunión con JAC vereda El Progreso, firma de acuerdo de socialización"
-                          rows={3}
-                          style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px',
-                            fontSize: 15, outline: 'none', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
-                      </div>
-
-                      {/* Territorio */}
-                      <div style={{ fontSize: 13, color: C.muted, marginBottom: 16 }}>
-                        Territorio: <strong style={{ color: C.text }}>{myTerritorio || 'Nacional'}</strong>
-                      </div>
-
-                      {/* Enviar */}
-                      <button onClick={handleSubmit}
-                        disabled={!file || !desc.trim() || !geo || uploading}
-                        style={{ width: '100%', background: (!file || !desc.trim() || !geo || uploading) ? '#cbd5e1' : C.navy,
-                          color: 'white', border: 'none', borderRadius: 10, padding: '12px 20px',
-                          fontSize: 15, fontWeight: 700, cursor: (!file || !desc.trim() || !geo || uploading) ? 'not-allowed' : 'pointer' }}>
-                        {uploading ? 'Subiendo...' : 'Guardar evidencia'}
-                      </button>
-                    </div>
-                  </div>
-                )
-              }
-              return <CaptureForm />
-            })()}
+            {showEvidenciaCapture && (
+              <CaptureForm myTerritorio={myTerritorio} session={session} loadData={loadData}
+                setShowEvidenciaCapture={setShowEvidenciaCapture} />
+            )}
 
             {/* ── Galería de evidencias recientes ── */}
             {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).length > 0 && (

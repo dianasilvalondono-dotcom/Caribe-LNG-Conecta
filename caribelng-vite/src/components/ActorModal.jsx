@@ -136,8 +136,11 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
     setSavingRecoDAC(true)
     setRecoDACSaved(false)
     try {
+      // Comparar contra el estado inicial cargado del select (actor.posicion || 'Neutro'),
+      // no contra el fallback vacío. Así, registrar solo una Lectura DAC no fuerza
+      // posicion='Neutro' ni crea el historial falso "(sin definir) → Neutro".
       const posicionAnterior = actor.posicion || ''
-      const posicionCambio = posicion !== posicionAnterior
+      const posicionCambio = posicion !== (actor.posicion || 'Neutro')
       const nuevaLectura = recomendacionDAC.trim()
       const tieneNuevaLectura = nuevaLectura.length > 0
       const updates = {}

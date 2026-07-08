@@ -16,7 +16,7 @@ export default function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
     const byTerr = (t) => d.actors?.filter(a => a.territorio === t) || []
     lines.push(`Actores Tolú: ${byTerr('Tolú').length}, Barbosa: ${byTerr('Barbosa').length}, Nacional: ${byTerr('Nacional').length}`)
     const sem = (color) => d.actors?.filter(a => a.semaforo === color).length || 0
-    lines.push(`Semáforo: ${sem('Verde')} verde, ${sem('Amarillo')} amarillo, ${sem('Rojo')} rojo`)
+    lines.push(`Semáforo: ${sem('verde')} verde, ${sem('amarillo')} amarillo, ${sem('naranja')} naranja, ${sem('rojo')} rojo, ${sem('monitor')} en monitoreo`)
     lines.push(`Total acuerdos: ${d.agreements?.length || 0}`)
     d.agreements?.forEach(a => lines.push(`  - ${a.nombre}: ${a.estado} (${a.territorio})`))
     lines.push(`Total riesgos sociales: ${d.riesgos?.length || 0}`)
@@ -28,9 +28,9 @@ export default function ChatBot({ appData, knowledgeDocs, session, isMobile }) {
     lines.push(`BARBOSA: C3 Licencia C3 (formación, género) | HUB Cancha El Machete (polideportivo, espacio comunitario) | ECO Cadena de Reciclaje (puntos ecológicos, siembra 150 árboles, genera ingreso)`)
     lines.push(`\n== CRONOGRAMA LEGISLATIVO ==`)
     d.cronoLeg?.forEach(c => lines.push(`  - ${c.fecha}: [${c.nivel_riesgo}] ${c.evento} (${c.tipo})`))
-    lines.push(`\n== ACTORES CLAVE (top 20 por relevancia) ==`)
-    const topActors = [...(d.actors || [])].sort((a, b) => (b.relevancia || 0) - (a.relevancia || 0)).slice(0, 20)
-    topActors.forEach(a => lines.push(`  - ${a.nombre} (${a.territorio}, ${a.sector}, semáforo: ${a.semaforo}, cargo: ${a.cargo || 'N/A'})`))
+    lines.push(`\n== ACTORES CLAVE (top 20 por poder) ==`)
+    const topActors = [...(d.actors || [])].sort((a, b) => (b.poder || 0) - (a.poder || 0)).slice(0, 20)
+    topActors.forEach(a => lines.push(`  - ${a.nombre} (${a.territorio}, ${a.tipo || 'N/A'}, semáforo: ${a.semaforo}, posición: ${a.posicion || 'N/A'}, prioridad: ${a.prioridad || 'N/A'})`))
     lines.push(`\n== KPIs DAC ==`)
     d.kpisDac?.forEach(k => lines.push(`  - ${k.kpi_id}: valor=${k.valor || 'pendiente'}, estado=${k.estado || 'EN CURSO'}`))
     lines.push(`\n== REPORTES SEMANALES ==`)

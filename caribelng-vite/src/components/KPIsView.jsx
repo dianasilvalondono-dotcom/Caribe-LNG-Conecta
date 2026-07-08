@@ -3,6 +3,10 @@ import { C } from '../lib/constants'
 import { Bar, Tag, StatCard } from './ui'
 import { upsertKpiDac, deleteKpiEntry } from '../lib/supabase'
 
+// Parseo local: fechas 'YYYY-MM-DD' se interpretan en zona local (no UTC) para que
+// el día 1 de mes no caiga en el trimestre anterior en Colombia.
+const localDate = (x) => x == null ? new Date(NaN) : new Date(String(x).length === 10 ? x + 'T00:00:00' : x)
+
 export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, agreements, kpisDac, onKpiDacSaved, actors, registrosDiarios = [], evidencias = [], allInteractions = [], cronograma = [], comiteActas = [], contratistas = [], capacitaciones = [] }) {
   const [mainTab, setMainTab] = useState('dac')
   const [terrFilter, setTerrFilter] = useState('Todos')
@@ -56,16 +60,17 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
 
   // Hitos de acuerdos: 4 por territorio (mapeo, mesas, propuesta, firma)
   // Aproximación: avance >=25% = mapeo, >=50% = mesas, >=75% = propuesta, 100% = firma
-  const hitosCompletados = agreements.reduce((s, a) => {
-    let h = 0
-    if (a.avance >= 25) h++
-    if (a.avance >= 50) h++
-    if (a.avance >= 75) h++
-    if (a.avance >= 100) h++
-    return s + h
-  }, 0)
-  const totalHitos = 8 // 4 por territorio × 2
-  const hitosPct = Math.round((hitosCompletados / totalHitos) * 100)
+  const hitosOf = (a) => (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0)
+  const hitosCompletados = agreements.reduce((s, a) => s + hitosOf(a), 0)
+  const totalHitos = agreements.length * 4 // 4 hitos por acuerdo (mapeo, mesas, propuesta, firma)
+  const hitosPct = totalHitos ? Math.min(100, Math.round((hitosCompletados / totalHitos) * 100)) : 0
+  // Subtotales por territorio (denominador = nº acuerdos del territorio × 4, tope 100%)
+  const agsTolu = agreements.filter(a => a.territorio === 'Tolú')
+  const agsBarbosa = agreements.filter(a => a.territorio === 'Barbosa')
+  const hitosTolu = agsTolu.reduce((s, a) => s + hitosOf(a), 0)
+  const hitosToluTot = agsTolu.length * 4
+  const hitosBarbosa = agsBarbosa.reduce((s, a) => s + hitosOf(a), 0)
+  const hitosBarbosaTot = agsBarbosa.length * 4
 
   // PGS ejecutado: promedio avance acuerdos como proxy
   const pgsEjecutado = acuerdosAvgPct
@@ -81,10 +86,10 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
     { num: 1, titulo: 'Formalización de Acuerdos Sociales Tolú y Barbosa', peso: '5%', color: C.tolu,
       fecha: '30 junio 2026', medicion: '% hitos completados',
       meta: '≥75% hitos (6/8)', alertaRoja: '<50% hitos al 30 junio o sin mesas de diálogo',
-      value: `${hitosCompletados}/8`, pct: hitosPct, metaNum: 75,
+      value: `${hitosCompletados}/${totalHitos}`, pct: hitosPct, metaNum: 75,
       reconocimiento: reconocer(hitosPct, 100),
       sc: hitosPct >= 75 ? '#10b981' : hitosPct >= 50 ? '#f59e0b' : '#ef4444',
-      sub: `Tolú: ${agreements.filter(a => a.territorio === 'Tolú').reduce((s, a) => s + (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0), 0)}/4 · Barbosa: ${agreements.filter(a => a.territorio === 'Barbosa').reduce((s, a) => s + (a.avance >= 25 ? 1 : 0) + (a.avance >= 50 ? 1 : 0) + (a.avance >= 75 ? 1 : 0) + (a.avance >= 100 ? 1 : 0), 0)}/4`
+      sub: `Tolú: ${hitosTolu}/${hitosToluTot} · Barbosa: ${hitosBarbosa}/${hitosBarbosaTot}`
     },
     { num: 2, titulo: 'Ejecución del Plan de Gestión Social', peso: '5%', color: C.barbosa,
       fecha: '31 dic 2026', medicion: '% del plan ejecutado',
@@ -97,9 +102,9 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
     { num: 3, titulo: 'Gestión de Riesgos Sociales y Reputacionales', peso: '5%', color: '#ef4444',
       fecha: 'Continuo', medicion: '% alertas gestionadas a tiempo',
       meta: '≥90% alertas escaladas a tiempo', alertaRoja: '<70% alertas o incidente sin respuesta en 72h',
-      value: `${pqrsPct}%`, pct: pqrsPct, metaNum: 90,
-      reconocimiento: reconocer(pqrsPct, 90),
-      sc: pqrsPct >= 90 ? '#10b981' : pqrsPct >= 70 ? '#f59e0b' : '#ef4444',
+      value: `${alertasPct}%`, pct: alertasPct, metaNum: 90,
+      reconocimiento: reconocer(alertasPct, 90),
+      sc: alertasPct >= 90 ? '#10b981' : alertasPct >= 70 ? '#f59e0b' : '#ef4444',
       sub: `PQRS cerradas: ${pqrsCerradas}/${totalPqrs} · Incidentes: ${totalIncidentesD} · Alertas escaladas: ${totalAlertas}`
     },
   ]
@@ -175,7 +180,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   function getMonthData(territorio, mes) {
     return reportes.filter(r => {
       if (territorio !== 'Todos' && r.territorio !== territorio) return false
-      const m = new Date(r.fecha_corte).getMonth()
+      const m = localDate(r.fecha_corte).getMonth()
       return m === mes
     })
   }
@@ -595,14 +600,14 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
                   {territorios.map(terr => {
                     const color = terr === 'Tolú' ? C.tolu : C.barbosa
                     const rd = registrosDiarios.filter(r => r.territorio === terr)
-                    const rdMes = rd.filter(r => { const d = new Date(r.fecha); return d.getMonth() === mesActual && d.getFullYear() === anioActual })
+                    const rdMes = rd.filter(r => { const d = localDate(r.fecha); return d.getMonth() === mesActual && d.getFullYear() === anioActual })
                     const ev = evidencias.filter(e => e.territorio === terr)
-                    const evMes = ev.filter(e => { const d = new Date(e.capturada_at); return d.getMonth() === mesActual && d.getFullYear() === anioActual })
+                    const evMes = ev.filter(e => { const d = localDate(e.capturada_at); return d.getMonth() === mesActual && d.getFullYear() === anioActual })
                     const tiposCount = {}
                     rdMes.forEach(r => { tiposCount[r.tipo_reunion] = (tiposCount[r.tipo_reunion] || 0) + 1 })
                     const asistentesTotal = rdMes.reduce((s, r) => s + (r.asistentes || 0), 0)
                     const semanasConRegistro = new Set(rdMes.map(r => {
-                      const d = new Date(r.fecha); const oneJan = new Date(d.getFullYear(), 0, 1)
+                      const d = localDate(r.fecha); const oneJan = new Date(d.getFullYear(), 0, 1)
                       return Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7)
                     })).size
                     const semanasDelMes = Math.ceil(new Date(anioActual, mesActual + 1, 0).getDate() / 7)

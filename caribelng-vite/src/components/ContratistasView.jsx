@@ -104,10 +104,11 @@ export default function ContratistasView({ profile, isAdmin }) {
   }
 
   async function deleteContratista(c) {
-    if (!confirm(`¿Borrar "${c.nombre}"? Sus capacitaciones también se borrarán.`)) return
+    if (!confirm(`¿Borrar "${c.nombre}"? Sus capacitaciones también se borrarán.`)) return false
     const { error } = await supabase.from('contratistas').delete().eq('id', c.id)
-    if (error) return alert('Error: ' + error.message)
+    if (error) { alert('Error: ' + error.message); return false }
     await loadAll()
+    return true
   }
 
   async function saveCapacitacion(form) {
@@ -245,7 +246,7 @@ export default function ContratistasView({ profile, isAdmin }) {
           canDelete={canDelete}
           onClose={() => setSelected(null)}
           onEdit={() => { setEditing(selected); setSelected(null) }}
-          onDelete={() => { deleteContratista(selected); setSelected(null) }}
+          onDelete={async () => { if (await deleteContratista(selected)) setSelected(null) }}
           onAddCapac={() => setNewCapac({ contratista_id: selected.id, contratista_nombre: selected.nombre })}
           onDeleteCapac={deleteCapacitacion} />
       )}

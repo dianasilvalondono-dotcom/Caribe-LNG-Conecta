@@ -108,7 +108,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
 
   const recentActivity = [
     ...seguimiento.slice().sort((a, b) => new Date(b.created_at || b.fecha_pactada) - new Date(a.created_at || a.fecha_pactada)).slice(0, 3).map(s => ({ icon: '', text: `Acuerdo <span style="color:#1565C0;font-weight:700">${s.acuerdo || ''}</span> — ${(s.compromiso || '').substring(0, 45)}`, time: s.fecha_pactada || '' })),
-    ...reportes.slice().sort((a, b) => (b.semana || '').localeCompare(a.semana || '')).slice(0, 2).map(r => ({ icon: '', text: `Reporte semanal <span style="color:#1565C0;font-weight:700">${r.territorio}</span> — Sem. ${r.semana}`, time: r.semana || '' })),
+    ...reportes.slice().sort((a, b) => Number(b.semana) - Number(a.semana)).slice(0, 2).map(r => ({ icon: '', text: `Reporte semanal <span style="color:#1565C0;font-weight:700">${r.territorio}</span> — Sem. ${r.semana}`, time: r.semana || '' })),
   ].slice(0, 5)
 
   const territorioGestora = {
@@ -479,7 +479,7 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
               {(() => {
                 const alertas = []
                 const ultimosReportes = {}
-                reportes.forEach(r => { if (!ultimosReportes[r.territorio] || r.semana > ultimosReportes[r.territorio].semana) ultimosReportes[r.territorio] = r })
+                reportes.forEach(r => { if (!ultimosReportes[r.territorio] || Number(r.semana) > Number(ultimosReportes[r.territorio].semana)) ultimosReportes[r.territorio] = r })
                 Object.values(ultimosReportes).forEach(r => {
                   if (r.pqrs_pendientes > 0) alertas.push({ icon: '', text: `${r.territorio}: ${r.pqrs_pendientes} quejas sin resolver`, color: '#f97316', nav: () => setView('input') })
                   if (r.incidentes > 0) alertas.push({ icon: '', text: `${r.territorio}: ${r.incidentes} incidente(s)`, color: '#ef4444', nav: () => setView('input') })

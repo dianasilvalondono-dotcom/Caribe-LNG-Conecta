@@ -291,7 +291,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
                     <span style={{ fontSize: 15, color: C.subtle, marginLeft: 8 }}>{new Date(r.fecha_corte).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    {(isAdmin || profile?.role === 'gestora') && (
+                    {(isAdmin || (profile?.role === 'gestora' && r.territorio === profile?.territorio)) && (
                       <button onClick={async () => { if (confirm('¿Borrar este reporte?')) { await deleteReporteSemanal(r.id); onSaved() } }}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.red, padding: '0 2px' }}
                         title="Borrar">✕</button>
