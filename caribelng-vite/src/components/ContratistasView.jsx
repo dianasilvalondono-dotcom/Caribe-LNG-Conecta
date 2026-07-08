@@ -328,9 +328,10 @@ function ContratistaModal({ row, onCancel, onSave, saving }) {
         <Field label="Contacto · Nombre"><input value={f.contacto_nombre} onChange={e => u('contacto_nombre', e.target.value)} style={inputStyle()} /></Field>
         <Field label="Contacto · Email"><input type="email" value={f.contacto_email} onChange={e => u('contacto_email', e.target.value)} style={inputStyle()} /></Field>
       </Grid2>
+      <Field label="Contacto · Teléfono"><input value={f.contacto_telefono} onChange={e => u('contacto_telefono', e.target.value)} style={inputStyle()} /></Field>
       <Grid2>
-        <Field label="Contacto · Teléfono"><input value={f.contacto_telefono} onChange={e => u('contacto_telefono', e.target.value)} style={inputStyle()} /></Field>
         <Field label="Inicio del contrato"><input type="date" value={f.fecha_inicio || ''} onChange={e => u('fecha_inicio', e.target.value)} style={inputStyle()} /></Field>
+        <Field label="Fin del contrato"><input type="date" value={f.fecha_fin || ''} onChange={e => u('fecha_fin', e.target.value)} style={inputStyle()} /></Field>
       </Grid2>
       <Field label="Notas"><textarea value={f.notas} onChange={e => u('notas', e.target.value)} rows={2} style={{ ...inputStyle(), minHeight: 50, resize: 'vertical' }} /></Field>
     </Modal>

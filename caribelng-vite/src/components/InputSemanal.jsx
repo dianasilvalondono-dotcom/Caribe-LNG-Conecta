@@ -3,6 +3,24 @@ import { C } from '../lib/constants'
 import { Field } from './ui'
 import { supabase, addReporteSemanal, deleteReporteSemanal, sendPushNotification, uploadReporteToOneDrive } from '../lib/supabase'
 
+const NumField = ({ label, value, onChange, max }) => (
+  <div style={{ flex: 1, minWidth: 120 }}>
+    <label style={{ fontSize: 16, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{label}</label>
+    <input type="number" min="0" max={max} value={value} onChange={e => { const v = parseInt(e.target.value) || 0; onChange(max ? Math.min(v, max) : v) }}
+      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
+        fontWeight: 700, color: C.text, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', textAlign: 'center' }} />
+  </div>
+)
+
+const TextArea = ({ label, value, onChange, placeholder }) => (
+  <div style={{ marginBottom: 10 }}>
+    <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
+    <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
+        resize: 'none', height: 60, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
+  </div>
+)
+
 export default function InputSemanal({ session, profile, territorio, reportes, seguimiento, onSaved, isAdmin }) {
   const [tab, setTab] = useState('reporte')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960)
@@ -98,24 +116,6 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
 
 
   const myReportes = reportes.filter(r => r.territorio === myTerr)
-
-  const NumField = ({ label, value, onChange, max }) => (
-    <div style={{ flex: 1, minWidth: 120 }}>
-      <label style={{ fontSize: 16, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 3 }}>{label}</label>
-      <input type="number" min="0" max={max} value={value} onChange={e => { const v = parseInt(e.target.value) || 0; onChange(max ? Math.min(v, max) : v) }}
-        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
-          fontWeight: 700, color: C.text, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', textAlign: 'center' }} />
-    </div>
-  )
-
-  const TextArea = ({ label, value, onChange, placeholder }) => (
-    <div style={{ marginBottom: 10 }}>
-      <label style={{ fontSize: 15, color: C.muted, fontWeight: 600, display: 'block', marginBottom: 3 }}>{label}</label>
-      <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px', fontSize: 16,
-          resize: 'none', height: 60, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: C.text }} />
-    </div>
-  )
 
   return (
     <div>

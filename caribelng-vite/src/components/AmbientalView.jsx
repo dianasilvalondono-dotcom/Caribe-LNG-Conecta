@@ -965,6 +965,11 @@ function PGRDModal({ row, saving, onCancel, onSave, C2 }) {
           </select>
         </Field>
       </Grid2>
+      <Field label="Prioridad">
+        <select value={f.prioridad} onChange={e => u('prioridad', e.target.value)} style={inputStyle}>
+          {['alta', 'media', 'baja'].map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+        </select>
+      </Field>
       <Field label="Título *"><input value={f.titulo} onChange={e => u('titulo', e.target.value)} style={inputStyle} placeholder="Ej: Plan Maestro PGRD v1.0 operación Tolú" /></Field>
       <Grid2>
         <Field label="Fecha estimada"><input type="date" value={f.fecha_estimada || ''} onChange={e => u('fecha_estimada', e.target.value)} style={inputStyle} /></Field>
