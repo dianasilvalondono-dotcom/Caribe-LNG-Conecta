@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { supabase, uploadPqrsDoc } from '../lib/supabase'
 import { C } from '../lib/constants'
 
-// Documento de marca (Brand Book v2): tipografía Georgia, NO Georgia.
+// Documento de marca (Brand Book v2): plantilla oficial (banner navy + pie de olas), tipografía Georgia.
 const SERIF = "Georgia, 'Times New Roman', serif"
 const NAVY = '#0D47A1'
 
@@ -96,6 +96,7 @@ export default function PqrsRespuesta({ p, onClose, onSaved, onSaveDoc }) {
           #pqrs-carta {
             position: absolute !important; left: 0; top: 0; width: 100% !important;
             box-shadow: none !important; border-radius: 0 !important; margin: 0 !important;
+            -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
           }
           .pqrs-noprint { display: none !important; }
           .pqrs-edit { border: none !important; background: transparent !important; padding: 0 !important; resize: none !important; }
@@ -131,15 +132,12 @@ export default function PqrsRespuesta({ p, onClose, onSaved, onSaveDoc }) {
       {/* La carta */}
       <div id="pqrs-carta" style={{ maxWidth: 800, margin: '0 auto', background: 'white', borderRadius: 6, overflow: 'hidden', fontFamily: SERIF, color: '#2B2926', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
 
-        {/* Encabezado navy */}
-        <div style={{ background: NAVY, color: 'white', padding: '22px 40px 18px' }}>
-          <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: 0.5, fontFamily: SERIF }}>Caribe LNG</div>
-          <div style={{ height: 2, background: 'rgba(255,255,255,0.55)', marginTop: 10, width: '100%' }} />
-        </div>
+        {/* Encabezado oficial (Brand Book v2): franja navy con logo en reversa + ola */}
+        <img src="/brand/banner_cover.png" alt="Caribe LNG" style={{ display: 'block', width: '100%' }} />
 
         <div style={{ padding: '28px 40px 40px' }}>
           {/* Título */}
-          <h1 style={{ margin: '0 0 2px', fontSize: 24, fontWeight: 700, color: NAVY, fontFamily: SERIF, letterSpacing: 0.3 }}>PQRS · SOLICITUD</h1>
+          <h1 style={{ margin: '0 0 2px', fontSize: 24, fontWeight: 700, color: NAVY, fontFamily: SERIF, letterSpacing: 0.3 }}>PQRS - SOLICITUD</h1>
           <div style={{ fontSize: 13, color: '#5C6370', marginBottom: 20, fontFamily: SERIF }}>
             Respuesta: <strong style={{ color: '#2B2926' }}>{p.numero_documental || p.codigo || '—'}</strong>
           </div>
@@ -188,11 +186,8 @@ export default function PqrsRespuesta({ p, onClose, onSaved, onSaveDoc }) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ background: NAVY, color: 'white', padding: '14px 40px', fontFamily: SERIF, fontSize: 12, textAlign: 'center', lineHeight: 1.6 }}>
-          <div style={{ fontWeight: 700 }}>Caribe LNG S.A.S. E.S.P.</div>
-          <div style={{ opacity: 0.85 }}>Cra. 7 #73-47, oficina 801. Bogotá, Colombia</div>
-        </div>
+        {/* Footer oficial (Brand Book v2): watermark de olas con razón social + dirección (texto incrustado en la imagen) */}
+        <img src="/brand/band_footer_company.png" alt="Caribe LNG S.A.S. E.S.P. · Cra. 7 #73-47, oficina 801. Bogotá, Colombia" style={{ display: 'block', width: '100%', marginTop: 8 }} />
       </div>
     </div>
   )
