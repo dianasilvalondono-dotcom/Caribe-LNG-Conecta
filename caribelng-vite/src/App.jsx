@@ -2341,11 +2341,11 @@ export default function App() {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                           <div style={{ fontSize: 14, fontWeight: 800, color: C.text, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidencias recientes</div>
                           {isAdmin && (
-                            <a href="https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=%2Fpersonal%2Fdiana_silva_caribelng_com%2FDocuments%2FConecta%2FEvidencias"
+                            <a href="https://course2.sharepoint.com/sites/CaribeLNG/Documentos/Forms/AllItems.aspx?id=%2Fsites%2FCaribeLNG%2FDocumentos%2FConecta%2FEvidencias"
                               target="_blank" rel="noopener noreferrer"
                               style={{ fontSize: 12, fontWeight: 700, color: C.navy, background: '#EEF2FF', border: `1px solid ${C.navy}`,
                                 borderRadius: 6, padding: '4px 10px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                              Ver en OneDrive →
+                              Ver en SharePoint →
                             </a>
                           )}
                         </div>
@@ -3559,12 +3559,13 @@ export default function App() {
                       </span>
                     </div>
                   </div>
-                  <a href={`https://course2-my.sharepoint.com/personal/diana_silva_caribelng_com/Documents/Forms/AllItems.aspx?id=${encodeURIComponent(`/personal/diana_silva_caribelng_com/Documents/Conecta/Evidencias/${ev.territorio}/${new Date(ev.capturada_at).getFullYear()}-${String(new Date(ev.capturada_at).getMonth() + 1).padStart(2, '0')}`)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
-                      borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-                    Ver carpeta en OneDrive →
-                  </a>
+                  {ev.foto_url && (
+                    <a href={ev.foto_url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
+                        borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                      Abrir archivo en SharePoint →
+                    </a>
+                  )}
                   {isAdmin && (
                     <button onClick={async () => {
                       if (!confirm('¿Eliminar esta evidencia?')) return
