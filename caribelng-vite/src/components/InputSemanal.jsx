@@ -69,8 +69,27 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
   const [prioridades, setPrioridades] = useState('')
 
 
+  function resetForm() {
+    setSemana('')
+    setFechaCorte(new Date().toISOString().split('T')[0])
+    setAcuerdosFirmados(0); setCompromisosNuevos(0); setCompromisosCumplidos(0)
+    setIncumplimientos(0); setDiagnosticos(0); setActasVecindad(0); setInduccionesPgs(0)
+    setCiclosDiag(0); setAsociacionesMapeadas(0); setPersonasObstaculizadoras(0)
+    setAliadosIdentificados(0); setVisitasAid(0)
+    setEventosAid(0); setEventosAii(0); setEventosInst(0); setAsistentes(0)
+    setPctSocAsistentes(0); setPqrsRecibidas(0); setPqrsCerradas(0); setPqrsPendientes(0)
+    setPctPqrsTiempo(0); setPctPqrsCerradas(0)
+    setIncidentes(0); setActoresGest(0); setAlertasDac(0)
+    setLogros(''); setDificultades(''); setEscalamientos(''); setPrioridades('')
+  }
+
   async function handleSaveReporte() {
     if (!semana || !fechaCorte) return
+    if (saving) return
+    // Guardia anti-duplicado: si ya existe un reporte de esta semana/territorio,
+    // confirmar antes de insertar otra fila con las mismas metricas.
+    const yaExiste = myReportes.some(r => String(r.semana) === String(parseInt(semana)))
+    if (yaExiste && !confirm(`Ya hay un reporte de la semana ${parseInt(semana)} para ${myTerr}. ¿Guardar otro de todas formas?`)) return
     setSaving(true)
     try {
       await addReporteSemanal({
@@ -90,6 +109,7 @@ export default function InputSemanal({ session, profile, territorio, reportes, s
       })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
+      resetForm()
       onSaved()
       // Subir reporte a OneDrive
       uploadReporteToOneDrive({

@@ -94,11 +94,25 @@ export default function PqrsView({ profile, isAdmin }) {
   const nuevos30 = base.filter(p => p.fecha_recepcion && new Date(p.fecha_recepcion + 'T00:00:00') >= hace30).length
   const resueltos = base.filter(p => !ABIERTOS.includes(p.estado_actual)).length
 
-  // Radicado automático: YYYYMMDD-NN según fecha_recepcion + consecutivo del día
-  function generarCodigo(fechaRecepcion) {
+  // Radicado automático: YYYYMMDD-NN según fecha_recepcion + consecutivo del día.
+  // Consulta la BD (no las filas en memoria, que pueden estar paginadas o
+  // filtradas por RLS) y toma el consecutivo mayor del día + 1.
+  // NOTA: el único consecutivo 100% atómico y a prueba de concurrencia sería
+  // una secuencia/RPC en Postgres; pendiente de crear (ver SQL para Diana).
+  async function generarCodigo(fechaRecepcion) {
     const ymd = (fechaRecepcion || new Date().toISOString().slice(0, 10)).replaceAll('-', '')
-    const mismosDia = rows.filter(p => (p.fecha_recepcion || '').replaceAll('-', '') === ymd).length
-    const nn = String(mismosDia + 1).padStart(2, '0')
+    let maxNN = 0
+    try {
+      const { data } = await supabase.from('pqrs').select('codigo').like('codigo', `${ymd}-%`)
+      for (const r of (data || [])) {
+        const m = /-(\d+)$/.exec(r.codigo || '')
+        if (m) maxNN = Math.max(maxNN, parseInt(m[1], 10))
+      }
+    } catch { /* si falla la consulta, cae al conteo en memoria abajo */ }
+    if (maxNN === 0) {
+      maxNN = rows.filter(p => (p.fecha_recepcion || '').replaceAll('-', '') === ymd).length
+    }
+    const nn = String(maxNN + 1).padStart(2, '0')
     return `${ymd}-${nn}`
   }
 
@@ -151,7 +165,7 @@ export default function PqrsView({ profile, isAdmin }) {
     }
     let error
     if (editing === 'new') {
-      const codigo = generarCodigo(payload.fecha_recepcion)
+      const codigo = await generarCodigo(payload.fecha_recepcion)
       payload.codigo = codigo
       payload.numero_documental = codigo + '-01'
       payload.created_by = profile?.id
@@ -175,9 +189,16 @@ export default function PqrsView({ profile, isAdmin }) {
 
   // Persiste url+nombre de un PDF adjunto (petición o respuesta firmada) y refresca en memoria.
   async function saveDocPatch(row, patch) {
-    const { error } = await supabase.from('pqrs')
-      .update({ ...patch, updated_at: new Date().toISOString() }).eq('id', row.id)
+    // .select() para no mostrar exito falso: si RLS niega el UPDATE, Supabase
+    // devuelve 0 filas SIN error; sin esto la UI marcaba el PDF como adjunto
+    // aunque la BD no cambiara (y se revertia al recargar).
+    const { data, error } = await supabase.from('pqrs')
+      .update({ ...patch, updated_at: new Date().toISOString() }).eq('id', row.id).select()
     if (error) { alert('No se pudo guardar el documento: ' + error.message); return false }
+    if (!data || data.length === 0) {
+      alert('No se pudo guardar el documento: no tienes permiso sobre esta solicitud.')
+      return false
+    }
     setRows(rs => rs.map(r => r.id === row.id ? { ...r, ...patch } : r))
     setSelected(s => s && s.id === row.id ? { ...s, ...patch } : s)
     return true

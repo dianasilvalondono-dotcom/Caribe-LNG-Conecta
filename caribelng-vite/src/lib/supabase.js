@@ -500,20 +500,24 @@ async function compressImage(file, maxWidth = 1200, quality = 0.75) {
 }
 
 export async function uploadEvidenciaPhoto(file, territorio) {
+  // Sufijo aleatorio ademas del timestamp: al subir varios archivos en lote,
+  // dos pueden resolver el mismo milisegundo y .upload() (no upsert) falla con
+  // "already exists", perdiendo esa evidencia. El sufijo lo evita.
   const timestamp = Date.now()
+  const rand = Math.random().toString(36).slice(2, 8)
   const isImage = file.type?.startsWith('image/')
   let body, fileName, contentType
 
   if (isImage) {
     // Imagen: comprimir y guardar como jpg
     body = await compressImage(file)
-    fileName = `foto_${timestamp}.jpg`
+    fileName = `foto_${timestamp}_${rand}.jpg`
     contentType = 'image/jpeg'
   } else {
     // PDF u otro documento: subir tal cual respetando extensión y mime
     body = file
     const ext = (file.name?.split('.').pop() || 'bin').toLowerCase().slice(0, 8)
-    fileName = `doc_${timestamp}.${ext}`
+    fileName = `doc_${timestamp}_${rand}.${ext}`
     contentType = file.type || 'application/octet-stream'
   }
 

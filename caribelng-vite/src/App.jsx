@@ -99,7 +99,10 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
         compromiso: actividad, fecha_pactada: fecha, estado: nuevoEstado,
         notas: notas, avance_porcentaje: pct,
       })
-      await updateAgreementAvance(ag.id, nuevoAvance, notas || ag.notas)
+      // La nota por-avance va en el seguimiento (arriba). La nota a nivel de
+      // acuerdo NO se toca aqui: se preserva localNotas (la nota viva del
+      // acuerdo) para no pisar lo que se guardo con "Guardar nota".
+      await updateAgreementAvance(ag.id, nuevoAvance, localNotas || null)
       setLocalAvance(nuevoAvance)
       setLocalEstadoCode(nuevoEstado)
       setActividad(''); setPorcentaje(''); setNotas('')
@@ -119,7 +122,7 @@ function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
       await deleteSeguimientoAcuerdo(h.id)
       const nuevoAvance = Math.max(0, localAvance - (h.avance_porcentaje || 0))
       const nuevoEstado = nuevoAvance >= 100 ? 'cumplido' : nuevoAvance > 0 ? 'en_curso' : 'por_estructurar'
-      await updateAgreementAvance(ag.id, nuevoAvance, ag.notas)
+      await updateAgreementAvance(ag.id, nuevoAvance, localNotas || null)
       setLocalAvance(nuevoAvance)
       setLocalEstadoCode(nuevoEstado)
       setHistorial([])
@@ -947,9 +950,18 @@ function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTer
                         <div>
                           {/* Grid de previews con botón ✕ por foto */}
                           <div style={{ display: 'grid', gridTemplateColumns: total === 1 ? '1fr' : 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8, marginBottom: 10 }}>
-                            {previews.map((src, i) => (
+                            {previews.map((src, i) => {
+                              const esImagen = (files[i]?.type || '').startsWith('image/')
+                              return (
                               <div key={i} style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', aspectRatio: '1', background: '#f1f5f9' }}>
-                                <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                {esImagen ? (
+                                  <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 6, textAlign: 'center' }}>
+                                    <div style={{ fontSize: 28 }}>📄</div>
+                                    <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, marginTop: 4, wordBreak: 'break-word', lineHeight: 1.2 }}>{files[i]?.name || 'documento'}</div>
+                                  </div>
+                                )}
                                 {!uploading && (
                                   <button onClick={() => removeFile(i)} aria-label="Quitar"
                                     style={{ position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, lineHeight: 1, padding: 0 }}>
@@ -958,7 +970,7 @@ function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTer
                                 )}
                                 <div style={{ position: 'absolute', bottom: 4, left: 6, fontSize: 10, color: 'white', fontWeight: 700, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{i + 1}</div>
                               </div>
-                            ))}
+                            )})}
                             {/* Botón + para agregar más */}
                             {!uploading && (
                               <div onClick={() => fileRef.current?.click()}
@@ -1356,20 +1368,26 @@ export default function App() {
     if (!session) return
     setDataLoading(true)
     try {
-      const [a, ag, rp, sg, ri, ae, ct, cp] = await Promise.all([
+      // allSettled (no Promise.all): si un loader falla (p.ej. RLS niega una
+      // tabla a un rol), NO debe tumbar toda la app dejandola en blanco. Cada
+      // seccion se llena con lo que cargo; los fallos se registran.
+      const [a, ag, rp, sg, ri, ae, ct, cp] = await Promise.allSettled([
         getActors(), getAgreements(), getReportesSemanales(),
         getSeguimientoAcuerdos(), getRiesgos(), getActorEdits(),
         supabase.from('contratistas').select('*').order('nombre'),
         supabase.from('capacitaciones_contratistas').select('*').order('fecha', { ascending: false }),
       ])
-      setActors(a || [])
-      setAgreements(ag || [])
-      setReportes(rp || [])
-      setSeguimiento(sg || [])
-      setRiesgos(ri || [])
-      setActorEdits(ae || [])
-      setContratistas(ct?.data || [])
-      setCapacitaciones(cp?.data || [])
+      const val = (r, d) => r.status === 'fulfilled' ? r.value : d
+      const failed = [a, ag, rp, sg, ri, ae, ct, cp].filter(r => r.status === 'rejected')
+      if (failed.length) console.error('loadCoreData: fallaron', failed.length, 'loaders', failed.map(f => f.reason?.message || f.reason))
+      setActors(val(a, []) || [])
+      setAgreements(val(ag, []) || [])
+      setReportes(val(rp, []) || [])
+      setSeguimiento(val(sg, []) || [])
+      setRiesgos(val(ri, []) || [])
+      setActorEdits(val(ae, []) || [])
+      setContratistas(val(ct, {})?.data || [])
+      setCapacitaciones(val(cp, {})?.data || [])
     } finally { setDataLoading(false) }
   }, [session])
 
