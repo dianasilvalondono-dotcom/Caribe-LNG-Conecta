@@ -365,7 +365,11 @@ function PqrsModal({ row, seesAll, myTerritorio, nextCodigo, onCancel, onSave, s
   const u = (k, v) => setF(s => ({ ...s, [k]: v }))
   const toggle = (k) => setOpen(s => ({ ...s, [k]: !s[k] }))
 
-  const codigoPreview = row ? (row.codigo || '') : (nextCodigo ? nextCodigo(f.fecha_recepcion) : '')
+  // El radicado real (consecutivo del día) se calcula contra la BD al guardar;
+  // aquí solo mostramos el prefijo del día como vista previa. (nextCodigo es
+  // async, no se puede renderizar directo o pinta "[object Promise]".)
+  const ymdPrev = (f.fecha_recepcion || '').replaceAll('-', '')
+  const codigoPreview = row ? (row.codigo || '') : (ymdPrev ? `${ymdPrev}-NN · se asigna al guardar` : 'Se asigna al guardar')
   const canSave = !!f.tipo_solicitud && !!f.solicitante_nombre?.trim() && !!f.descripcion?.trim() && !!f.fecha_recepcion
 
   return (
