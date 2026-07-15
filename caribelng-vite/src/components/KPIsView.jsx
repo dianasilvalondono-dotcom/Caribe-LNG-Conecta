@@ -209,7 +209,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
           const tVerdes = tActores.filter(a => a.semaforo === 'verde').length
           return (
             <div style={{ background: heroGrad, borderRadius: 18, padding: '20px 20px', marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+              
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: 'white' }}>{territorio}</h2>
               <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>
                 {territorio === 'Tolú' ? 'Terminal marítima · Sucre' : 'Planta regasificación · Antioquia'}
@@ -376,7 +376,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
   return (
     <div>
       <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+        
         <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Indicadores 2026</h1>
         <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Caribe LNG · Dirección de Asuntos Corporativos · Enero–Diciembre 2026</p>
       </div>
@@ -414,7 +414,7 @@ export default function KPIsView({ reportes, seguimiento, isAdmin, onDeleted, ag
         <div>
           {/* Scorecard summary */}
           <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1a3d7a 60%, #1565C0 100%)', borderRadius: 16, padding: '20px 22px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+            
             <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>Reconocimiento proporcional</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontSize: 36, fontWeight: 900, color: 'white' }}>{totalReconocimiento.toFixed(1)}%</span>

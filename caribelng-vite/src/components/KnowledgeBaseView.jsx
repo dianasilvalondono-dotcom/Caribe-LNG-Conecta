@@ -151,7 +151,7 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
   return (
     <div>
       <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+        
         <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Base de Conocimiento</h1>
         <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Documentos para el asistente IA · {docs.length} docs · ~{Math.round(docs.reduce((s,d) => s + (d.contenido?.length || 0), 0) / 1000)}K caracteres</p>
       </div>

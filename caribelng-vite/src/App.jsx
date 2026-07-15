@@ -1734,7 +1734,7 @@ export default function App() {
           <div>
             {/* Hero */}
             <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+              
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, position: 'relative', zIndex: 1 }}>
                 <div>
                   <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Base de Actores</h1>
@@ -2169,7 +2169,7 @@ export default function App() {
         {view === 'acuerdos' && (
           <div>
             <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #007A87 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '24px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+              
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
                 <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{agreements.filter(a => a.estado_code === 'cumplido').length} cumplidos de {agreements.length}</span>
@@ -2223,7 +2223,7 @@ export default function App() {
               const pendiente = cronograma.filter(c => c.estado === 'Pendiente').length
               return (
                 <div style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #0D47A1 50%, #1565C0 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '24px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                  
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: enProceso > 0 ? '#fbbf24' : '#34d399' }} />
                     <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>{enProceso} en proceso</span>
@@ -2368,7 +2368,7 @@ export default function App() {
             <div>
               {/* Hero */}
               <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #00BFB3 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
                   <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' }}>3 ejes de inversión social</span>
@@ -2533,7 +2533,7 @@ export default function App() {
         {view === 'input' && (
           <div>
             <div style={{ background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+              
               <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'white' }}>Registro de Campo</h1>
               <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Registros diarios, reportes semanales y evidencias</p>
             </div>
@@ -2731,8 +2731,8 @@ export default function App() {
             <div style={{ maxWidth: 1140, margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 16px' }}>
               {/* Header */}
               <div style={{ background: `linear-gradient(135deg, #0a2d5e 0%, ${C.navy} 40%, ${C.blue} 100%)`, borderRadius: 16, padding: '24px 28px', marginBottom: 20, color: 'white', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', right: -20, top: -20, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
-                <div style={{ position: 'absolute', right: 40, bottom: -40, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
+                
+                
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Dirección de Asuntos Corporativos</div>
                 <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5, marginBottom: 18 }}>Mesa de Dirección</div>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -2920,8 +2920,8 @@ export default function App() {
               return (
                 <div style={{ background: heroGrad, borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
                   {/* Decorative circles */}
-                  <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-                  <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                  
+                  
                   <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
                       <div>
@@ -3305,8 +3305,8 @@ export default function App() {
               {/* Hero */}
               <div style={{ background: `linear-gradient(135deg, #0a2d5e 0%, ${C.navy} 45%, ${C.blue} 100%)`,
                 borderRadius: 16, padding: '24px 28px', marginBottom: 20, color: 'white', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', right: -30, top: -30, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-                <div style={{ position: 'absolute', right: 60, bottom: -50, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                
+                
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Mi Territorio · Repositorio</div>
                 <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Reuniones · Plan de Gestión Social</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 16, maxWidth: 720, lineHeight: 1.55 }}>

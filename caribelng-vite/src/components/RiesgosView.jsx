@@ -62,8 +62,8 @@ export default function RiesgosView({ riesgos, riesgosLeg, cronoLeg, isAdmin, on
     <div>
       {/* Hero header */}
       <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 30%, #dc2626 70%, #f87171 100%)', borderRadius: 20, padding: isMobile ? '20px 16px' : '28px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
+        
+        
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 100, marginBottom: 10 }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: rojos.length > 0 ? '#fbbf24' : '#34d399', animation: rojos.length > 0 ? 'none' : 'none' }} />
