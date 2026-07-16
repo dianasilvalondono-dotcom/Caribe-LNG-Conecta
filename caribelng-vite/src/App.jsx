@@ -1712,8 +1712,8 @@ export default function App() {
             session={session}
             actorEdits={actorEdits}
             setView={setView}
-            setFilterS={setFilterS}
-            setFilterT={setFilterT}
+            setFilterS={(v) => { setFilterS(v); setFilterT('Todos'); setFilterR('Todos'); setFilterContacto('Todos'); setFilterPrioridad('Todos'); setSearch('') }}
+            setFilterT={(v) => { setFilterT(v); setFilterS('Todos'); setFilterR('Todos'); setFilterContacto('Todos'); setFilterPrioridad('Todos'); setSearch('') }}
             setSelectedActor={setSelectedActor}
             loadData={loadData}
             exportToExcel={exportToExcel}
@@ -3594,7 +3594,7 @@ export default function App() {
                     <a href={ev.foto_url} target="_blank" rel="noopener noreferrer"
                       style={{ display: 'block', marginTop: 16, background: '#EEF2FF', color: C.navy, border: `1px solid ${C.navy}`,
                         borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-                      Abrir archivo en SharePoint →
+                      Abrir archivo →
                     </a>
                   )}
                   {isAdmin && (
