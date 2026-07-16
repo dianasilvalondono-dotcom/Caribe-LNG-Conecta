@@ -176,11 +176,13 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
 
   const sc = SEMAFORO[actor.semaforo] || SEMAFORO.amarillo
 
+  // viewer = solo lectura: no propone ediciones (no ve la pestaña Editar)
+  const canEditActor = profile?.role !== 'viewer'
   const MODAL_TABS = [
     { id: 'perfil', label: 'Perfil' },
     { id: 'relacionamiento', label: 'Actividad' },
     { id: 'personal', label: 'Personal' },
-    { id: 'editar', label: 'Editar' },
+    ...(canEditActor ? [{ id: 'editar', label: 'Editar' }] : []),
   ]
 
   const tc = getTipoColor(actor.tipo)
