@@ -33,7 +33,8 @@ export default function ContratistasView({ profile, isAdmin }) {
   const [newCapac, setNewCapac] = useState(null) // contratista_id para nueva capacitación
   const [savingCapac, setSavingCapac] = useState(false)
 
-  const canEdit = profile?.role === 'admin' || profile?.role === 'supervisor' || profile?.role === 'gestora' || profile?.role === 'employee'
+  // Roles con escritura: admin, supervisor, gestora. viewer = solo lectura.
+  const canEdit = profile?.role === 'admin' || profile?.role === 'supervisor' || profile?.role === 'gestora'
   const canDelete = profile?.role === 'admin'
 
   async function loadAll() {

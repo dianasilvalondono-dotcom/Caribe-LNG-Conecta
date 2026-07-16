@@ -888,6 +888,7 @@ function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTer
                 const [files, setFiles] = useState([])
                 const [previews, setPreviews] = useState([])
                 const [desc, setDesc] = useState('')
+                const [descError, setDescError] = useState('')
                 const [geo, setGeo] = useState(null)
                 const [lugar, setLugar] = useState(null)
                 const [captureTime, setCaptureTime] = useState(null)
@@ -1003,11 +1004,17 @@ function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTer
                               </div>
                             </div>
                           )}
+                          {descError && (
+                            <div style={{ marginBottom: 8, background: '#FFCDD2', color: '#B71C1C', border: '1px solid #ef9a9a', borderRadius: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600 }}>
+                              {descError}
+                            </div>
+                          )}
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button onClick={reset} disabled={uploading}
                               style={{ flex: 1, background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8, padding: '10px', fontSize: 14, fontWeight: 600, cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.5 : 1 }}>Cancelar</button>
                             <button onClick={async () => {
-                              if (!desc.trim()) return alert('Agrega una descripción')
+                              if (!desc.trim()) { setDescError('Agrega una descripción.'); return }
+                              setDescError('')
                               setUploading(true)
                               setProgress({ done: 0, total, failed: 0 })
                               let failed = 0
@@ -1296,6 +1303,7 @@ export default function App() {
   const [dataLoading, setDataLoading] = useState(true)
   const [selectedActor, setSelectedActor] = useState(null)
   const [showNewActor, setShowNewActor] = useState(false)
+  const [newActorError, setNewActorError] = useState('')
   const [newActor, setNewActor] = useState({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '', recomendacion_dac: '' })
   const [search, setSearch] = useState('')
   const [filterT, setFilterT] = useState('Todos')
@@ -2018,21 +2026,28 @@ export default function App() {
                     </div>
                   )}
                 </div>
+                {/* Mensaje de validación inline */}
+                {newActorError && (
+                  <div style={{ marginTop: 12, background: '#FFCDD2', color: '#B71C1C', border: '1px solid #ef9a9a', borderRadius: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600 }}>
+                    {newActorError}
+                  </div>
+                )}
                 {/* Botones */}
                 <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'flex-end' }}>
-                  <button onClick={() => setShowNewActor(false)}
+                  <button onClick={() => { setShowNewActor(false); setNewActorError('') }}
                     style={{ background: '#f1f5f9', color: C.muted, border: 'none', borderRadius: 8,
                       padding: '8px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                     Cancelar
                   </button>
                   <button onClick={async () => {
-                    if (!newActor.nombre.trim()) return alert('El nombre es obligatorio')
+                    if (!newActor.nombre.trim()) { setNewActorError('El nombre es obligatorio.'); return }
+                    setNewActorError('')
                     try {
                       await addActor(newActor)
                       await loadData()
                       setShowNewActor(false)
                       setNewActor({ nombre: '', tipo: 'Político', territorio: 'Nacional', semaforo: 'rojo', posicion: 'Neutro', poder: 3, interes: 3, prioridad: '', riesgo: 'Bajo', owner: '', contacto: '', telefono: '', correo: '', que_hacemos: '', recomendacion_gestora: '', recomendacion_dac: '' })
-                    } catch (err) { alert('Error creando actor: ' + err.message) }
+                    } catch (err) { setNewActorError('Error creando actor: ' + err.message) }
                   }}
                     style={{ background: C.navy, color: 'white', border: 'none', borderRadius: 8,
                       padding: '8px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
@@ -2093,7 +2108,7 @@ export default function App() {
                 { key: 'verde', label: 'Relación estable', count: stats.verde, color: SEMAFORO.verde.color, bg: '#dcfce7' },
                 { key: 'amarillo', label: 'Requiere atención', count: stats.amarillo, color: SEMAFORO.amarillo.color, bg: '#fef9c3' },
                 { key: 'naranja', label: 'Riesgo moderado', count: stats.naranja, color: SEMAFORO.naranja.color, bg: '#ffedd5' },
-                { key: 'rojo', label: 'Por iniciar', count: stats.rojo, color: SEMAFORO.rojo.color, bg: '#fee2e2' },
+                { key: 'rojo', label: 'Acción inmediata', count: stats.rojo, color: SEMAFORO.rojo.color, bg: '#fee2e2' },
                 { key: 'monitor', label: 'Mapeado · Monitor', count: stats.monitor, color: SEMAFORO.monitor.color, bg: '#E2E8F0' },
               ].map(chip => {
                 const active = filterS === chip.key
