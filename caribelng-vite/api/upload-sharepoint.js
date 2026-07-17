@@ -45,12 +45,11 @@ async function requireAuth(req) {
     const { data: { user }, error } = await authClient.auth.getUser(token)
     if (error || !user) return null
     let role = null
-    const svcKey = process.env.SUPABASE_SERVICE_KEY
-    if (svcKey) {
-      const admin = createClient(supabaseUrl, svcKey)
-      const { data: prof } = await admin.from('profiles').select('role').eq('id', user.id).single()
+    try {
+      const asUser = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: `Bearer ${token}` } } })
+      const { data: prof } = await asUser.from('profiles').select('role').eq('id', user.id).single()
       role = prof?.role || null
-    }
+    } catch { role = null }
     return { user, role }
   } catch {
     return null
