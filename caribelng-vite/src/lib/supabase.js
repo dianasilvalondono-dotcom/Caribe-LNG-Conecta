@@ -557,8 +557,18 @@ export async function deleteEvidencia(id) {
   // Run in Supabase SQL editor:
   // CREATE POLICY "Admins can delete evidencias" ON evidencias FOR DELETE
   // USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'));
+  // Primero leemos la fila para saber qué archivo borrar en Storage y no dejar huérfanos.
+  const { data: row } = await supabase.from('evidencias').select('foto_url').eq('id', id).single()
   const { error } = await supabase.from('evidencias').delete().eq('id', id)
   if (error) throw error
+  // Borrar también el objeto en Storage (bucket 'archivos'); si falla, no rompe el borrado de la fila.
+  const url = row?.foto_url || ''
+  const marker = '/archivos/'
+  const at = url.indexOf(marker)
+  if (at !== -1) {
+    const path = decodeURIComponent(url.slice(at + marker.length).split('?')[0])
+    try { await supabase.storage.from('archivos').remove([path]) } catch { /* huérfano tolerable, no bloquea */ }
+  }
 }
 
 // ── Audit Log ────────────────────────────────────────────────────────────────
