@@ -709,7 +709,7 @@ function DailyForm({ myTerritorio, session, loadData, isMobile, registrosDiarios
                           const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
                           setGeoLugar(parts.join(', ') || data.display_name)
                           if (!lugarR) setLugarR(parts[0] || '')
-                        } catch {}
+                        } catch (e) { console.warn('Geocodificación inversa falló (lugar queda vacío):', e.message) }
                       },
                       () => {},
                       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
@@ -853,7 +853,7 @@ function DailyForm({ myTerritorio, session, loadData, isMobile, registrosDiarios
                             {r.foto_url && (() => {
                               const ext = (r.foto_url.split('.').pop() || '').toLowerCase().split('?')[0]
                               const isImg = /^(jpg|jpeg|png|gif|webp|heic|heif)$/.test(ext)
-                              if (isImg) return <img src={r.foto_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                              if (isImg) return <img src={r.foto_url} alt="" loading="lazy" decoding="async" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
                               return (
                                 <div style={{ width: 56, height: 56, borderRadius: 8, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, flexShrink: 0 }}>
                                   <span style={{ fontSize: 20, lineHeight: 1 }}>📄</span>
@@ -914,7 +914,7 @@ function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTer
                           const a = data.address || {}
                           const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
                           setLugar(parts.join(', ') || data.display_name)
-                        } catch {}
+                        } catch (e) { console.warn('Geocodificación inversa falló (lugar queda vacío):', e.message) }
                       },
                       () => {},
                       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
@@ -1086,7 +1086,7 @@ function EvidenciasTab({ isMobile, session, myTerritorio, evidencias, seesAllTer
                               <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
                                 style={{ background: C.card, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', cursor: 'pointer' }}>
                                 {isImg ? (
-                                  <img src={url} alt="" style={{ width: '100%', height: 140, objectFit: 'cover', background: '#F1F5F9' }} />
+                                  <img src={url} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: 140, objectFit: 'cover', background: '#F1F5F9' }} />
                                 ) : (
                                   <div style={{ width: '100%', height: 140, background: 'linear-gradient(135deg,#1E3A8A,#1565C0)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
                                     <div style={{ fontSize: 42, lineHeight: 1 }}>{docIcon}</div>
@@ -1127,7 +1127,7 @@ function CaptureForm({ myTerritorio, session, loadData, setShowEvidenciaCapture 
                     const a = data.address || {}
                     const parts = [a.village || a.hamlet || a.neighbourhood || a.suburb, a.town || a.city || a.municipality, a.county || a.state_district, a.state].filter(Boolean)
                     setLugar(parts.join(', ') || data.display_name || 'Ubicación desconocida')
-                  } catch { setLugar(null) }
+                  } catch (e) { console.warn('Geocodificación inversa falló (lugar queda vacío):', e.message); setLugar(null) }
                 }
 
                 const handleFile = (e) => {
@@ -2692,7 +2692,7 @@ export default function App() {
                       {ev.slice(0, 6).map(e => (
                         <div key={e.id} style={{ borderRadius: 8, overflow: 'hidden', aspectRatio: '1', position: 'relative', cursor: 'pointer' }}
                           onClick={() => window.open(e.foto_url, '_blank')}>
-                          <img src={e.foto_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={e.foto_url} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           {e.lugar && <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.6))', padding: '12px 4px 4px', fontSize: 9, color: 'white', lineHeight: 1.2 }}>{e.lugar.split(',')[0]}</div>}
                         </div>
                       ))}
@@ -3259,7 +3259,7 @@ export default function App() {
                 {evidencias.filter(e => seesAllTerritorios ? true : (myTerritorio ? e.territorio === myTerritorio : true)).slice(0, 10).map(ev => (
                   <div key={ev.id} onClick={() => setSelectedEvidencia(ev)}
                     style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}`, alignItems: 'flex-start', cursor: 'pointer' }}>
-                    <img src={ev.foto_url} alt="" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                    <img src={ev.foto_url} alt="" loading="lazy" decoding="async" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 2 }}>{ev.descripcion}</div>
                       <div style={{ fontSize: 12, color: C.subtle }}>

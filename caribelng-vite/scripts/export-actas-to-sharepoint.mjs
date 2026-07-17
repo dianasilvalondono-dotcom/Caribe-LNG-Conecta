@@ -6,8 +6,14 @@
 // USO:  node scripts/export-actas-to-sharepoint.mjs
 //       DRY_RUN=1 node scripts/export-actas-to-sharepoint.mjs   (solo genera, no sube)
 
-const SUPA_URL = process.env.VITE_SUPABASE_URL || 'https://vtvmlzgekfnptlqyiikr.supabase.co'
-const SUPA_ANON = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0dm1semdla2ZucHRscXlpaWtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDE0ODYsImV4cCI6MjA4ODY3NzQ4Nn0.A9YWCOCyTq1W_EwMsL5in_RD86TPrrzIgk8jFa8WZ6A'
+// SEC-15: sin fallback embebido. La anon key es pública por diseño, pero
+// hardcodearla dificulta la rotación; se lee siempre de entorno.
+const SUPA_URL = process.env.VITE_SUPABASE_URL
+const SUPA_ANON = process.env.VITE_SUPABASE_ANON_KEY
+if (!SUPA_URL || !SUPA_ANON) {
+  console.error('Faltan VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY en el entorno.')
+  process.exit(1)
+}
 const UPLOAD_URL = process.env.UPLOAD_URL || 'https://caribe-lng-conecta.vercel.app/api/upload-sharepoint'
 const DRY_RUN = process.env.DRY_RUN === '1'
 

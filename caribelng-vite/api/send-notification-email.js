@@ -8,7 +8,8 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Caribe LNG Conecta <alertas@caribelng.com>'
 const DEFAULT_TO = process.env.ALERT_TO_EMAIL || 'diana.silva@caribelng.com'
 
-// Auth: exige un JWT válido de Supabase en Authorization: Bearer <token>
+// Auth: exige un JWT válido de Supabase y devuelve {user, role}. El rol se lee
+// server-side con la service key (SEC-08/SEC-11): no basta con tener sesión.
 async function requireAuth(req) {
   const authHeader = req.headers.authorization || ''
   const token = authHeader.replace(/^Bearer\s+/i, '').trim()
@@ -20,7 +21,14 @@ async function requireAuth(req) {
     const supabase = createClient(supabaseUrl, supabaseAnonKey)
     const { data: { user }, error } = await supabase.auth.getUser(token)
     if (error || !user) return null
-    return user
+    let role = null
+    const svcKey = process.env.SUPABASE_SERVICE_KEY
+    if (svcKey) {
+      const admin = createClient(supabaseUrl, svcKey)
+      const { data: prof } = await admin.from('profiles').select('role').eq('id', user.id).single()
+      role = prof?.role || null
+    }
+    return { user, role }
   } catch {
     return null
   }
@@ -34,8 +42,12 @@ function isAllowedRecipient(email) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const user = await requireAuth(req)
-  if (!user) return res.status(401).json({ error: 'No autorizado' })
+  const auth = await requireAuth(req)
+  if (!auth) return res.status(401).json({ error: 'No autorizado' })
+  // Solo roles con función operativa pueden disparar notificaciones (evita abuso por 'viewer'). SEC-08.
+  if (!['admin', 'supervisor', 'gestora'].includes(auth.role)) {
+    return res.status(403).json({ error: 'Rol sin permiso para enviar notificaciones' })
+  }
 
   if (!RESEND_API_KEY) return res.status(500).json({ error: 'RESEND_API_KEY no configurado' })
 

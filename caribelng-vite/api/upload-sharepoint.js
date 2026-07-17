@@ -44,7 +44,14 @@ async function requireAuth(req) {
     const authClient = createClient(supabaseUrl, supabaseAnonKey)
     const { data: { user }, error } = await authClient.auth.getUser(token)
     if (error || !user) return null
-    return user
+    let role = null
+    const svcKey = process.env.SUPABASE_SERVICE_KEY
+    if (svcKey) {
+      const admin = createClient(supabaseUrl, svcKey)
+      const { data: prof } = await admin.from('profiles').select('role').eq('id', user.id).single()
+      role = prof?.role || null
+    }
+    return { user, role }
   } catch {
     return null
   }
@@ -64,8 +71,11 @@ async function getSiteId(token) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const user = await requireAuth(req)
-  if (!user) return res.status(401).json({ error: 'No autorizado' })
+  const auth = await requireAuth(req)
+  if (!auth) return res.status(401).json({ error: 'No autorizado' })
+  if (!['admin', 'supervisor', 'gestora'].includes(auth.role)) {
+    return res.status(403).json({ error: 'Rol sin permiso para subir archivos' }) // SEC-11
+  }
 
   try {
     const { fileName, territorio, fileBase64, type, contentType } = req.body

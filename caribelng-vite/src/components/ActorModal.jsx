@@ -110,7 +110,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
           semaforo_nuevo: actor.semaforo,
           userId: session.user.id,
         })
-      } catch {}
+      } catch (e) { console.error('No se pudo registrar la interacción de cambio de posición:', e.message) }
       // Notificar a Diana por email (solo si no es la propia Diana quien hizo el cambio)
       if (!isAdmin) {
         try {
@@ -123,7 +123,7 @@ export default function ActorModal({ actor, session, onClose, onUpdated, isAdmin
             recomendacion_gestora: actor.recomendacion_gestora,
           })
           sendNotificationEmail({ subject, html })
-        } catch {}
+        } catch (e) { console.error('No se pudo enviar el email de cambio de posición:', e.message) }
       }
       onUpdated()
       setPosicionInlineSaved(true)
