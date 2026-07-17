@@ -23,9 +23,16 @@ export default function LoginScreen() {
     if (!email) return
     setSending(true); setError('')
     try {
+      // SEC-05: solo correos corporativos pueden pedir código; shouldCreateUser:false
+      // evita que cualquier dominio externo obtenga sesión creando un usuario nuevo.
+      if (!/@caribelng\.com$/i.test(email.trim())) {
+        setError('Usa tu correo corporativo @caribelng.com')
+        setSending(false)
+        return
+      }
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin }
+        options: { emailRedirectTo: window.location.origin, shouldCreateUser: false }
       })
       if (error) throw error
       try { localStorage.setItem('clng_last_email', email) } catch {}

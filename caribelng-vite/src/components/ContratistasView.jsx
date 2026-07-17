@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase, removeStorageObjectsByUrl } from '../lib/supabase'
 import { C } from '../lib/constants'
 
 const TIPOS = ['Contratista', 'Proveedor', 'Aliado logístico', 'Aliado estratégico', 'Otro']
@@ -106,6 +106,14 @@ export default function ContratistasView({ profile, isAdmin }) {
 
   async function deleteContratista(c) {
     if (!confirm(`¿Borrar "${c.nombre}"? Sus capacitaciones también se borrarán.`)) return false
+    // Cumplir la promesa de la UI: borrar primero las capacitaciones hijas y sus
+    // evidencias en Storage, luego el contratista (COD-02).
+    const { data: caps } = await supabase.from('capacitaciones_contratistas').select('id, evidencia_url').eq('contratista_id', c.id)
+    if (caps?.length) {
+      await removeStorageObjectsByUrl(caps.map(k => k.evidencia_url))
+      const { error: eCap } = await supabase.from('capacitaciones_contratistas').delete().eq('contratista_id', c.id)
+      if (eCap) { alert('Error borrando capacitaciones: ' + eCap.message); return false }
+    }
     const { error } = await supabase.from('contratistas').delete().eq('id', c.id)
     if (error) { alert('Error: ' + error.message); return false }
     await loadAll()
@@ -138,6 +146,7 @@ export default function ContratistasView({ profile, isAdmin }) {
     if (!confirm('¿Borrar esta capacitación?')) return
     const { error } = await supabase.from('capacitaciones_contratistas').delete().eq('id', k.id)
     if (error) return alert('Error: ' + error.message)
+    await removeStorageObjectsByUrl(k.evidencia_url) // COD-21
     await loadAll()
   }
 

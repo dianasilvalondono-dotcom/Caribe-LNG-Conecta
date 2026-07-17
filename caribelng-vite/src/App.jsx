@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import * as XLSX from 'xlsx'
-import { BarChart, Bar as RBar, XAxis, YAxis, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts'
 
 import { supabase, signInWithMicrosoft, signOut, getProfile, upsertProfile,
          getActors, addActor, getAgreements, getInteractions, getAllInteractions, addInteraction, updateActor, updateAgreementAvance,
@@ -23,7 +21,9 @@ import { IconDashboard, IconPin, IconUsers, IconGlobe, IconHandshake, IconLeaf, 
          IconAlert, IconClipboard, IconTarget, IconEdit, IconBrain, IconCamera, IconBell, IconSearch, IconDownload, IconBook } from './components/Icons'
 
 // ── Export helper ────────────────────────────────────────────────────────────
-function exportToExcel(data, filename, sheetName = 'Datos') {
+async function exportToExcel(data, filename, sheetName = 'Datos') {
+  // Import dinámico: xlsx (~880 KB) sale del chunk inicial y solo se descarga al exportar (PERF-03).
+  const XLSX = await import('xlsx')
   const ws = XLSX.utils.json_to_sheet(data)
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, sheetName)
@@ -56,7 +56,7 @@ import Dashboard from './components/Dashboard'
 // ━━ Agreement card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AgreementCard({ ag, canEdit, onEdit, onAvanceAdded, isAdmin }) {
   const isT = ag.territorio === 'Tolú'
-  const stC = { cumplido: C.green, en_curso: C.accent, estructural: C.barbosa, por_estructurar: C.yellow }
+  const stC = { cumplido: C.green, en_curso: C.accent, por_estructurar: C.yellow }
   const [localAvance, setLocalAvance] = useState(ag.avance || 0)
   const [localEstadoCode, setLocalEstadoCode] = useState(ag.estado_code || 'por_estructurar')
   const [localNotas, setLocalNotas] = useState(ag.notas || '')
@@ -1437,7 +1437,7 @@ export default function App() {
         setComiteActas(await getComiteActas() || [])
       }
     } catch (err) { console.error('Error loading view data:', err) }
-  }, [session, cronograma.length, huellaSocial.length, riesgosLeg.length, kpisDac.length, knowledgeBase.length])
+  }, [session, cronograma.length, huellaSocial.length, riesgosLeg.length, kpisDac.length, knowledgeBase.length, allInteractions.length])
 
   // Full reload (for real-time updates)
   const loadData = useCallback(async () => {
@@ -1537,25 +1537,6 @@ export default function App() {
   )
   if (!session) return <LoginScreen />
 
-  const NAV = [
-    { id: 'dashboard', label: 'Dashboard', icon: <IconDashboard size={16} /> },
-    { id: 'miterritorio', label: 'Mi Territorio', icon: <IconPin size={16} />, children: [
-      { id: 'gestora', label: 'Vista General', icon: <IconPin size={16} /> },
-      { id: 'input', label: 'Registro de Campo', icon: <IconEdit size={16} /> },
-      { id: 'comite', label: 'Reuniones PGS', icon: <IconUsers size={16} /> },
-    ]},
-    { id: 'actores', label: 'Actores', icon: <IconUsers size={16} /> },
-    { id: 'estrategia', label: 'Estrategia Social', icon: <IconGlobe size={16} />, children: [
-      { id: 'huella', label: 'Huella Social', icon: <IconLeaf size={16} /> },
-      { id: 'kpis', label: 'Indicadores', icon: <IconTarget size={16} /> },
-    ]},
-    { id: 'riesgos', label: 'Riesgos Sociales', icon: <IconAlert size={16} /> },
-    { id: 'pqrs', label: 'PQRS', icon: <IconClipboard size={16} /> },
-    ...(isAdmin ? [{ id: 'knowledge', label: 'Base Conocimiento', icon: <IconBrain size={16} /> }] : []),
-    ...(isAdmin ? [{ id: 'dac', label: 'Dirección', icon: <IconBell size={16} /> }] : []),
-  ]
-  // helper: check if a view belongs to a dropdown group
-  const isInGroup = (groupId) => NAV.find(n => n.id === groupId)?.children?.some(c => c.id === view)
 
   if (isMobile && isPortrait) return (
     <div style={{ fontFamily: "Georgia, 'Times New Roman', serif",
@@ -2218,7 +2199,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {agreements.filter(a => a.territorio === t)
-                      .sort((a, b) => parseInt(a.id.slice(1)) - parseInt(b.id.slice(1)))
+                      .sort((a, b) => (parseInt(String(a.id).slice(1)) || 0) - (parseInt(String(b.id).slice(1)) || 0))
                       .map(ag => (
                       <AgreementCard key={ag.id} ag={ag} canEdit={isGestora} onEdit={() => {}} onAvanceAdded={loadData} isAdmin={isAdmin} />
                     ))}

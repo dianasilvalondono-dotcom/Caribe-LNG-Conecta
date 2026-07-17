@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 360" width="1120" height="360">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Courgette&amp;display=swap');
-    </style>
-  </defs>
+  
   <g transform="translate(0,260) scale(0.1,-0.1)" fill="#fff" stroke="none">
     <path d="M7568 2208 c-10 -7 -21 -24 -26 -38 -5 -14 -67 -316 -138 -672 -116
 -584 -127 -649 -115 -672 19 -34 69 -49 153 -44 64 3 73 7 98 35 15 17 29 36

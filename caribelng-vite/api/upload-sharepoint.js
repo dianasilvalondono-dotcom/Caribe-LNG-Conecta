@@ -71,6 +71,12 @@ export default async function handler(req, res) {
     const { fileName, territorio, fileBase64, type, contentType } = req.body
     if (!fileName || !fileBase64) return res.status(400).json({ error: 'Missing fileName or fileBase64' })
 
+    // SEC-12: sanear territorio y fileName para evitar path traversal en la ruta de Graph.
+    // Solo territorios conocidos; cualquier otro cae a 'General'. El nombre se limpia de separadores.
+    const TERRITORIOS_OK = ['Tolú', 'Barbosa', 'Nacional', 'General']
+    const safeTerritorio = TERRITORIOS_OK.includes(territorio) ? territorio : 'General'
+    const safeFileName = String(fileName).replace(/[\\/]/g, '_').replace(/\.\./g, '_')
+
     const token = await getAccessToken()
     const siteId = await getSiteId(token)
 
@@ -82,7 +88,7 @@ export default async function handler(req, res) {
     // Ambiental   -> Conecta/Ambiental/Documentos|PGRD|Compromisos/{Territorio}/{YYYY-MM}/file
     const now = new Date()
     const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    const t = territorio || 'General'
+    const t = safeTerritorio
     let folder
     if (type === 'reporte') folder = `Conecta/Reportes/${t}`
     else if (type === 'registro') folder = `Conecta/Registros/${t}/${month}`
@@ -91,7 +97,7 @@ export default async function handler(req, res) {
     else if (type === 'pgrd') folder = `Conecta/Ambiental/PGRD/${t}/${month}`
     else if (type === 'compromiso') folder = `Conecta/Ambiental/Compromisos/${t}/${month}`
     else folder = `Conecta/Evidencias/${t}/${month}`
-    const filePath = `${folder}/${fileName}`
+    const filePath = `${folder}/${safeFileName}`
 
     // Convert base64 to buffer
     const buffer = Buffer.from(fileBase64, 'base64')

@@ -106,9 +106,11 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
   const compromisosVencidos = compromisosPendientes.filter(s => new Date(s.fecha_pactada + 'T23:59:59') < today)
   const compromisosProximos = compromisosPendientes.filter(s => { const d = new Date(s.fecha_pactada); const diff = (d - today) / 86400000; return diff >= 0 && diff <= 7 }).sort((a, b) => new Date(a.fecha_pactada) - new Date(b.fecha_pactada))
 
+  // Actividad reciente como datos estructurados (label + highlight), NO como HTML —
+  // se renderiza con nodos React para evitar XSS almacenado (SEC-06).
   const recentActivity = [
-    ...seguimiento.slice().sort((a, b) => new Date(b.created_at || b.fecha_pactada) - new Date(a.created_at || a.fecha_pactada)).slice(0, 3).map(s => ({ icon: '', text: `Acuerdo <span style="color:#1565C0;font-weight:700">${s.acuerdo || ''}</span> — ${(s.compromiso || '').substring(0, 45)}`, time: s.fecha_pactada || '' })),
-    ...reportes.slice().sort((a, b) => Number(b.semana) - Number(a.semana)).slice(0, 2).map(r => ({ icon: '', text: `Reporte semanal <span style="color:#1565C0;font-weight:700">${r.territorio}</span> — Sem. ${r.semana}`, time: r.semana || '' })),
+    ...seguimiento.slice().sort((a, b) => new Date(b.created_at || b.fecha_pactada) - new Date(a.created_at || a.fecha_pactada)).slice(0, 3).map(s => ({ pre: 'Acuerdo ', hi: s.acuerdo || '', post: ` — ${(s.compromiso || '').substring(0, 45)}`, time: s.fecha_pactada || '' })),
+    ...reportes.slice().sort((a, b) => Number(b.semana) - Number(a.semana)).slice(0, 2).map(r => ({ pre: 'Reporte semanal ', hi: r.territorio || '', post: ` — Sem. ${r.semana}`, time: r.semana || '' })),
   ].slice(0, 5)
 
   const territorioGestora = {
@@ -302,7 +304,9 @@ export default function Dashboard({ stats, actors, agreements, riesgos, seguimie
                   {i < recentActivity.length - 1 && <div style={{ position: 'absolute', left: 15, top: 30, bottom: 0, width: 1, background: '#e2e8f0' }} />}
                   <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0, border: '2px solid white', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>{item.icon}</div>
                   <div style={{ paddingTop: 4, flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: C_text, lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: item.text }} />
+                    <div style={{ fontSize: 12, fontWeight: 600, color: C_text, lineHeight: 1.4 }}>
+                      {item.pre}<span style={{ color: '#1565C0', fontWeight: 700 }}>{item.hi}</span>{item.post}
+                    </div>
                     <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{item.time}</div>
                   </div>
                 </div>

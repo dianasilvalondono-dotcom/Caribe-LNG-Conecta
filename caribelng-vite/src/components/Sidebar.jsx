@@ -1,4 +1,4 @@
-import { C } from '../lib/constants'
+import { C, initials } from '../lib/constants'
 import AppLauncher from './AppLauncher'
 
 // ── Sidebar Conecta (estilo Bridge/Financiera) ──
@@ -22,9 +22,6 @@ const Icons = {
   logout:    () => s(<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>),
 }
 
-function initials(name) {
-  return (name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-}
 
 export default function Sidebar({ activeView, onNavigate, profile, session, onSignOut, onReplayTour, isAdmin, globalSearch, setGlobalSearch, showGlobalSearch, setShowGlobalSearch, searchResults }) {
   const sections = [

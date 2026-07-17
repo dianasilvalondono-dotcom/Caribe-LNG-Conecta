@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { supabase, uploadPqrsDoc } from '../lib/supabase'
+import { supabase, uploadPqrsDoc, removeStorageObjectsByUrl } from '../lib/supabase'
 import { C } from '../lib/constants'
 import PqrsRespuesta from './PqrsRespuesta'
 
@@ -183,6 +183,8 @@ export default function PqrsView({ profile, isAdmin }) {
     if (!confirm(`¿Borrar la solicitud ${p.codigo || ''}? No se puede deshacer.`)) return
     const { error } = await supabase.from('pqrs').delete().eq('id', p.id)
     if (error) return alert('No se pudo borrar: ' + error.message)
+    // Borrar también los PDF adjuntos (petición/respuesta firmada) de Storage (COD-03).
+    await removeStorageObjectsByUrl([p.peticion_url, p.respuesta_url])
     setSelected(null)
     await loadAll()
   }

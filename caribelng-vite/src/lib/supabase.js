@@ -323,8 +323,11 @@ export async function updateKnowledgeDoc(id, { titulo, categoria, contenido }) {
 }
 
 export async function deleteKnowledgeDoc(id) {
+  // Leer el archivo asociado para borrarlo también de Storage (COD-04).
+  const { data: row } = await supabase.from('knowledge_base').select('file_url').eq('id', id).single()
   const { error } = await supabase.from('knowledge_base').delete().eq('id', id)
   if (error) throw error
+  await removeStorageObjectsByUrl(row?.file_url)
 }
 
 // ── File Storage (Knowledge Base) ────────────────────────────────────────────
@@ -552,23 +555,25 @@ export async function getEvidencias(territorio) {
   return data || []
 }
 
+// Helper compartido: borra del bucket 'archivos' los objetos apuntados por una o
+// varias URLs públicas. Deriva el path de cada URL; si el remove falla, no rompe
+// el flujo (el huérfano es tolerable, pero el objetivo es no dejarlos). SEC/COD.
+export async function removeStorageObjectsByUrl(urls) {
+  const marker = '/archivos/'
+  const paths = (Array.isArray(urls) ? urls : [urls])
+    .filter(Boolean)
+    .map(u => { const at = String(u).indexOf(marker); return at === -1 ? null : decodeURIComponent(String(u).slice(at + marker.length).split('?')[0]) })
+    .filter(Boolean)
+  if (!paths.length) return
+  try { await supabase.storage.from('archivos').remove(paths) } catch { /* huérfano tolerable, no bloquea */ }
+}
+
 export async function deleteEvidencia(id) {
-  // NOTE: requires RLS policy for admin delete on evidencias table
-  // Run in Supabase SQL editor:
-  // CREATE POLICY "Admins can delete evidencias" ON evidencias FOR DELETE
-  // USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'));
-  // Primero leemos la fila para saber qué archivo borrar en Storage y no dejar huérfanos.
+  // NOTE: requires RLS policy for admin delete on evidencias table (ver auditoría SEC-02).
   const { data: row } = await supabase.from('evidencias').select('foto_url').eq('id', id).single()
   const { error } = await supabase.from('evidencias').delete().eq('id', id)
   if (error) throw error
-  // Borrar también el objeto en Storage (bucket 'archivos'); si falla, no rompe el borrado de la fila.
-  const url = row?.foto_url || ''
-  const marker = '/archivos/'
-  const at = url.indexOf(marker)
-  if (at !== -1) {
-    const path = decodeURIComponent(url.slice(at + marker.length).split('?')[0])
-    try { await supabase.storage.from('archivos').remove([path]) } catch { /* huérfano tolerable, no bloquea */ }
-  }
+  await removeStorageObjectsByUrl(row?.foto_url)
 }
 
 // ── Audit Log ────────────────────────────────────────────────────────────────

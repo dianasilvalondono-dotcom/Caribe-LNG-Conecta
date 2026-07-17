@@ -29,18 +29,24 @@ Fuente canónica: `Caribe LNG/01 Estrategia Institucional/20260708_Fundamentos_C
 ## Estructura de la app
 El archivo principal es `App.jsx`. Toda la UI vive ahí.
 
-### Vistas (tabs en el menú superior)
+### Vistas (menú lateral — fuente real: `src/components/Sidebar.jsx`)
 | id | Descripción |
 |----|-------------|
 | `dashboard` | Resumen ejecutivo con estadísticas y semáforos |
-| `actores` | Base de datos de 184 actores con filtros y modal de detalle |
-| `acuerdos` | 6 acuerdos territoriales (3 Tolú, 3 Barbosa) con seguimiento |
-| `cronograma` | Eventos 2026 por territorio, dos columnas lado a lado |
+| `gestora` | Mi Territorio — vista general/personal de gestora |
+| `input` | Registro de Campo (diario, reporte semanal, evidencias, escalar alerta) |
+| `comite` | Reuniones PGS (actas del comité) |
+| `actores` | Base de actores con filtros y modal de detalle (semáforo de 5 estados) |
+| `contratistas` | Contratistas/proveedores/aliados + capacitaciones |
 | `huella` | Huella Social Territorial por territorio, dos columnas |
-| `input` | Input Semanal para gestoras |
-| `kpis` | KPIs de Gestión Social con seguimiento trimestral |
+| `kpis` | Indicadores de Gestión Social con seguimiento trimestral |
 | `riesgos` | Mapa de riesgos, bow-tie y cronograma legislativo |
-| `gestora` | Vista personal para gestoras de territorio |
+| `pqrs` | PQRSF (petición/queja/reclamo/sugerencia/felicitación) con estados y respuesta |
+| `ambiental` | Gestión Ambiental (documentos EIA/permisos, PGRD, compromisos, bitácora) |
+| `knowledge` | Base de Conocimiento (solo admin) |
+| `dac` | Dirección — alertas, ediciones pendientes, historial (solo admin) |
+
+> Vistas `acuerdos` y `cronograma`: eliminadas del código (estaban huérfanas; el seguimiento de acuerdos vive en Huella Social y Mi Territorio).
 
 ## Design tokens (objeto C en App.jsx) — Brandbook 2026
 ```js
@@ -63,10 +69,12 @@ const C = {
 }
 ```
 
-## Roles de usuario
-- **admin** — acceso total, puede borrar, editar todo
-- **gestora** — puede registrar novedades, editar actores, ver su territorio
-- Campo en tabla `profiles`: `role`, `territorio`
+## Roles de usuario (columna `profiles.role`; + `territorio`, `ambiental_access`)
+- **admin** — acceso total: edita/borra todo, ve Dirección y Base de Conocimiento, aprueba ediciones.
+- **supervisor** — ve todos los territorios; no borra lo estratégico; no aprueba ediciones.
+- **gestora** — registra novedades y evidencias; edita actores de su territorio vía flujo de aprobación.
+- **viewer** — solo lectura (no crea/edita/propone).
+- Flag `ambiental_access='full'` da edición del módulo ambiental a no-admin.
 
 ## Tablas principales en Supabase
 - `actors` — actores del territorio
@@ -85,7 +93,7 @@ const C = {
 - Sin CSS externo ni módulos — todo en App.jsx
 - Layouts de dos columnas para comparar Tolú vs Barbosa
 - Banners clickeables que filtran contenido
-- Fuente: Montserrat
+- Fuente: **Georgia** (Brand Book v2.0; sin fuentes descargadas ni Google Fonts)
 
 ## Reglas para Claude
 

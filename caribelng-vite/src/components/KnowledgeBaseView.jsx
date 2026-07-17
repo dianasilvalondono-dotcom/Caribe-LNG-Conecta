@@ -1,13 +1,10 @@
 import { useState, useRef } from 'react'
-import * as pdfjsLib from 'pdfjs-dist'
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import mammoth from 'mammoth'
-import * as XLSX from 'xlsx'
-import JSZip from 'jszip'
 import { C } from '../lib/constants'
 import { addKnowledgeDoc, updateKnowledgeDoc, deleteKnowledgeDoc, uploadKnowledgeFile } from '../lib/supabase'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
+// pdfjs / mammoth / xlsx / jszip (~3 MB combinados) se importan DINÁMICAMENTE dentro
+// del handler de parseo para no cargarlos en el chunk inicial de todas las gestoras
+// que nunca abren la Base de Conocimiento (PERF-03 / PERF-04).
 
 export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
   const [editing, setEditing] = useState(null)
@@ -22,6 +19,9 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
     const buf = await file.arrayBuffer()
 
     if (ext === 'pdf') {
+      const pdfjsLib = await import('pdfjs-dist')
+      const { default: pdfjsWorker } = await import('pdfjs-dist/build/pdf.worker.min.mjs?url')
+      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
       const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise
       const pages = []
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -33,11 +33,13 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
     }
 
     if (ext === 'docx') {
+      const { default: mammoth } = await import('mammoth')
       const result = await mammoth.extractRawText({ arrayBuffer: buf })
       return result.value
     }
 
     if (ext === 'xlsx' || ext === 'xls') {
+      const XLSX = await import('xlsx')
       const wb = XLSX.read(buf, { type: 'array' })
       const lines = []
       for (const name of wb.SheetNames) {
@@ -49,6 +51,7 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
     }
 
     if (ext === 'pptx') {
+      const { default: JSZip } = await import('jszip')
       const zip = await JSZip.loadAsync(buf)
       const slides = []
       const slideFiles = Object.keys(zip.files)
@@ -103,7 +106,6 @@ export default function KnowledgeBaseView({ docs, onReload, isMobile }) {
       let fileUrl = null
       try {
         fileUrl = await uploadKnowledgeFile(file)
-        console.log('File uploaded:', fileUrl)
       } catch(err) {
         console.error('File storage error:', err)
         alert('Nota: el archivo no se pudo guardar en Storage (' + err.message + '), pero el texto se extraerá igual.')
